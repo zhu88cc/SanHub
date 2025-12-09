@@ -221,29 +221,12 @@ export default function ApiConfigPage() {
               placeholder="http://localhost:8000"
             />
             <div className="pt-3 border-t border-white/10">
-              <p className="text-xs text-white/40 mb-3">后台管理（用于显示全站配额）</p>
-              <div className="space-y-3">
-                <UrlInput
-                  label="后台 URL"
-                  value={config.soraBackendUrl}
-                  onChange={(v) => setConfig({ ...config, soraBackendUrl: v })}
-                  placeholder="https://video.lmmllm.com"
-                />
-                <UrlInput
-                  label="后台用户名"
-                  value={config.soraBackendUsername}
-                  onChange={(v) => setConfig({ ...config, soraBackendUsername: v })}
-                  placeholder="admin"
-                />
-                <ApiKeyInput
-                  label="后台密码"
-                  value={config.soraBackendPassword}
-                  onChange={(v) => setConfig({ ...config, soraBackendPassword: v })}
-                  keyName="soraBackend"
-                  showKey={showKeys['soraBackend'] || false}
-                  onToggleShow={() => toggleShowKey('soraBackend')}
-                />
-              </div>
+              <a
+                href="/admin/tokens"
+                className="text-sm text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                后台管理 & Token 导入 →
+              </a>
             </div>
           </div>
         </div>

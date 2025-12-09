@@ -392,11 +392,35 @@ export default function VideoGenerationPage() {
 
   return (
     <div className="max-w-7xl mx-auto space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">视频生成</h1>
-        <p className="text-muted-foreground mt-1">
-          支持普通生成、Remix、分镜等多种创作模式
-        </p>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold">视频生成</h1>
+          <p className="text-muted-foreground mt-1">
+            支持普通生成、Remix、分镜等多种创作模式
+          </p>
+        </div>
+        {/* 全站剩余配额 */}
+        {quota && (
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl px-4 py-3 flex items-center gap-3 shrink-0">
+            <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <Zap className="w-4 h-4 text-blue-400" />
+            </div>
+            <div>
+              <p className="text-sm text-white/60">全站剩余生成次数</p>
+              <div className="flex items-center gap-4">
+                <span className="text-white">
+                  <span className="text-lg font-medium text-blue-400">{quota.video10sCount}</span>
+                  <span className="text-white/40 text-sm ml-1">次 10s</span>
+                </span>
+                <span className="text-white/20">|</span>
+                <span className="text-white">
+                  <span className="text-lg font-medium text-purple-400">{quota.video15sCount}</span>
+                  <span className="text-white/40 text-sm ml-1">次 15s</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -665,31 +689,7 @@ export default function VideoGenerationPage() {
           </div>
         </div>
 
-        <div className="lg:col-span-2 space-y-4">
-          {/* 全站剩余配额 */}
-          {quota && (
-            <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-xl p-4">
-              <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-blue-500/20 rounded-lg flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-blue-400" />
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm text-white/60">全站剩余生成次数</p>
-                  <div className="flex items-center gap-4 mt-1">
-                    <span className="text-white">
-                      <span className="text-lg font-medium text-blue-400">{quota.video10sCount}</span>
-                      <span className="text-white/40 text-sm ml-1">次 10s</span>
-                    </span>
-                    <span className="text-white/20">|</span>
-                    <span className="text-white">
-                      <span className="text-lg font-medium text-purple-400">{quota.video15sCount}</span>
-                      <span className="text-white/40 text-sm ml-1">次 15s</span>
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
+        <div className="lg:col-span-2">
           <ResultGallery
             generations={generations}
             tasks={tasks}
