@@ -74,6 +74,7 @@ export default function VideoGenerationPage() {
   const [atCursorPosition, setAtCursorPosition] = useState<number | null>(null);
   const [showCharacterLibrary, setShowCharacterLibrary] = useState(false);
   const [librarySearchQuery, setLibrarySearchQuery] = useState('');
+  const [displayLimit, setDisplayLimit] = useState(20); // 初始显示20个
   const promptTextareaRef = useRef<HTMLTextAreaElement>(null);
   const remixPromptRef = useRef<HTMLTextAreaElement>(null);
 
@@ -716,6 +717,7 @@ export default function VideoGenerationPage() {
                           onClick={() => {
                             setShowCharacterLibrary(!showCharacterLibrary);
                             setLibrarySearchQuery('');
+                            setDisplayLimit(20); // 重置显示数量
                           }}
                           className="flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-pink-500/10 to-purple-500/10 border border-pink-500/20 rounded-md hover:from-pink-500/20 hover:to-purple-500/20 transition-all"
                         >
@@ -989,7 +991,7 @@ export default function VideoGenerationPage() {
 
             {/* Search */}
             {characterCards.length > 0 && (
-              <div className="px-3 sm:px-4 py-3 border-b border-white/10">
+              <div className="px-3 sm:px-4 py-3 border-b border-white/10 space-y-2">
                 <input
                   type="text"
                   value={librarySearchQuery}
@@ -997,6 +999,9 @@ export default function VideoGenerationPage() {
                   placeholder="搜索角色名..."
                   className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-pink-500/30 transition-colors"
                 />
+                <p className="text-xs text-white/40 text-center">
+                  共 {characterCards.length} 个角色卡
+                </p>
               </div>
             )}
 
@@ -1007,10 +1012,13 @@ export default function VideoGenerationPage() {
                   const filtered = characterCards.filter((card) => 
                     card.characterName.toLowerCase().includes(librarySearchQuery.toLowerCase())
                   );
+                  const displayed = filtered.slice(0, displayLimit);
+                  const hasMore = filtered.length > displayLimit;
                   
                   return filtered.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-2.5">
-                      {filtered.map((card) => (
+                    <>
+                      <div className="grid grid-cols-1 gap-2.5">
+                        {displayed.map((card) => (
                     <button
                       key={card.id}
                       type="button"
@@ -1037,8 +1045,22 @@ export default function VideoGenerationPage() {
                         <p className="text-xs sm:text-sm text-white/40 mt-0.5">点击添加到描述</p>
                       </div>
                     </button>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                      
+                      {/* 加载更多按钮 */}
+                      {hasMore && (
+                        <div className="mt-3 text-center">
+                          <button
+                            type="button"
+                            onClick={() => setDisplayLimit(prev => prev + 20)}
+                            className="px-4 py-2 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-pink-500/30 rounded-lg text-sm text-white/70 hover:text-white transition-all"
+                          >
+                            加载更多 ({filtered.length - displayLimit} 个)
+                          </button>
+                        </div>
+                      )}
+                    </>
                   ) : (
                     <div className="px-4 py-12 text-center">
                       <User className="w-12 h-12 mx-auto text-white/20 mb-3" />
