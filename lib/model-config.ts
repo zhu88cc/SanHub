@@ -7,7 +7,7 @@ export interface ImageModelConfig {
   id: string;
   name: string;
   description: string;
-  provider: 'gemini' | 'zimage';
+  provider: 'gemini' | 'zimage' | 'sora';
   channel?: 'modelscope' | 'gitee'; // zimage 专用
   apiModel: string; // 实际调用的模型名称
   features: {
@@ -42,6 +42,25 @@ export interface VideoModelConfig {
 // ========================================
 
 export const IMAGE_MODELS: ImageModelConfig[] = [
+  // Sora Image (优先显示)
+  {
+    id: 'sora-image',
+    name: 'Sora Image',
+    description: '高质量图像',
+    provider: 'sora',
+    apiModel: 'sora-image',
+    features: {
+      supportReferenceImage: true,
+      supportImageSize: false,
+    },
+    aspectRatios: ['1:1', '3:2', '2:3'],
+    resolutions: {
+      '1:1': '1024x1024',
+      '3:2': '1792x1024',
+      '2:3': '1024x1792',
+    },
+    defaultAspectRatio: '1:1',
+  },
   // Gemini Nano (Flash)
   {
     id: 'gemini-nano',

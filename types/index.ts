@@ -167,6 +167,8 @@ export interface SoraGenerateRequest {
   prompt: string;
   model: string; // sora-video-landscape-10s, sora-image 等
   files?: { mimeType: string; data: string }[];
+  style_id?: string; // 风格: festive, retro, news, selfie, handheld, anime
+  remix_target_id?: string; // Remix 视频 ID
 }
 
 // Gemini 生成请求

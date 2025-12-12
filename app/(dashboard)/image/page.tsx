@@ -73,9 +73,10 @@ export default function ImageGenerationPage() {
         const res = await fetch('/api/user/tasks');
         if (res.ok) {
           const data = await res.json();
-          // 加载图像类型的任务 (gemini 和 zimage)
+          // 加载图像类型的任务 (sora, gemini, zimage)
           const imageTasks: Task[] = (data.data || [])
             .filter((t: any) =>
+              t.type?.includes('sora-image') ||
               t.type?.includes('gemini') ||
               t.type?.includes('zimage') ||
               t.type?.includes('gitee')
@@ -271,7 +272,20 @@ export default function ImageGenerationPage() {
     let res: Response;
     let taskType: string;
 
-    if (currentModel.provider === 'gemini') {
+    if (currentModel.provider === 'sora') {
+      const size = getImageResolution(currentModel, aspectRatio);
+      res = await fetch('/api/generate/sora-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          prompt: taskPrompt,
+          model: currentModel.apiModel,
+          size,
+          input_image: images.length > 0 ? images[0].data : undefined,
+        }),
+      });
+      taskType = 'sora-image';
+    } else if (currentModel.provider === 'gemini') {
       res = await fetch('/api/generate/gemini', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

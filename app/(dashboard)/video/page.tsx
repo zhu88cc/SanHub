@@ -54,6 +54,17 @@ export default function VideoGenerationPage() {
   const [prompt, setPrompt] = useState('');
   const [files, setFiles] = useState<{ data: string; mimeType: string; preview: string }[]>([]);
 
+  // 视频风格选择 (仅普通模式可用)
+  const [selectedStyle, setSelectedStyle] = useState<string | null>(null);
+  const VIDEO_STYLES = [
+    { id: 'festive', name: 'Festive', image: '/styles/Festive.jpg' },
+    { id: 'retro', name: 'Retro', image: '/styles/Retro.jpg' },
+    { id: 'news', name: 'News', image: '/styles/News.jpg' },
+    { id: 'selfie', name: 'Selfie', image: '/styles/Selfie.jpg' },
+    { id: 'handheld', name: 'Handheld', image: '/styles/Handheld.jpg' },
+    { id: 'anime', name: 'Anime', image: '/styles/Anime.jpg' },
+  ];
+
   // Remix 模式
   const [remixUrl, setRemixUrl] = useState('');
 
@@ -378,13 +389,21 @@ export default function VideoGenerationPage() {
   const buildPrompt = (): string => {
     switch (creationMode) {
       case 'remix':
-        if (!remixUrl.trim()) return prompt.trim();
-        return `${remixUrl.trim()} ${prompt.trim()}`.trim();
+        return prompt.trim(); // remix_target_id 单独传递
       case 'storyboard':
         return storyboardPrompt.trim();
       default:
         return prompt.trim();
     }
+  };
+
+  // 提取 Remix Target ID
+  const extractRemixTargetId = (): string | undefined => {
+    if (creationMode !== 'remix' || !remixUrl.trim()) return undefined;
+    const url = remixUrl.trim();
+    // 支持完整 URL 或纯 ID
+    const match = url.match(/s_[a-f0-9]+/i);
+    return match ? match[0] : url;
   };
 
   // 构建files数组
@@ -411,7 +430,12 @@ export default function VideoGenerationPage() {
   };
 
   // 单次提交任务的核心函数
-  const submitSingleTask = async (taskPrompt: string, taskModel: string, taskFiles: { mimeType: string; data: string }[]) => {
+  const submitSingleTask = async (
+    taskPrompt: string,
+    taskModel: string,
+    taskFiles: { mimeType: string; data: string }[],
+    options?: { remixTargetId?: string; styleId?: string }
+  ) => {
     const res = await fetch('/api/generate/sora', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -419,6 +443,8 @@ export default function VideoGenerationPage() {
         model: taskModel,
         prompt: taskPrompt,
         files: taskFiles,
+        remix_target_id: options?.remixTargetId,
+        style_id: options?.styleId,
       }),
     });
 
@@ -456,8 +482,12 @@ export default function VideoGenerationPage() {
     const taskModel = buildSoraModelId(aspectRatio, duration);
     const taskFiles = buildFiles();
 
+    const remixTargetId = extractRemixTargetId();
+    // 仅普通模式可用风格
+    const styleId = creationMode === 'normal' ? selectedStyle || undefined : undefined;
+
     try {
-      await submitSingleTask(taskPrompt, taskModel, taskFiles);
+      await submitSingleTask(taskPrompt, taskModel, taskFiles, { remixTargetId, styleId });
 
       toast({
         title: '任务已提交',
@@ -498,11 +528,13 @@ export default function VideoGenerationPage() {
     const taskPrompt = buildPrompt();
     const taskModel = buildSoraModelId(aspectRatio, duration);
     const taskFiles = buildFiles();
+    const remixTargetId = extractRemixTargetId();
+    const styleId = creationMode === 'normal' ? selectedStyle || undefined : undefined;
 
     try {
       // 连续提交3个任务
       for (let i = 0; i < 3; i++) {
-        await submitSingleTask(taskPrompt, taskModel, taskFiles);
+        await submitSingleTask(taskPrompt, taskModel, taskFiles, { remixTargetId, styleId });
       }
 
       toast({
@@ -663,6 +695,55 @@ export default function VideoGenerationPage() {
               {/* Mode-specific inputs */}
               {creationMode === 'normal' && (
                 <>
+                  {/* 视频风格选择 */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <label className="text-xs text-white/50 uppercase tracking-wider">视频风格</label>
+                      {selectedStyle && (
+                        <button
+                          onClick={() => setSelectedStyle(null)}
+                          className="text-xs text-white/40 hover:text-white/60"
+                        >
+                          取消选择
+                        </button>
+                      )}
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      {VIDEO_STYLES.map((style) => (
+                        <button
+                          key={style.id}
+                          onClick={() => setSelectedStyle(selectedStyle === style.id ? null : style.id)}
+                          className={cn(
+                            'relative aspect-video rounded-lg overflow-hidden border-2 transition-all',
+                            selectedStyle === style.id
+                              ? 'border-purple-500 ring-2 ring-purple-500/30'
+                              : 'border-white/10 hover:border-white/30'
+                          )}
+                        >
+                          <img
+                            src={style.image}
+                            alt={style.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className={cn(
+                            'absolute inset-0 flex items-end justify-center pb-1.5 bg-gradient-to-t from-black/80 to-transparent',
+                            selectedStyle === style.id && 'from-purple-900/80'
+                          )}>
+                            <span className="text-[10px] font-medium text-white">{style.name}</span>
+                          </div>
+                          {selectedStyle === style.id && (
+                            <div className="absolute top-1 right-1 w-4 h-4 bg-purple-500 rounded-full flex items-center justify-center">
+                              <svg className="w-2.5 h-2.5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-white/30">可选：选择一个风格应用到生成的视频</p>
+                  </div>
+
                   {currentModel.features.supportReferenceFile && (
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">

@@ -11,6 +11,7 @@ import {
   AlertCircle,
   CheckCircle,
   Video,
+  X,
 } from 'lucide-react';
 import { cn, fileToBase64 } from '@/lib/utils';
 import { toast } from '@/components/ui/toaster';
@@ -43,6 +44,15 @@ export default function CharacterCardPage() {
   const [loadingCards, setLoadingCards] = useState(true);
   // 进行中的任务（在内存中，刷新后消失）
   const [pendingTasks, setPendingTasks] = useState<PendingTask[]>([]);
+  
+  // 角色卡参数
+  const [instructionSet, setInstructionSet] = useState('');
+  const [safetyInstructionSet, setSafetyInstructionSet] = useState('');
+  
+  // 时间戳滑块 (最多5秒范围)
+  const [timestampStart, setTimestampStart] = useState(0);
+  const [timestampEnd, setTimestampEnd] = useState(3);
+  const [videoDuration, setVideoDuration] = useState(15); // 视频时长，最大15秒
 
   // 加载角色卡列表（包括已完成和进行中的）
   const loadCharacterCards = useCallback(async () => {
@@ -64,6 +74,24 @@ export default function CharacterCardPage() {
       loadCharacterCards();
     }
   }, [session?.user, loadCharacterCards]);
+
+  // 轮询检查处理中的角色卡状态（包括 pendingTasks）
+  useEffect(() => {
+    const hasProcessingInCards = characterCards.some(card => card.status === 'processing');
+    const hasProcessingInTasks = pendingTasks.some(task => task.status === 'processing');
+    
+    if (!hasProcessingInCards && !hasProcessingInTasks) return;
+
+    const interval = setInterval(() => {
+      loadCharacterCards();
+      // 清理已完成或失败的 pendingTasks（已在 characterCards 中的）
+      setPendingTasks(prev => prev.filter(task => 
+        !characterCards.some(card => card.id === task.id)
+      ));
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [characterCards, pendingTasks, loadCharacterCards]);
 
   // 提取视频第一帧
   const extractFirstFrame = (videoUrl: string): Promise<string> => {
@@ -113,9 +141,9 @@ export default function CharacterCardPage() {
       return;
     }
 
-    // 限制文件大小 (20MB)
-    if (file.size > 20 * 1024 * 1024) {
-      setError('视频文件不能超过 20MB');
+    // 限制文件大小 (15MB)
+    if (file.size > 15 * 1024 * 1024) {
+      setError('视频文件不能超过 15MB');
       return;
     }
 
@@ -125,8 +153,33 @@ export default function CharacterCardPage() {
       const base64Data = data.split(',')[1] || data;
       const previewUrl = URL.createObjectURL(file);
       
+      // 获取视频时长
+      const duration = await new Promise<number>((resolve, reject) => {
+        const video = document.createElement('video');
+        video.src = previewUrl;
+        video.onloadedmetadata = () => {
+          resolve(video.duration);
+        };
+        video.onerror = () => reject(new Error('无法读取视频时长'));
+      });
+
+      // 限制视频时长最大15秒
+      if (duration > 15) {
+        URL.revokeObjectURL(previewUrl);
+        setError('视频时长不能超过 15 秒');
+        return;
+      }
+      
       // 提取第一帧
       const firstFrame = await extractFirstFrame(previewUrl);
+      
+      // 设置视频时长和重置滑块
+      const actualDuration = Math.min(duration, 15);
+      setVideoDuration(actualDuration);
+      setTimestampStart(0);
+      // 根据视频时长智能设置结束时间（推荐3秒范围）
+      const defaultEnd = Math.min(3, actualDuration);
+      setTimestampEnd(defaultEnd);
       
       setVideoFile({
         data: base64Data,
@@ -155,7 +208,7 @@ export default function CharacterCardPage() {
 
     setError('');
     setSubmitting(true);
-    setProgressMessages([]);
+    setProgressMessages(['正在提交任务...']);
 
     try {
       const response = await fetch('/api/generate/character-card', {
@@ -166,81 +219,40 @@ export default function CharacterCardPage() {
         body: JSON.stringify({
           videoBase64: videoFile.data,
           firstFrameBase64: videoFile.firstFrame,
+          instructionSet: instructionSet.trim() || undefined,
+          safetyInstructionSet: safetyInstructionSet.trim() || undefined,
+          timestamps: `${timestampStart},${timestampEnd}`,
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const data = await response.json();
         throw new Error(data.error || '生成失败');
       }
 
-      if (!response.body) {
-        throw new Error('响应没有 body');
-      }
+      // 添加到进行中任务列表
+      const newTask: PendingTask = {
+        id: data.data.id,
+        avatarUrl: videoFile?.firstFrame || '',
+        status: 'processing',
+        createdAt: Date.now(),
+      };
+      setPendingTasks(prev => [newTask, ...prev]);
 
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let buffer = '';
+      toast({
+        title: '任务已提交',
+        description: '角色卡正在后台生成，请稍候刷新页面查看结果',
+      });
 
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
+      // 清空视频
+      clearVideo();
 
-        buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+      // 5秒后自动刷新列表
+      setTimeout(() => {
+        loadCharacterCards();
+      }, 5000);
 
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6).trim();
-            if (data === '[DONE]') {
-              continue;
-            }
-
-            try {
-              const parsed = JSON.parse(data);
-              
-              if (parsed.event === 'progress') {
-                setProgressMessages(prev => [...prev, parsed.data.message]);
-              } else if (parsed.event === 'started') {
-                // 添加到进行中任务列表
-                const newTask: PendingTask = {
-                  id: parsed.data.id,
-                  avatarUrl: videoFile?.firstFrame || '',
-                  status: 'processing',
-                  createdAt: Date.now(),
-                };
-                setPendingTasks(prev => [newTask, ...prev]);
-              } else if (parsed.event === 'completed') {
-                // 从进行中任务列表移除
-                setPendingTasks(prev => prev.filter(t => t.id !== parsed.data.id));
-                toast({
-                  title: '角色卡生成成功',
-                  description: `角色: ${parsed.data.characterName}`,
-                });
-                // 刷新列表
-                loadCharacterCards();
-                // 清空视频
-                clearVideo();
-              } else if (parsed.event === 'error') {
-                // 从进行中任务列表移除（失败的任务已从数据库删除，刷新后消失）
-                setPendingTasks(prev => prev.map(t => 
-                  t.status === 'processing'
-                    ? { ...t, status: 'failed' as const, errorMessage: parsed.data.message }
-                    : t
-                ));
-                throw new Error(parsed.data.message);
-              }
-            } catch (parseError) {
-              if (parseError instanceof SyntaxError) {
-                // 忽略 JSON 解析错误
-              } else {
-                throw parseError;
-              }
-            }
-          }
-        }
-      }
     } catch (err) {
       setError(err instanceof Error ? err.message : '生成失败');
       toast({
@@ -250,6 +262,35 @@ export default function CharacterCardPage() {
       });
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  // 删除角色卡
+  const handleDeleteCard = async (cardId: string) => {
+    try {
+      const res = await fetch('/api/user/character-cards', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cardId }),
+      });
+
+      if (res.ok) {
+        // 从列表中移除
+        setCharacterCards(prev => prev.filter(c => c.id !== cardId));
+        toast({
+          title: '已删除',
+          description: '角色卡已删除',
+        });
+      } else {
+        const data = await res.json();
+        throw new Error(data.error || '删除失败');
+      }
+    } catch (err) {
+      toast({
+        title: '删除失败',
+        description: err instanceof Error ? err.message : '删除失败',
+        variant: 'destructive',
+      });
     }
   };
 
@@ -335,6 +376,92 @@ export default function CharacterCardPage() {
                     </div>
                   </div>
                 )}
+              </div>
+
+              {/* 角色信息 */}
+              <div className="space-y-3">
+                <label className="text-xs text-white/50 uppercase tracking-wider">角色信息（可选）</label>
+
+                <div>
+                  <label className="text-[10px] text-white/40 mb-1 block">
+                    时间戳提取区间 ({timestampStart}s - {timestampEnd}s)
+                  </label>
+                  <div className="space-y-3">
+                    <div className="relative h-2 bg-white/10 rounded-full">
+                      {/* 选中区间显示 */}
+                      <div
+                        className="absolute h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full"
+                        style={{
+                          left: `${(timestampStart / videoDuration) * 100}%`,
+                          width: `${((timestampEnd - timestampStart) / videoDuration) * 100}%`,
+                        }}
+                      />
+                    </div>
+                    <div className="flex gap-4">
+                      <div className="flex-1">
+                        <label className="text-[10px] text-white/30 mb-1 block">起始 (秒)</label>
+                        <input
+                          type="range"
+                          min={0}
+                          max={Math.min(timestampEnd - 0.5, videoDuration - 0.5)}
+                          step={0.5}
+                          value={timestampStart}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            setTimestampStart(val);
+                            // 确保范围不超过5秒
+                            if (timestampEnd - val > 5) {
+                              setTimestampEnd(val + 5);
+                            }
+                          }}
+                          className="w-full accent-pink-500"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        <label className="text-[10px] text-white/30 mb-1 block">结束 (秒)</label>
+                        <input
+                          type="range"
+                          min={Math.max(timestampStart + 0.5, 0.5)}
+                          max={videoDuration}
+                          step={0.5}
+                          value={timestampEnd}
+                          onChange={(e) => {
+                            const val = parseFloat(e.target.value);
+                            setTimestampEnd(val);
+                            // 确保范围不超过5秒
+                            if (val - timestampStart > 5) {
+                              setTimestampStart(val - 5);
+                            }
+                          }}
+                          className="w-full accent-purple-500"
+                        />
+                      </div>
+                    </div>
+                    <p className="text-[10px] text-white/30">
+                      选择区间: {(timestampEnd - timestampStart).toFixed(1)}s (最大5秒) · 视频时长: {videoDuration}s
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-white/40 mb-1 block">人物介绍 (instruction_set)</label>
+                  <textarea
+                    value={instructionSet}
+                    onChange={(e) => setInstructionSet(e.target.value)}
+                    placeholder="描述角色的性格、特点等..."
+                    className="w-full h-16 px-3 py-2 bg-white/5 border border-white/10 text-white rounded-lg resize-none focus:outline-none focus:border-white/30 placeholder:text-white/20 text-sm"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-[10px] text-white/40 mb-1 block">安全指令 (safety_instruction_set)</label>
+                  <textarea
+                    value={safetyInstructionSet}
+                    onChange={(e) => setSafetyInstructionSet(e.target.value)}
+                    placeholder="安全相关的指令..."
+                    className="w-full h-16 px-3 py-2 bg-white/5 border border-white/10 text-white rounded-lg resize-none focus:outline-none focus:border-white/30 placeholder:text-white/20 text-sm"
+                  />
+                </div>
               </div>
 
               {/* 进度消息 */}
@@ -423,7 +550,7 @@ export default function CharacterCardPage() {
                     })
                     .map((card) => {
                       console.log('[Render] CharacterCard:', card);
-                      return <CharacterCardItem key={card.id} card={card} />;
+                      return <CharacterCardItem key={card.id} card={card} onDelete={handleDeleteCard} />;
                     })}
                 </div>
               )}
@@ -489,7 +616,7 @@ function PendingTaskItem({ task }: { task: PendingTask }) {
 }
 
 // 角色卡卡片组件
-function CharacterCardItem({ card }: { card: CharacterCard }) {
+function CharacterCardItem({ card, onDelete }: { card: CharacterCard; onDelete?: (id: string) => void }) {
   const statusColors = {
     pending: 'bg-yellow-500/20 text-yellow-400',
     processing: 'bg-blue-500/20 text-blue-400',
@@ -505,19 +632,44 @@ function CharacterCardItem({ card }: { card: CharacterCard }) {
   };
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all">
+    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all group">
       {/* 头像区域 */}
-      <div className="aspect-square bg-gradient-to-br from-pink-500/10 to-purple-500/10 flex items-center justify-center">
+      <div className={cn(
+        "aspect-square flex items-center justify-center relative",
+        card.status === 'failed' 
+          ? "bg-gradient-to-br from-red-500/10 to-red-900/10" 
+          : "bg-gradient-to-br from-pink-500/10 to-purple-500/10"
+      )}>
         {card.avatarUrl ? (
-          <img
-            src={card.avatarUrl}
-            alt={card.characterName}
-            className="w-full h-full object-cover"
-          />
+          <>
+            <img
+              src={card.avatarUrl}
+              alt={card.characterName}
+              className={cn("w-full h-full object-cover", card.status === 'failed' && "opacity-50")}
+            />
+            {card.status === 'failed' && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                <X className="w-10 h-10 text-red-400" />
+              </div>
+            )}
+          </>
         ) : card.status === 'processing' || card.status === 'pending' ? (
           <Loader2 className="w-12 h-12 text-white/30 animate-spin" />
+        ) : card.status === 'failed' ? (
+          <X className="w-12 h-12 text-red-400/50" />
         ) : (
           <User className="w-16 h-16 text-white/20" />
+        )}
+        
+        {/* 删除按钮 */}
+        {onDelete && (
+          <button
+            onClick={() => onDelete(card.id)}
+            className="absolute top-2 right-2 p-1.5 bg-black/50 hover:bg-red-500/80 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+            title="删除"
+          >
+            <Trash2 className="w-4 h-4 text-white" />
+          </button>
         )}
       </div>
 
@@ -525,7 +677,7 @@ function CharacterCardItem({ card }: { card: CharacterCard }) {
       <div className="p-3 space-y-2">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-medium text-white truncate">
-            {card.characterName || '生成中...'}
+            {card.characterName || (card.status === 'failed' ? '生成失败' : '生成中...')}
           </h3>
           <span className={cn('px-2 py-0.5 text-[10px] rounded-md', statusColors[card.status])}>
             {statusLabels[card.status]}
@@ -533,7 +685,9 @@ function CharacterCardItem({ card }: { card: CharacterCard }) {
         </div>
         <p className="text-[10px] text-white/40">{formatDate(card.createdAt)}</p>
         {card.errorMessage && (
-          <p className="text-[10px] text-red-400 truncate">{card.errorMessage}</p>
+          <p className="text-[10px] text-red-400 line-clamp-2" title={card.errorMessage}>
+            {card.errorMessage}
+          </p>
         )}
       </div>
     </div>
