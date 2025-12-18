@@ -962,23 +962,6 @@ export default function HistoryPage() {
                         </a>
                       </div>
                     )}
-
-                    {typeof selected.params?.revised_prompt === 'string' && selected.params.revised_prompt && (
-                      <div className="flex items-start gap-2">
-                        <span className="text-white/40 text-xs shrink-0 w-14">改写</span>
-                        <span className="text-white/70 text-xs break-words flex-1">{selected.params.revised_prompt}</span>
-                        <button
-                          onClick={() => {
-                            navigator.clipboard.writeText(selected.params.revised_prompt as string);
-                            toast({ title: '已复制改写提示词' });
-                          }}
-                          className="shrink-0 p-1.5 text-white/40 hover:text-white/80 hover:bg-white/10 rounded-lg transition-colors"
-                          title="复制改写提示词"
-                        >
-                          <Copy className="w-4 h-4" />
-                        </button>
-                      </div>
-                    )}
                   </div>
                 </div>
                 <div className="flex gap-2 shrink-0 w-full md:w-auto">
