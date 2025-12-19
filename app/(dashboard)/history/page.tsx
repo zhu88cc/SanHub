@@ -29,6 +29,7 @@ import { toast } from '@/components/ui/toaster';
 import type { Generation, CharacterCard } from '@/types';
 import { formatDate, truncate } from '@/lib/utils';
 import { downloadAsset } from '@/lib/download';
+import { IMAGE_MODELS } from '@/lib/model-config';
 
 // 任务类型
 interface Task {
@@ -52,7 +53,20 @@ const TYPE_BADGE_MAP: Record<string, { label: string; icon: any }> = {
   'character-card': { label: '角色卡', icon: User },
 };
 
+const IMAGE_MODEL_LABELS = new Map(
+  IMAGE_MODELS.map((model) => [model.apiModel, model.name])
+);
+
 const getTypeBadge = (type: string) => TYPE_BADGE_MAP[type] || { label: type, icon: Palette };
+const getGenerationBadge = (gen: Generation) => {
+  if (gen.type === 'zimage-image' || gen.type === 'gitee-image') {
+    const modelLabel = gen.params?.model ? IMAGE_MODEL_LABELS.get(gen.params.model) : undefined;
+    if (modelLabel) {
+      return { label: modelLabel, icon: Image };
+    }
+  }
+  return getTypeBadge(gen.type);
+};
 
 // 骨架屏组件
 const SkeletonCard = () => (
@@ -132,7 +146,7 @@ const GenerationCard = memo(function GenerationCard({
   onSelect,
   onView,
 }: GenerationCardProps) {
-  const badge = getTypeBadge(gen.type);
+  const badge = getGenerationBadge(gen);
   const videoRef = useRef<HTMLVideoElement>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
   
@@ -909,7 +923,7 @@ export default function HistoryPage() {
                     <span className="text-white/40 text-xs">{selected.cost} 积分</span>
                     <span className="text-white/20 hidden md:inline">·</span>
                     <span className="px-2 py-0.5 bg-white/10 text-white/60 text-xs rounded">
-                      {getTypeBadge(selected.type).label}
+                      {getGenerationBadge(selected).label}
                     </span>
                   </div>
                   <div className="mt-3 space-y-2">
