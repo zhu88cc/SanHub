@@ -79,6 +79,7 @@ export default function VideoGenerationPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [keepPrompt, setKeepPrompt] = useState(false);
 
   // 角色卡选择
   const [characterCards, setCharacterCards] = useState<CharacterCard[]>([]);
@@ -475,18 +476,20 @@ export default function VideoGenerationPage() {
         description: '任务已加入队列，可继续提交新任务',
       });
 
-      // 清空输入
-      switch (creationMode) {
-        case 'remix':
-          setRemixUrl('');
-          setPrompt('');
-          break;
-        case 'storyboard':
-          setStoryboardPrompt('');
-          break;
-        default:
-          setPrompt('');
-          clearFiles();
+      // 清空输入（如果勾选了保留提示词则不清空）
+      if (!keepPrompt) {
+        switch (creationMode) {
+          case 'remix':
+            setRemixUrl('');
+            setPrompt('');
+            break;
+          case 'storyboard':
+            setStoryboardPrompt('');
+            break;
+          default:
+            setPrompt('');
+            clearFiles();
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '生成失败');
@@ -523,18 +526,20 @@ export default function VideoGenerationPage() {
         description: '已提交 3 个相同任务，等待结果中...',
       });
 
-      // 清空输入
-      switch (creationMode) {
-        case 'remix':
-          setRemixUrl('');
-          setPrompt('');
-          break;
-        case 'storyboard':
-          setStoryboardPrompt('');
-          break;
-        default:
-          setPrompt('');
-          clearFiles();
+      // 清空输入（如果勾选了保留提示词则不清空）
+      if (!keepPrompt) {
+        switch (creationMode) {
+          case 'remix':
+            setRemixUrl('');
+            setPrompt('');
+            break;
+          case 'storyboard':
+            setStoryboardPrompt('');
+            break;
+          default:
+            setPrompt('');
+            clearFiles();
+        }
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : '生成失败');
@@ -849,6 +854,17 @@ export default function VideoGenerationPage() {
                   </p>
                 </div>
               )}
+
+              {/* Keep Prompt Checkbox */}
+              <label className="flex items-center gap-2 cursor-pointer select-none">
+                <input
+                  type="checkbox"
+                  checked={keepPrompt}
+                  onChange={(e) => setKeepPrompt(e.target.checked)}
+                  className="w-4 h-4 rounded border-white/20 bg-white/5 text-white accent-purple-500 cursor-pointer"
+                />
+                <span className="text-sm text-white/50">保留提示词</span>
+              </label>
 
               {/* Error */}
               {error && (
