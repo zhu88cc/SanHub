@@ -285,7 +285,7 @@ export const IMAGE_MODELS: ImageModelConfig[] = [
   {
     id: 'seedvr2-upscale',
     name: 'SeedVR2 HD',
-    description: 'Gitee AI 超清修复 · <=5MB, <=1440px · 常见报错: Image file size exceeds 5MB limit / 分辨率不支持',
+    description: 'Gitee AI 超清修复 · <=5MB, <=1440px',
     provider: 'zimage',
     channel: 'gitee',
     apiModel: 'SeedVR2-3B',
