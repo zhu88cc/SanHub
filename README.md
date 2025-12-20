@@ -20,6 +20,7 @@
 - 支持 16:9、9:16、1:1 多种比例
 - 参考图/视频驱动生成
 - 实时任务状态追踪
+- **三种创作模式**：普通生成、视频 Remix、视频分镜
 
 ### 🎨 图像生成
 - **Gemini Nano** - 极速出图模式
@@ -28,11 +29,25 @@
 - **Gitee AI** - 国产 AI 图像服务
 - 风格迁移与编辑
 
+### �览️ 工作空间
+- 可视化工作流画布
+- 节点拖拽与连接
+- 多工作空间管理
+- AI 对话节点集成
+
+### 📝 提示词模板
+- 11 种预设创作模板
+- 3x3 电影镜头图、分镜故事板
+- 角色情绪板、场景概念图
+- 剧本大纲、场景对话生成
+- 电影海报风格等
+
 ### 🖼️ 作品广场
 - 瀑布流浏览社区作品
 - 热门 / 最新排序
 - 一键复制提示词
 - 作品公开分享
+- 用户主页展示
 
 ### 🎤 角色卡
 - 视频驱动角色创建
@@ -42,6 +57,8 @@
 ### 🛠️ 系统管理
 - 用户管理与权限控制
 - API 密钥配置
+- **AI 对话模型管理**
+- **Sora Token 管理**
 - 积分定价自定义
 - 系统公告发布
 - 注册开关控制
@@ -163,19 +180,27 @@ sanhub/
 │   ├── (dashboard)/         # 用户面板
 │   │   ├── video/           # 视频生成
 │   │   ├── image/           # 图像生成
+│   │   ├── workspace/       # 工作空间
 │   │   ├── gallery/         # 作品广场
+│   │   ├── square/          # 社区广场
 │   │   ├── history/         # 历史记录
 │   │   └── settings/        # 用户设置
 │   ├── admin/               # 管理后台
 │   │   ├── users/           # 用户管理
 │   │   ├── api/             # API 配置
+│   │   ├── models/          # AI 模型管理
+│   │   ├── tokens/          # Sora Token 管理
 │   │   ├── pricing/         # 定价设置
 │   │   └── announcement/    # 公告管理
 │   └── api/                 # API 路由
 ├── components/
 │   ├── ui/                  # 基础 UI 组件
 │   ├── generator/           # 生成器组件
+│   ├── workspace/           # 工作空间组件
 │   └── layout/              # 布局组件
+├── data/
+│   ├── media/               # 媒体文件存储
+│   └── prompts/             # 提示词模板
 ├── lib/
 │   ├── db.ts                # 数据库操作
 │   ├── db-adapter.ts        # 数据库适配器
@@ -183,6 +208,7 @@ sanhub/
 │   ├── sora.ts              # Sora API 封装
 │   ├── gemini.ts            # Gemini API 封装
 │   ├── zimage.ts            # Z-Image API 封装
+│   ├── model-config.ts      # 模型配置
 │   └── picui.ts             # PicUI 图床 API
 └── types/                   # TypeScript 类型定义
 ```
