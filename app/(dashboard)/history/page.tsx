@@ -393,6 +393,9 @@ export default function HistoryPage() {
     const controller = new AbortController();
     abortControllersRef.current.set(taskId, controller);
 
+    const maxConsecutiveErrors = 5;
+    let consecutiveErrors = 0;
+
     const poll = async () => {
       if (controller.signal.aborted) return;
 
@@ -408,6 +411,8 @@ export default function HistoryPage() {
           return;
         }
 
+        // Reset error counter on success
+        consecutiveErrors = 0;
         const status = data.data.status;
 
         if (status === 'completed' || status === 'failed' || status === 'cancelled') {
@@ -428,9 +433,24 @@ export default function HistoryPage() {
           setTimeout(poll, 5000);
         }
       } catch (err) {
-        if ((err as Error).name !== 'AbortError') {
-          abortControllersRef.current.delete(taskId);
+        if ((err as Error).name === 'AbortError') return;
+        consecutiveErrors++;
+        const errMsg = (err as Error).message || '网络错误';
+        // Retry on transient network errors
+        const isTransientError =
+          errMsg.includes('socket') ||
+          errMsg.includes('Socket') ||
+          errMsg.includes('ECONNRESET') ||
+          errMsg.includes('ETIMEDOUT') ||
+          errMsg.includes('network') ||
+          errMsg.includes('fetch');
+        if (isTransientError && consecutiveErrors < maxConsecutiveErrors) {
+          console.warn(`[Poll] Transient error (${consecutiveErrors}/${maxConsecutiveErrors}), retrying...`, errMsg);
+          const delay = Math.min(5000 * Math.pow(2, consecutiveErrors - 1), 60000);
+          setTimeout(poll, delay);
+          return;
         }
+        abortControllersRef.current.delete(taskId);
       }
     };
 
