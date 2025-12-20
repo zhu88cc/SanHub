@@ -427,8 +427,28 @@ export default function WorkspaceEditorPage() {
         ...prev,
         { id: `${fromNode.id}-${toNode.id}`, from: fromNode.id, to: toNode.id },
       ]);
+    } else if ((toNode.type === 'image' || toNode.type === 'video') && (fromNode.type === 'chat' || fromNode.type === 'prompt-template')) {
+      // Prompt/chat connection: replace only prompt/chat connections, keep image connections
+      setEdgesDirty((prev) => [
+        ...prev.filter((edge) => {
+          if (edge.to !== nodeId) return true;
+          const sourceNode = nodes.find((n) => n.id === edge.from);
+          return sourceNode?.type === 'image'; // Keep image connections
+        }),
+        { id: `${fromNode.id}-${toNode.id}`, from: fromNode.id, to: toNode.id },
+      ]);
+    } else if ((toNode.type === 'image' || toNode.type === 'video') && fromNode.type === 'image') {
+      // Image connection: replace only image connections, keep prompt/chat connections
+      setEdgesDirty((prev) => [
+        ...prev.filter((edge) => {
+          if (edge.to !== nodeId) return true;
+          const sourceNode = nodes.find((n) => n.id === edge.from);
+          return sourceNode?.type !== 'image'; // Keep non-image connections
+        }),
+        { id: `${fromNode.id}-${toNode.id}`, from: fromNode.id, to: toNode.id },
+      ]);
     } else {
-      // For other connections, replace existing input
+      // For other connections, replace existing input of same type
       setEdgesDirty((prev) => [
         ...prev.filter((edge) => edge.to !== nodeId),
         { id: `${fromNode.id}-${toNode.id}`, from: fromNode.id, to: toNode.id },
