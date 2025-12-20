@@ -17,6 +17,10 @@ import {
   Wand2,
   ZoomIn,
   ZoomOut,
+  MessageSquare,
+  FileText,
+  Send,
+  Image as ImageIcon,
 } from 'lucide-react';
 import { toast } from '@/components/ui/toaster';
 import { cn } from '@/lib/utils';
@@ -30,7 +34,15 @@ import {
   ImageModelConfig,
   VideoModelConfig,
 } from '@/lib/model-config';
-import type { CharacterCard, WorkspaceData, WorkspaceEdge, WorkspaceNode, WorkspaceNodeType } from '@/types';
+import type { CharacterCard, WorkspaceData, WorkspaceEdge, WorkspaceNode, WorkspaceNodeType, ChatModel } from '@/types';
+
+interface PromptTemplate {
+  id: string;
+  name: string;
+  content: string;
+}
+
+const CHAT_MAX_LENGTH = 2000;
 
 const CANVAS_WIDTH = 2400;
 const CANVAS_HEIGHT = 1400;
@@ -67,6 +79,8 @@ export default function WorkspaceEditorPage() {
     x: number;
     y: number;
   } | null>(null);
+  const [chatModels, setChatModels] = useState<ChatModel[]>([]);
+  const [promptTemplates, setPromptTemplates] = useState<PromptTemplate[]>([]);
   const nodesRef = useRef<WorkspaceNode[]>([]);
   const edgesRef = useRef<WorkspaceEdge[]>([]);
 
@@ -154,6 +168,34 @@ export default function WorkspaceEditorPage() {
   }, []);
 
   useEffect(() => {
+    const loadChatModels = async () => {
+      try {
+        const res = await fetch('/api/chat/models');
+        if (!res.ok) return;
+        const data = await res.json();
+        setChatModels((data.data || []).filter((m: ChatModel) => m.enabled));
+      } catch (error) {
+        console.error('Failed to load chat models:', error);
+      }
+    };
+    loadChatModels();
+  }, []);
+
+  useEffect(() => {
+    const loadPromptTemplates = async () => {
+      try {
+        const res = await fetch('/api/prompts');
+        if (!res.ok) return;
+        const data = await res.json();
+        setPromptTemplates(data.data || []);
+      } catch (error) {
+        console.error('Failed to load prompt templates:', error);
+      }
+    };
+    loadPromptTemplates();
+  }, []);
+
+  useEffect(() => {
     return () => {
       abortControllersRef.current.forEach((controller) => controller.abort());
       abortControllersRef.current.clear();
@@ -206,22 +248,53 @@ export default function WorkspaceEditorPage() {
           },
         } as WorkspaceNode;
       }
-      const model = VIDEO_MODELS[0];
+      if (type === 'video') {
+        const model = VIDEO_MODELS[0];
+        return {
+          id,
+          type,
+          name: '视频生成',
+          position,
+          data: {
+            modelId: model.id,
+            aspectRatio: model.defaultAspectRatio,
+            duration: model.defaultDuration,
+            prompt: '',
+            status: 'idle',
+          },
+        } as WorkspaceNode;
+      }
+      if (type === 'chat') {
+        return {
+          id,
+          type,
+          name: '聊天节点',
+          position,
+          data: {
+            prompt: '',
+            chatModelId: chatModels[0]?.id || '',
+            chatMessages: [],
+            chatOutput: '',
+            inputImages: [],
+            status: 'idle',
+          },
+        } as WorkspaceNode;
+      }
+      // prompt-template
       return {
         id,
         type,
-        name: '视频生成',
+        name: '提示词模板',
         position,
         data: {
-          modelId: model.id,
-          aspectRatio: model.defaultAspectRatio,
-          duration: model.defaultDuration,
           prompt: '',
+          templateId: '',
+          templateOutput: '',
           status: 'idle',
         },
       } as WorkspaceNode;
     },
-    []
+    [chatModels]
   );
 
   const addNodeAt = useCallback(
@@ -298,33 +371,69 @@ export default function WorkspaceEditorPage() {
     const toNode = nodes.find((node) => node.id === nodeId);
     if (!fromNode || !toNode) return;
 
+    // Connection rules:
+    // - chat node: can receive from image nodes (multiple), output to image/video nodes
+    // - prompt-template node: no input, output to image/video/chat nodes
+    // - image node: can receive from image/chat/prompt-template nodes
+    // - video node: can receive from image/chat/prompt-template nodes
+
     if (toNode.type === 'video') {
-      if (fromNode.type !== 'image') {
-        toast({ title: '仅支持图片节点连接视频节点' });
+      if (fromNode.type !== 'image' && fromNode.type !== 'chat' && fromNode.type !== 'prompt-template') {
+        toast({ title: '视频节点仅支持图片、聊天或模板节点连接' });
         setConnectingFrom(null);
         return;
       }
     } else if (toNode.type === 'image') {
-      if (fromNode.type !== 'image') {
-        toast({ title: '仅支持图片节点作为参考图' });
+      if (fromNode.type !== 'image' && fromNode.type !== 'chat' && fromNode.type !== 'prompt-template') {
+        toast({ title: '图片节点仅支持图片、聊天或模板节点连接' });
         setConnectingFrom(null);
         return;
       }
-      const targetModel = getImageModelById(toNode.data.modelId) || IMAGE_MODELS[0];
-      if (!targetModel.features.supportReferenceImage) {
-        toast({ title: '该模型不支持参考图' });
+      if (fromNode.type === 'image') {
+        const targetModel = getImageModelById(toNode.data.modelId || '') || IMAGE_MODELS[0];
+        if (!targetModel.features.supportReferenceImage) {
+          toast({ title: '该模型不支持参考图' });
+          setConnectingFrom(null);
+          return;
+        }
+      }
+    } else if (toNode.type === 'chat') {
+      // Chat node can receive from image nodes (for vision) or prompt-template nodes
+      if (fromNode.type !== 'image' && fromNode.type !== 'prompt-template') {
+        toast({ title: '聊天节点仅支持图片或模板节点连接' });
         setConnectingFrom(null);
         return;
       }
+    } else if (toNode.type === 'prompt-template') {
+      // Prompt template node has no input
+      toast({ title: '提示词模板节点不支持输入连接' });
+      setConnectingFrom(null);
+      return;
     } else {
       setConnectingFrom(null);
       return;
     }
 
-    setEdgesDirty((prev) => [
-      ...prev.filter((edge) => edge.to !== nodeId),
-      { id: `${fromNode.id}-${toNode.id}`, from: fromNode.id, to: toNode.id },
-    ]);
+    // For chat nodes, allow multiple inputs from image nodes
+    if (toNode.type === 'chat' && fromNode.type === 'image') {
+      // Check if this edge already exists
+      const existingEdge = edges.find((e) => e.from === fromNode.id && e.to === toNode.id);
+      if (existingEdge) {
+        toast({ title: '该连接已存在' });
+        setConnectingFrom(null);
+        return;
+      }
+      setEdgesDirty((prev) => [
+        ...prev,
+        { id: `${fromNode.id}-${toNode.id}`, from: fromNode.id, to: toNode.id },
+      ]);
+    } else {
+      // For other connections, replace existing input
+      setEdgesDirty((prev) => [
+        ...prev.filter((edge) => edge.to !== nodeId),
+        { id: `${fromNode.id}-${toNode.id}`, from: fromNode.id, to: toNode.id },
+      ]);
+    }
     setConnectingFrom(null);
   };
 
@@ -499,17 +608,35 @@ export default function WorkspaceEditorPage() {
   );
 
   const handleGenerateNode = async (node: WorkspaceNode) => {
-    const basePrompt = node.data.prompt.trim();
+    // Get prompt from node itself or from connected chat/template node
+    let basePrompt = node.data.prompt.trim();
+    
+    // Check for connected chat or prompt-template node to get prompt
+    const inputEdge = edgesRef.current.find((edge) => edge.to === node.id);
+    if (inputEdge) {
+      const inputNode = nodesRef.current.find((n) => n.id === inputEdge.from);
+      if (inputNode?.type === 'chat' && inputNode.data.chatOutput) {
+        // Use chat output as prompt if no prompt is set
+        if (!basePrompt) {
+          basePrompt = inputNode.data.chatOutput.trim();
+        }
+      } else if (inputNode?.type === 'prompt-template' && inputNode.data.templateOutput) {
+        // Use template output as prompt if no prompt is set
+        if (!basePrompt) {
+          basePrompt = inputNode.data.templateOutput.trim();
+        }
+      }
+    }
 
     try {
       if (node.type === 'image') {
-        const model = getImageModelById(node.data.modelId) || IMAGE_MODELS[0];
-        const inputEdge = edgesRef.current.find((edge) => edge.to === node.id);
-        const inputNode = inputEdge
-          ? nodesRef.current.find((n) => n.id === inputEdge.from)
+        const model = getImageModelById(node.data.modelId || '') || IMAGE_MODELS[0];
+        const imageInputEdge = edgesRef.current.find((edge) => edge.to === node.id);
+        const imageInputNode = imageInputEdge
+          ? nodesRef.current.find((n) => n.id === imageInputEdge.from && n.type === 'image')
           : undefined;
         const referenceImageUrl = model.features.supportReferenceImage
-          ? inputNode?.data.outputUrl
+          ? imageInputNode?.data.outputUrl
           : undefined;
 
         if (inputEdge && model.features.supportReferenceImage && !referenceImageUrl) {
@@ -589,16 +716,17 @@ export default function WorkspaceEditorPage() {
           return;
         }
         updateNodeData(node.id, { status: 'pending', errorMessage: undefined });
-        const model = getVideoModelById(node.data.modelId) || VIDEO_MODELS[0];
+        const model = getVideoModelById(node.data.modelId || '') || VIDEO_MODELS[0];
         const taskModel = buildSoraModelId(
           node.data.aspectRatio || model.defaultAspectRatio,
           node.data.duration || model.defaultDuration
         );
-        const inputEdge = edgesRef.current.find((edge) => edge.to === node.id);
-        const inputNode = inputEdge
-          ? nodesRef.current.find((n) => n.id === inputEdge.from)
+        // Find image input node for reference image
+        const videoInputEdge = edgesRef.current.find((edge) => edge.to === node.id);
+        const videoInputNode = videoInputEdge
+          ? nodesRef.current.find((n) => n.id === videoInputEdge.from && n.type === 'image')
           : undefined;
-        const referenceImageUrl = inputNode?.data.outputUrl;
+        const referenceImageUrl = videoInputNode?.data.outputUrl;
 
         const res = await fetch('/api/generate/sora', {
           method: 'POST',
@@ -620,6 +748,69 @@ export default function WorkspaceEditorPage() {
       updateNodeData(node.id, {
         status: 'failed',
         errorMessage: error instanceof Error ? error.message : '生成失败',
+      });
+    }
+  };
+
+  const handleChatGenerate = async (node: WorkspaceNode) => {
+    const prompt = node.data.prompt.trim();
+    if (!prompt) {
+      updateNodeData(node.id, { errorMessage: '请输入提示词', status: 'failed' });
+      return;
+    }
+    if (!node.data.chatModelId) {
+      updateNodeData(node.id, { errorMessage: '请选择聊天模型', status: 'failed' });
+      return;
+    }
+
+    // Collect input images from connected image nodes
+    const inputEdges = edgesRef.current.filter((edge) => edge.to === node.id);
+    const inputImages: string[] = [];
+    for (const edge of inputEdges) {
+      const inputNode = nodesRef.current.find((n) => n.id === edge.from);
+      if (inputNode?.type === 'image' && inputNode.data.outputUrl) {
+        inputImages.push(inputNode.data.outputUrl);
+      }
+    }
+
+    // Check if model supports vision when images are provided
+    const selectedModel = chatModels.find((m) => m.id === node.data.chatModelId);
+    if (inputImages.length > 0 && selectedModel && !selectedModel.supportsVision) {
+      updateNodeData(node.id, { errorMessage: '该模型不支持图片输入', status: 'failed' });
+      return;
+    }
+
+    updateNodeData(node.id, { status: 'pending', errorMessage: undefined, inputImages });
+
+    try {
+      const res = await fetch('/api/chat/workspace', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          modelId: node.data.chatModelId,
+          prompt,
+          images: inputImages,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || '聊天失败');
+      }
+      updateNodeData(node.id, {
+        status: 'completed',
+        chatOutput: data.data.content,
+        chatMessages: [
+          ...(node.data.chatMessages || []),
+          { role: 'user', content: prompt },
+          { role: 'assistant', content: data.data.content },
+        ],
+        errorMessage: undefined,
+      });
+      toast({ title: '聊天完成' });
+    } catch (error) {
+      updateNodeData(node.id, {
+        status: 'failed',
+        errorMessage: error instanceof Error ? error.message : '聊天失败',
       });
     }
   };
@@ -868,16 +1059,36 @@ export default function WorkspaceEditorPage() {
               </svg>
 
               {nodes.map((node) => {
+                // Determine model only for image/video nodes
                 const model =
                   node.type === 'image'
-                    ? getImageModelById(node.data.modelId) || IMAGE_MODELS[0]
-                    : getVideoModelById(node.data.modelId) || VIDEO_MODELS[0];
+                    ? getImageModelById(node.data.modelId || '') || IMAGE_MODELS[0]
+                    : node.type === 'video'
+                    ? getVideoModelById(node.data.modelId || '') || VIDEO_MODELS[0]
+                    : null;
               const incoming = incomingEdges.get(node.id) || [];
+              
+              // Determine input/output handles based on node type
               const supportsReferenceInput =
                 node.type === 'image' &&
+                model &&
                 (model as typeof IMAGE_MODELS[number]).features.supportReferenceImage;
-              const showInputHandle = node.type === 'video' || supportsReferenceInput;
-              const showOutputHandle = node.type === 'image';
+              const showInputHandle = 
+                node.type === 'video' || 
+                node.type === 'chat' || 
+                supportsReferenceInput;
+              const showOutputHandle = 
+                node.type === 'image' || 
+                node.type === 'chat' || 
+                node.type === 'prompt-template';
+              
+              // Get node icon based on type
+              const NodeIcon = node.type === 'chat' 
+                ? MessageSquare 
+                : node.type === 'prompt-template' 
+                ? FileText 
+                : null;
+              
               return (
                   <div
                     key={node.id}
@@ -889,28 +1100,35 @@ export default function WorkspaceEditorPage() {
                     onPointerDown={(event) => startDrag(event, node)}
                     className="flex items-center justify-between px-3 py-2 border-b border-white/10 bg-white/5 rounded-t-xl cursor-grab"
                   >
-                    <input
-                      value={node.name}
-                      onChange={(e) => updateNode(node.id, { name: e.target.value })}
-                      onPointerDown={(event) => event.stopPropagation()}
-                      className="text-sm text-white/90 bg-transparent focus:outline-none flex-1"
-                    />
-                    <div className="flex items-center gap-1">
-                      <button
-                        onClick={() =>
-                          node.type === 'video' ? handleGenerateVideo(node) : handleGenerateNode(node)
-                        }
+                    <div className="flex items-center gap-2 flex-1">
+                      {NodeIcon && <NodeIcon className="w-4 h-4 text-white/50" />}
+                      <input
+                        value={node.name}
+                        onChange={(e) => updateNode(node.id, { name: e.target.value })}
                         onPointerDown={(event) => event.stopPropagation()}
-                        disabled={node.data.status === 'pending' || node.data.status === 'processing'}
-                        className={cn(
-                          'text-white/40 hover:text-white transition',
-                          (node.data.status === 'pending' || node.data.status === 'processing') &&
-                            'opacity-40 cursor-not-allowed'
-                        )}
-                        title="重新生成"
-                      >
-                        <RotateCcw className="w-4 h-4" />
-                      </button>
+                        className="text-sm text-white/90 bg-transparent focus:outline-none flex-1"
+                      />
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {(node.type === 'image' || node.type === 'video' || node.type === 'chat') && (
+                        <button
+                          onClick={() => {
+                            if (node.type === 'video') handleGenerateVideo(node);
+                            else if (node.type === 'chat') handleChatGenerate(node);
+                            else handleGenerateNode(node);
+                          }}
+                          onPointerDown={(event) => event.stopPropagation()}
+                          disabled={node.data.status === 'pending' || node.data.status === 'processing'}
+                          className={cn(
+                            'text-white/40 hover:text-white transition',
+                            (node.data.status === 'pending' || node.data.status === 'processing') &&
+                              'opacity-40 cursor-not-allowed'
+                          )}
+                          title="重新生成"
+                        >
+                          <RotateCcw className="w-4 h-4" />
+                        </button>
+                      )}
                       <button
                         onClick={() => removeNode(node.id)}
                         onPointerDown={(event) => event.stopPropagation()}
@@ -941,6 +1159,160 @@ export default function WorkspaceEditorPage() {
                   )}
 
                   <div className="p-3 space-y-3 text-xs text-white/70">
+                    {/* Prompt Template Node */}
+                    {node.type === 'prompt-template' && (
+                      <>
+                        <div className="space-y-1">
+                          <label className="text-[10px] uppercase tracking-wider text-white/40">模板</label>
+                          <div className="relative">
+                            <select
+                              value={node.data.templateId || ''}
+                              onChange={(e) => {
+                                const template = promptTemplates.find((t) => t.id === e.target.value);
+                                updateNodeData(node.id, {
+                                  templateId: e.target.value,
+                                  templateOutput: template?.content || '',
+                                });
+                              }}
+                              className="w-full px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/30"
+                            >
+                              <option value="" className="bg-black">选择模板...</option>
+                              {promptTemplates.map((template) => (
+                                <option key={template.id} value={template.id} className="bg-black">
+                                  {template.name}
+                                </option>
+                              ))}
+                            </select>
+                            <ChevronDown className="w-3 h-3 text-white/30 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          </div>
+                        </div>
+                        {promptTemplates.length === 0 && (
+                          <div className="text-[10px] text-white/40">
+                            暂无模板，请在 data/prompts 目录添加 .txt 文件
+                          </div>
+                        )}
+                        <div className="space-y-1">
+                          <label className="text-[10px] uppercase tracking-wider text-white/40">输出内容</label>
+                          <div className="text-[10px] text-white/60 bg-white/5 rounded-lg px-2 py-1.5 max-h-32 overflow-auto whitespace-pre-wrap">
+                            {node.data.templateOutput || '选择模板后显示内容'}
+                          </div>
+                        </div>
+                      </>
+                    )}
+
+                    {/* Chat Node */}
+                    {node.type === 'chat' && (
+                      <>
+                        <div className="space-y-1">
+                          <label className="text-[10px] uppercase tracking-wider text-white/40">聊天模型</label>
+                          <div className="relative">
+                            <select
+                              value={node.data.chatModelId || ''}
+                              onChange={(e) => updateNodeData(node.id, { chatModelId: e.target.value })}
+                              className="w-full px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/30"
+                            >
+                              {chatModels.length === 0 ? (
+                                <option value="" className="bg-black">无可用模型</option>
+                              ) : (
+                                chatModels.map((m) => (
+                                  <option key={m.id} value={m.id} className="bg-black">
+                                    {m.name} {m.supportsVision ? '(支持图片)' : ''}
+                                  </option>
+                                ))
+                              )}
+                            </select>
+                            <ChevronDown className="w-3 h-3 text-white/30 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                          </div>
+                        </div>
+
+                        {incoming.length > 0 && (
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase tracking-wider text-white/40">
+                              <ImageIcon className="w-3 h-3 inline mr-1" />
+                              输入图片 ({incoming.length})
+                            </label>
+                            <div className="flex flex-wrap gap-1">
+                              {incoming.map((edge) => {
+                                const fromNode = nodes.find((n) => n.id === edge.from);
+                                return (
+                                  <span
+                                    key={edge.id}
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/10 text-white/60"
+                                  >
+                                    <Link2 className="w-3 h-3" />
+                                    {fromNode?.name || '节点'}
+                                    <button
+                                      onClick={() => removeEdge(edge.id)}
+                                      className="text-white/40 hover:text-white"
+                                    >
+                                      ×
+                                    </button>
+                                  </span>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+
+                        <div className="space-y-1">
+                          <div className="flex items-center justify-between">
+                            <label className="text-[10px] uppercase tracking-wider text-white/40">提示词</label>
+                            <span className="text-[10px] text-white/30">{node.data.prompt.length}/{CHAT_MAX_LENGTH}</span>
+                          </div>
+                          <textarea
+                            value={node.data.prompt}
+                            onChange={(e) => {
+                              if (e.target.value.length <= CHAT_MAX_LENGTH) {
+                                updateNodeData(node.id, { prompt: e.target.value });
+                              }
+                            }}
+                            maxLength={CHAT_MAX_LENGTH}
+                            className="w-full h-20 px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs resize-none focus:outline-none focus:border-white/30"
+                            placeholder="输入聊天内容..."
+                          />
+                        </div>
+
+                        {node.data.errorMessage && (
+                          <div className="text-red-400 text-xs">{node.data.errorMessage}</div>
+                        )}
+
+                        <button
+                          onClick={() => handleChatGenerate(node)}
+                          disabled={node.data.status === 'pending' || node.data.status === 'processing'}
+                          className={cn(
+                            'w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium transition',
+                            node.data.status === 'pending' || node.data.status === 'processing'
+                              ? 'bg-white/10 text-white/50 cursor-not-allowed'
+                              : 'bg-white text-black hover:bg-white/90'
+                          )}
+                        >
+                          {node.data.status === 'pending' || node.data.status === 'processing' ? (
+                            <>
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                              处理中...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-3 h-3" />
+                              发送
+                            </>
+                          )}
+                        </button>
+
+                        {node.data.chatOutput && (
+                          <div className="space-y-1">
+                            <label className="text-[10px] uppercase tracking-wider text-white/40">输出</label>
+                            <div className="text-[10px] text-white/60 bg-white/5 rounded-lg px-2 py-1.5 max-h-40 overflow-auto whitespace-pre-wrap">
+                              {node.data.chatOutput}
+                            </div>
+                          </div>
+                        )}
+                      </>
+                    )}
+
+                    {/* Image/Video Node - Model Selection */}
+                    {(node.type === 'image' || node.type === 'video') && model && (
+                    <>
                     <div className="space-y-1">
                       <label className="text-[10px] uppercase tracking-wider text-white/40">模型</label>
                       <div className="relative">
@@ -1219,6 +1591,8 @@ export default function WorkspaceEditorPage() {
                         </div>
                       </div>
                     )}
+                    </>
+                    )}
                   </div>
                   </div>
                 );
@@ -1246,6 +1620,24 @@ export default function WorkspaceEditorPage() {
                     className="block w-full text-left px-3 py-2 rounded hover:bg-white/10"
                   >
                     添加视频节点
+                  </button>
+                  <button
+                    onClick={() => {
+                      addNodeAt('chat', contextMenu);
+                      setContextMenu(null);
+                    }}
+                    className="block w-full text-left px-3 py-2 rounded hover:bg-white/10"
+                  >
+                    添加聊天节点
+                  </button>
+                  <button
+                    onClick={() => {
+                      addNodeAt('prompt-template', contextMenu);
+                      setContextMenu(null);
+                    }}
+                    className="block w-full text-left px-3 py-2 rounded hover:bg-white/10"
+                  >
+                    添加提示词模板
                   </button>
                 </div>
               )}

@@ -247,7 +247,114 @@ export interface CharacterCard {
 // Workspace types
 // ========================================
 
-export type WorkspaceNodeType = 'image' | 'video';
+export type WorkspaceNodeType = 'image' | 'video' | 'chat' | 'prompt-template';
+
+// Prompt template definitions
+export interface PromptTemplate {
+  id: string;
+  name: string;
+  description: string;
+  content: string;
+}
+
+export const PROMPT_TEMPLATES: PromptTemplate[] = [
+  {
+    id: 'character-sheet-3view',
+    name: '三视图角色设定表',
+    description: '角色前/侧/后三视图 + 脸部特写',
+    content: `Please create an illustrated character sheet with the following composition:
+
+Three-view orthographic poses:
+- Front view: Full body, standing straight in T-pose
+- Side view: Full body profile, standing straight in T-pose  
+- Back view: Full body rear, standing straight in T-pose
+
+Close-up section:
+- Face close-up portrait
+
+Requirements:
+- Label each view clearly (Front, Side, Back, Close-up)
+- Aspect ratio 3:2
+- Clean white or neutral background
+- Consistent lighting across all views
+- Professional character design reference style`,
+  },
+  {
+    id: 'turnaround-sheet',
+    name: '角色转面图',
+    description: '8方向角色转面参考图',
+    content: `Create a character turnaround reference sheet showing the character from 8 angles:
+- Front (0°)
+- Front-left (45°)
+- Left profile (90°)
+- Back-left (135°)
+- Back (180°)
+- Back-right (225°)
+- Right profile (270°)
+- Front-right (315°)
+
+Requirements:
+- All poses in neutral standing position
+- Consistent scale across all views
+- Clean background
+- Professional animation/game art reference style`,
+  },
+  {
+    id: 'expression-sheet',
+    name: '表情参考图',
+    description: '多种表情的角色面部参考',
+    content: `Create a character expression sheet showing various facial expressions:
+- Neutral/Default
+- Happy/Smiling
+- Sad/Melancholy
+- Angry/Frustrated
+- Surprised/Shocked
+- Confused/Puzzled
+- Embarrassed/Blushing
+- Determined/Confident
+
+Requirements:
+- Head and shoulders framing for each expression
+- Consistent art style across all expressions
+- Clear emotional distinction between each
+- Grid layout with labels`,
+  },
+  {
+    id: 'outfit-variations',
+    name: '服装变体图',
+    description: '同一角色的多套服装设计',
+    content: `Create a character outfit variation sheet showing the same character in different outfits:
+- Casual everyday wear
+- Formal/Business attire
+- Athletic/Sportswear
+- Sleepwear/Loungewear
+- Special occasion/Party outfit
+
+Requirements:
+- Full body view for each outfit
+- Consistent character appearance across all variations
+- Clean presentation with outfit labels
+- Professional fashion design reference style`,
+  },
+  {
+    id: 'action-poses',
+    name: '动作姿势图',
+    description: '角色动态动作参考',
+    content: `Create a character action pose reference sheet showing dynamic poses:
+- Running/Sprinting
+- Jumping/Leaping
+- Fighting stance
+- Sitting/Resting
+- Reaching/Grabbing
+- Falling/Tumbling
+
+Requirements:
+- Dynamic and expressive poses
+- Show motion and energy
+- Consistent character design
+- Clean background for easy reference`,
+  },
+];
 
 export interface WorkspaceNode {
   id: string;
@@ -255,17 +362,30 @@ export interface WorkspaceNode {
   name: string;
   position: { x: number; y: number };
   data: {
-    modelId: string;
+    // Common fields
+    prompt: string;
+    status?: 'idle' | 'pending' | 'processing' | 'completed' | 'failed';
+    errorMessage?: string;
+    
+    // Image/Video node fields
+    modelId?: string;
     aspectRatio?: string;
     duration?: string;
     imageSize?: string;
-    prompt: string;
     outputUrl?: string;
     outputType?: 'image' | 'video';
     generationId?: string;
     revisedPrompt?: string;
-    status?: 'idle' | 'pending' | 'processing' | 'completed' | 'failed';
-    errorMessage?: string;
+    
+    // Chat node fields
+    chatModelId?: string;
+    chatMessages?: Array<{ role: 'user' | 'assistant'; content: string }>;
+    chatOutput?: string; // The generated text output
+    inputImages?: string[]; // URLs of input images from connected nodes
+    
+    // Prompt template node fields
+    templateId?: string;
+    templateOutput?: string; // The selected template content
   };
 }
 

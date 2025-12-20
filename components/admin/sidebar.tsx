@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   Megaphone,
-  Sparkles
+  Sparkles,
+  MessageSquare
 } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
@@ -32,6 +33,7 @@ const navItems: NavItem[] = [
   { href: '/admin/users', label: '用户管理', icon: Users, roles: ['admin', 'moderator'] },
   { href: '/admin/pricing', label: '积分定价', icon: Coins, roles: ['admin'] },
   { href: '/admin/api', label: 'API 配置', icon: Settings, roles: ['admin'] },
+  { href: '/admin/models', label: '聊天模型', icon: MessageSquare, roles: ['admin'] },
   { href: '/admin/tokens', label: 'SORA Tokens', icon: Key, roles: ['admin'] },
   { href: '/admin/announcement', label: '公告管理', icon: Megaphone, roles: ['admin'] },
 ];

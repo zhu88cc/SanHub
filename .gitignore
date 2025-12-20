@@ -40,12 +40,15 @@ AGENTS.md
 # ===================
 # Database
 # ===================
-/data/
-*.db
-*.db-shm
-*.db-wal
+/data/*.db
+/data/*.db-shm
+/data/*.db-wal
+/data/media/
 *.sqlite
 *.sqlite3
+
+# Keep prompts directory
+!/data/prompts/
 
 # ===================
 # Logs
@@ -100,10 +103,12 @@ Desktop.ini
 *.tar.gz
 *.rar
 *.7z
-*.txt
 *.sql
 *.gz
 json.json
+
+# Keep prompt templates
+!/data/prompts/*.txt
 # ===================
 # Deployment
 # ===================
