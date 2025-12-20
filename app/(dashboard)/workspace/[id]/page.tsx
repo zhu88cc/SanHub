@@ -575,7 +575,9 @@ export default function WorkspaceEditorPage() {
       const controller = new AbortController();
       abortControllersRef.current.set(nodeId, controller);
       let attempts = 0;
+      let consecutiveErrors = 0;
       const maxAttempts = 240;
+      const maxConsecutiveErrors = 5;
 
       const poll = async () => {
         if (controller.signal.aborted) return;
@@ -593,6 +595,8 @@ export default function WorkspaceEditorPage() {
           if (!res.ok) {
             throw new Error(data.error || '查询任务状态失败');
           }
+          // Reset error counter on success
+          consecutiveErrors = 0;
           const status = data.data.status as string;
           if (status === 'completed') {
             await update();
@@ -618,9 +622,26 @@ export default function WorkspaceEditorPage() {
           }
         } catch (error) {
           if ((error as Error).name === 'AbortError') return;
+          consecutiveErrors += 1;
+          const errMsg = error instanceof Error ? error.message : '网络错误';
+          // Retry on transient network errors (socket closed, timeout, etc.)
+          const isTransientError =
+            errMsg.includes('socket') ||
+            errMsg.includes('Socket') ||
+            errMsg.includes('ECONNRESET') ||
+            errMsg.includes('ETIMEDOUT') ||
+            errMsg.includes('network') ||
+            errMsg.includes('fetch');
+          if (isTransientError && consecutiveErrors < maxConsecutiveErrors) {
+            console.warn(`[Poll] Transient error (${consecutiveErrors}/${maxConsecutiveErrors}), retrying...`, errMsg);
+            // Exponential backoff: 5s, 10s, 20s, 40s...
+            const delay = Math.min(5000 * Math.pow(2, consecutiveErrors - 1), 60000);
+            setTimeout(poll, delay);
+            return;
+          }
           updateNodeData(nodeId, {
             status: 'failed',
-            errorMessage: error instanceof Error ? error.message : '生成失败',
+            errorMessage: errMsg,
           });
           abortControllersRef.current.delete(nodeId);
         }
