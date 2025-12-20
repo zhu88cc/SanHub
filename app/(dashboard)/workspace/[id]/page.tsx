@@ -6,6 +6,7 @@ import { useSession } from 'next-auth/react';
 import {
   Check,
   ChevronDown,
+  Download,
   Link2,
   Loader2,
   MousePointer2,
@@ -1181,7 +1182,7 @@ export default function WorkspaceEditorPage() {
                     </button>
 
                     {node.data.outputUrl && (
-                      <div className="mt-2">
+                      <div className="mt-2 space-y-2">
                         {node.data.outputType === 'video' ? (
                           <video
                             key={`${node.data.generationId}-${node.data.outputUrl}`}
@@ -1197,6 +1198,16 @@ export default function WorkspaceEditorPage() {
                             className="w-full rounded-lg border border-white/10"
                           />
                         )}
+                        <a
+                          href={node.data.outputUrl}
+                          download={`${node.name || 'output'}-${node.data.generationId || Date.now()}.${node.data.outputType === 'video' ? 'mp4' : 'png'}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition"
+                        >
+                          <Download className="w-3 h-3" />
+                          下载
+                        </a>
                       </div>
                     )}
 
