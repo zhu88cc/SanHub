@@ -799,24 +799,36 @@ export default function WorkspaceEditorPage() {
   };
 
   const handleChatGenerate = async (node: WorkspaceNode) => {
-    const prompt = node.data.prompt.trim();
-    if (!prompt) {
-      updateNodeData(node.id, { errorMessage: '请输入提示词', status: 'failed' });
-      return;
-    }
+    let prompt = node.data.prompt.trim();
     if (!node.data.chatModelId) {
       updateNodeData(node.id, { errorMessage: '请选择聊天模型', status: 'failed' });
       return;
     }
 
-    // Collect input images from connected image nodes
+    // Collect inputs from connected nodes
     const inputEdges = edgesRef.current.filter((edge) => edge.to === node.id);
     const inputImages: string[] = [];
+    let templateContent = '';
+    
     for (const edge of inputEdges) {
       const inputNode = nodesRef.current.find((n) => n.id === edge.from);
       if (inputNode?.type === 'image' && inputNode.data.outputUrl) {
         inputImages.push(inputNode.data.outputUrl);
+      } else if (inputNode?.type === 'prompt-template' && inputNode.data.templateOutput) {
+        templateContent = inputNode.data.templateOutput.trim();
       }
+    }
+
+    // Combine template content with user prompt
+    if (templateContent && prompt) {
+      prompt = `${templateContent}\n\n${prompt}`;
+    } else if (templateContent && !prompt) {
+      prompt = templateContent;
+    }
+
+    if (!prompt) {
+      updateNodeData(node.id, { errorMessage: '请输入提示词或连接模板节点', status: 'failed' });
+      return;
     }
 
     // Check if model supports vision when images are provided

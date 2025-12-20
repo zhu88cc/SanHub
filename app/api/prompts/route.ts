@@ -6,6 +6,11 @@ import path from 'path';
 
 const PROMPTS_DIR = path.join(process.cwd(), 'data', 'prompts');
 
+// Validation constants
+const MAX_NAME_LENGTH = 50;
+const MAX_CONTENT_SIZE = 50000; // 50KB
+const VALID_NAME_PATTERN = /^[a-zA-Z0-9\u4e00-\u9fa5_-]+$/;
+
 async function ensureDir() {
   try {
     await fs.mkdir(PROMPTS_DIR, { recursive: true });
@@ -50,15 +55,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: false, error: '未登录' }, { status: 401 });
     }
 
-    const { name, content } = await request.json();
-    if (!name || typeof name !== 'string' || !content || typeof content !== 'string') {
-      return NextResponse.json({ success: false, error: '参数错误' }, { status: 400 });
+    const body = await request.json();
+    const { name, content } = body;
+
+    // Validate required fields
+    if (!name || typeof name !== 'string') {
+      return NextResponse.json({ success: false, error: '名称不能为空' }, { status: 400 });
+    }
+    if (!content || typeof content !== 'string') {
+      return NextResponse.json({ success: false, error: '内容不能为空' }, { status: 400 });
     }
 
-    // Sanitize filename
-    const safeName = name.replace(/[^a-zA-Z0-9\u4e00-\u9fa5_-]/g, '_').slice(0, 50);
-    if (!safeName) {
-      return NextResponse.json({ success: false, error: '名称无效' }, { status: 400 });
+    // Validate name length
+    if (name.length > MAX_NAME_LENGTH) {
+      return NextResponse.json(
+        { success: false, error: `名称不能超过 ${MAX_NAME_LENGTH} 个字符` },
+        { status: 400 }
+      );
+    }
+
+    // Validate content size
+    if (content.length > MAX_CONTENT_SIZE) {
+      return NextResponse.json(
+        { success: false, error: `内容不能超过 ${MAX_CONTENT_SIZE} 个字符` },
+        { status: 400 }
+      );
+    }
+
+    // Sanitize and validate filename
+    const safeName = name.trim().replace(/[^a-zA-Z0-9\u4e00-\u9fa5_-]/g, '_').slice(0, MAX_NAME_LENGTH);
+    if (!safeName || !VALID_NAME_PATTERN.test(safeName)) {
+      return NextResponse.json({ success: false, error: '名称包含无效字符' }, { status: 400 });
     }
 
     await ensureDir();
@@ -85,11 +112,17 @@ export async function DELETE(request: NextRequest) {
 
     const { searchParams } = new URL(request.url);
     const name = searchParams.get('name');
-    if (!name) {
-      return NextResponse.json({ success: false, error: '缺少名称' }, { status: 400 });
+    
+    if (!name || typeof name !== 'string') {
+      return NextResponse.json({ success: false, error: '名称不能为空' }, { status: 400 });
     }
 
+    // Validate name format to prevent path traversal
     const safeName = name.replace(/[^a-zA-Z0-9\u4e00-\u9fa5_-]/g, '_');
+    if (!safeName || !VALID_NAME_PATTERN.test(safeName)) {
+      return NextResponse.json({ success: false, error: '名称格式无效' }, { status: 400 });
+    }
+
     const filePath = path.join(PROMPTS_DIR, `${safeName}.txt`);
 
     try {

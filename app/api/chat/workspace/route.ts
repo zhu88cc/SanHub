@@ -3,7 +3,10 @@ import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { getChatModel, getUserById, updateUserBalance } from '@/lib/db';
 
+// Validation constants
 const CHAT_MAX_LENGTH = 2000;
+const MAX_IMAGES = 10;
+const MAX_IMAGE_URL_LENGTH = 100000; // ~100KB for base64 data URLs
 
 export async function POST(request: NextRequest) {
   try {
@@ -19,9 +22,17 @@ export async function POST(request: NextRequest) {
       images?: string[];
     };
 
-    if (!modelId || !prompt) {
+    // Validate required fields
+    if (!modelId || typeof modelId !== 'string') {
       return NextResponse.json(
-        { success: false, error: '缺少必要参数' },
+        { success: false, error: '模型 ID 不能为空' },
+        { status: 400 }
+      );
+    }
+
+    if (!prompt || typeof prompt !== 'string') {
+      return NextResponse.json(
+        { success: false, error: '提示词不能为空' },
         { status: 400 }
       );
     }
@@ -29,9 +40,33 @@ export async function POST(request: NextRequest) {
     // Validate prompt length
     if (prompt.length > CHAT_MAX_LENGTH) {
       return NextResponse.json(
-        { success: false, error: `提示词超过最大长度 ${CHAT_MAX_LENGTH}` },
+        { success: false, error: `提示词不能超过 ${CHAT_MAX_LENGTH} 个字符` },
         { status: 400 }
       );
+    }
+
+    // Validate images array
+    if (images !== undefined) {
+      if (!Array.isArray(images)) {
+        return NextResponse.json(
+          { success: false, error: '图片参数格式错误' },
+          { status: 400 }
+        );
+      }
+      if (images.length > MAX_IMAGES) {
+        return NextResponse.json(
+          { success: false, error: `图片数量不能超过 ${MAX_IMAGES} 张` },
+          { status: 400 }
+        );
+      }
+      for (const img of images) {
+        if (typeof img !== 'string' || img.length > MAX_IMAGE_URL_LENGTH) {
+          return NextResponse.json(
+            { success: false, error: '图片数据格式错误或过大' },
+            { status: 400 }
+          );
+        }
+      }
     }
 
     const model = await getChatModel(modelId);
