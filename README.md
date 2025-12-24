@@ -247,16 +247,16 @@ sanhub/
 <summary>点击展开截图</summary>
 
 ### 首页
-![首页](./docs/screenshots/home.png)
+![首页](./image/home.png)
 
 ### 视频生成
-![视频生成](./docs/screenshots/video.png)
+![视频生成](./image/video.png)
 
 ### 图像生成
-![图像生成](./docs/screenshots/image.png)
+![图像生成](./image/image.png)
 
 ### 管理后台
-![管理后台](./docs/screenshots/admin.png)
+![管理后台](./image/admin.png)
 
 </details>
 
