@@ -43,6 +43,9 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+# better-sqlite3 需要这些运行时依赖
+RUN apk add --no-cache libc6-compat
+
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 # 禁用 undici body timeout（Sora 视频生成需要较长时间）
@@ -57,8 +60,20 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-# 创建数据目录
-RUN mkdir -p /app/data && chown -R nextjs:nodejs /app/data
+# 复制 better-sqlite3 原生模块（standalone 不会自动包含）
+COPY --from=builder /app/node_modules/better-sqlite3 ./node_modules/better-sqlite3
+COPY --from=builder /app/node_modules/bindings ./node_modules/bindings
+COPY --from=builder /app/node_modules/file-uri-to-path ./node_modules/file-uri-to-path
+
+# 复制 entrypoint 脚本
+COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh
+
+# 复制 prompts 模板
+COPY --from=builder /app/data/prompts ./data/prompts
+
+# 创建数据目录并设置权限
+RUN mkdir -p /app/data/media && chown -R nextjs:nodejs /app/data
 
 # 设置权限
 USER nextjs
@@ -69,5 +84,6 @@ EXPOSE 3000
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
-# 启动命令
+# 使用 entrypoint 自动初始化环境
+ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["node", "server.js"]

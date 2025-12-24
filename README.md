@@ -85,69 +85,67 @@
 
 ## 🚀 快速开始
 
-### 1. 克隆项目
+### 方式一：Docker 部署（推荐）
+
+**零配置，一行命令启动：**
 
 ```bash
+git clone https://github.com/genz27/sanhub.git && cd sanhub && docker-compose up -d
+```
+
+启动后访问 http://localhost:3000
+
+| 项目 | 值 |
+|------|-----|
+| 默认管理员邮箱 | `admin@sanhub.local` |
+| 默认管理员密码 | `sanhub123` |
+
+> ⚠️ **首次登录后请立即在「用户设置」中修改密码！**
+
+**常用命令：**
+
+```bash
+docker-compose logs -f    # 查看日志
+docker-compose down       # 停止服务
+docker-compose up -d --build  # 重新构建
+```
+
+**生产环境部署（使用自定义域名）：**
+
+编辑 `docker-compose.yml`，取消注释并修改：
+
+```yaml
+environment:
+  - NEXTAUTH_URL=https://your-domain.com  # 必填：你的访问域名
+  - ADMIN_EMAIL=admin@example.com         # 可选：自定义管理员邮箱
+  - ADMIN_PASSWORD=your-secure-password   # 可选：自定义管理员密码
+```
+
+> 💡 `NEXTAUTH_URL` 只有在使用域名访问时才需要配置，本地 `localhost:3000` 访问无需设置。
+
+---
+
+### 方式二：本地开发
+
+```bash
+# 1. 克隆项目
 git clone https://github.com/genz27/sanhub.git
 cd sanhub
-```
 
-### 2. 安装依赖
-
-```bash
+# 2. 安装依赖
 npm install
-```
 
-### 3. 配置环境变量
-
-```bash
+# 3. 配置环境变量
 cp .env.example .env.local
-```
+# 编辑 .env.local，至少设置 NEXTAUTH_SECRET 和 ADMIN_EMAIL/ADMIN_PASSWORD
 
-编辑 `.env.local`，配置必要的环境变量：
-
-```env
-# 必填 - 认证密钥
-NEXTAUTH_SECRET=your-secret-key
-NEXTAUTH_URL=http://localhost:3000
-
-# 管理员账号
-ADMIN_EMAIL=admin@example.com
-ADMIN_PASSWORD=your-password
-
-# API 配置（按需填写，也可在管理后台配置）
-SORA_API_KEY=
-GEMINI_API_KEY=
-PICUI_API_KEY=
-```
-
-### 4. 启动开发服务器
-
-```bash
+# 4. 启动开发服务器
 npm run dev
 ```
 
 访问 http://localhost:3000
 
-### 5. 首次运行
-
-系统会自动：
-- 创建数据库表结构
-- 初始化系统配置
-- 创建管理员账号
-
-## 🐳 Docker 部署
-
-```bash
-# 构建并启动
-docker-compose up -d
-
-# 查看日志
-docker-compose logs -f
-
-# 停止服务
-docker-compose down
-```
+首次运行会自动创建数据库和管理员账号。
 
 ## 💾 数据库选择
 
