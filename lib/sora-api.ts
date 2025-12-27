@@ -1,9 +1,30 @@
-import { getSystemConfig } from './db';
+import { getSystemConfig, getVideoChannels } from './db';
 import { fetch as undiciFetch, Agent, FormData } from 'undici';
 
 // ========================================
 // Sora OpenAI-Style Non-Streaming API
 // ========================================
+
+// 获取 Sora 配置（优先从新渠道表读取，回退到旧 system_config）
+async function getSoraConfig(): Promise<{ apiKey: string; baseUrl: string }> {
+  // 优先从 video_channels 表获取 sora 类型的渠道
+  const channels = await getVideoChannels(true); // 只获取启用的
+  const soraChannel = channels.find(c => c.type === 'sora');
+  
+  if (soraChannel && soraChannel.apiKey) {
+    return {
+      apiKey: soraChannel.apiKey,
+      baseUrl: soraChannel.baseUrl || 'http://localhost:8000',
+    };
+  }
+  
+  // 回退到旧的 system_config
+  const config = await getSystemConfig();
+  return {
+    apiKey: config.soraApiKey || '',
+    baseUrl: config.soraBaseUrl || 'http://localhost:8000',
+  };
+}
 
 // 创建自定义 Agent
 const soraAgent = new Agent({
@@ -46,18 +67,18 @@ export interface VideoGenerationResponse {
 }
 
 export async function generateVideo(request: VideoGenerationRequest): Promise<VideoGenerationResponse> {
-  const config = await getSystemConfig();
+  const { apiKey, baseUrl } = await getSoraConfig();
 
-  if (!config.soraApiKey) {
-    throw new Error('Sora API Key 未配置，请在管理后台配置 API 密钥');
+  if (!apiKey) {
+    throw new Error('Sora API Key 未配置，请在管理后台「视频渠道」中配置 Sora 渠道');
   }
 
-  if (!config.soraBaseUrl) {
+  if (!baseUrl) {
     throw new Error('Sora Base URL 未配置');
   }
 
-  const baseUrl = config.soraBaseUrl.replace(/\/$/, '');
-  const apiUrl = `${baseUrl}/v1/videos`;
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+  const apiUrl = `${normalizedBaseUrl}/v1/videos`;
 
   console.log('[Sora API] 视频生成请求:', {
     apiUrl,
@@ -96,7 +117,7 @@ export async function generateVideo(request: VideoGenerationRequest): Promise<Vi
   const response = await undiciFetch(apiUrl, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${config.soraApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: formData,
     dispatcher: soraAgent,
@@ -145,18 +166,18 @@ export interface ImageGenerationResponse {
 }
 
 export async function generateImage(request: ImageGenerationRequest): Promise<ImageGenerationResponse> {
-  const config = await getSystemConfig();
+  const { apiKey, baseUrl } = await getSoraConfig();
 
-  if (!config.soraApiKey) {
-    throw new Error('Sora API Key 未配置，请在管理后台配置 API 密钥');
+  if (!apiKey) {
+    throw new Error('Sora API Key 未配置，请在管理后台「视频渠道」中配置 Sora 渠道');
   }
 
-  if (!config.soraBaseUrl) {
+  if (!baseUrl) {
     throw new Error('Sora Base URL 未配置');
   }
 
-  const baseUrl = config.soraBaseUrl.replace(/\/$/, '');
-  const apiUrl = `${baseUrl}/v1/images/generations`;
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+  const apiUrl = `${normalizedBaseUrl}/v1/images/generations`;
 
   console.log('[Sora API] 图片生成请求:', {
     apiUrl,
@@ -168,7 +189,7 @@ export async function generateImage(request: ImageGenerationRequest): Promise<Im
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${config.soraApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify(request),
     dispatcher: soraAgent,
@@ -214,18 +235,18 @@ export interface CharacterCardResponse {
 }
 
 export async function createCharacterCard(request: CharacterCardRequest): Promise<CharacterCardResponse> {
-  const config = await getSystemConfig();
+  const { apiKey, baseUrl } = await getSoraConfig();
 
-  if (!config.soraApiKey) {
-    throw new Error('Sora API Key 未配置，请在管理后台配置 API 密钥');
+  if (!apiKey) {
+    throw new Error('Sora API Key 未配置，请在管理后台「视频渠道」中配置 Sora 渠道');
   }
 
-  if (!config.soraBaseUrl) {
+  if (!baseUrl) {
     throw new Error('Sora Base URL 未配置');
   }
 
-  const baseUrl = config.soraBaseUrl.replace(/\/$/, '');
-  const apiUrl = `${baseUrl}/v1/characters`;
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+  const apiUrl = `${normalizedBaseUrl}/v1/characters`;
 
   console.log('[Sora API] 角色卡创建请求');
 
@@ -246,7 +267,7 @@ export async function createCharacterCard(request: CharacterCardRequest): Promis
   const response = await undiciFetch(apiUrl, {
     method: 'POST',
     headers: {
-      Authorization: `Bearer ${config.soraApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     body: formData,
     dispatcher: soraAgent,
@@ -309,28 +330,28 @@ export interface FeedResponse {
 }
 
 export async function getFeed(request: FeedRequest = {}): Promise<FeedResponse> {
-  const config = await getSystemConfig();
+  const { apiKey, baseUrl } = await getSoraConfig();
 
-  if (!config.soraApiKey) {
+  if (!apiKey) {
     throw new Error('Sora API Key 未配置');
   }
 
-  if (!config.soraBaseUrl) {
+  if (!baseUrl) {
     throw new Error('Sora Base URL 未配置');
   }
 
-  const baseUrl = config.soraBaseUrl.replace(/\/$/, '');
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
   const params = new URLSearchParams();
   if (request.limit) params.append('limit', String(request.limit));
   if (request.cut) params.append('cut', request.cut);
   if (request.cursor) params.append('cursor', request.cursor);
 
-  const apiUrl = `${baseUrl}/v1/feed?${params.toString()}`;
+  const apiUrl = `${normalizedBaseUrl}/v1/feed?${params.toString()}`;
 
   const response = await undiciFetch(apiUrl, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${config.soraApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     dispatcher: soraAgent,
   });
@@ -360,23 +381,23 @@ export interface ProfileResponse {
 }
 
 export async function getProfile(username: string): Promise<ProfileResponse> {
-  const config = await getSystemConfig();
+  const { apiKey, baseUrl } = await getSoraConfig();
 
-  if (!config.soraApiKey) {
+  if (!apiKey) {
     throw new Error('Sora API Key 未配置');
   }
 
-  if (!config.soraBaseUrl) {
+  if (!baseUrl) {
     throw new Error('Sora Base URL 未配置');
   }
 
-  const baseUrl = config.soraBaseUrl.replace(/\/$/, '');
-  const apiUrl = `${baseUrl}/v1/profiles/${encodeURIComponent(username)}`;
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+  const apiUrl = `${normalizedBaseUrl}/v1/profiles/${encodeURIComponent(username)}`;
 
   const response = await undiciFetch(apiUrl, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${config.soraApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     dispatcher: soraAgent,
   });
@@ -401,27 +422,27 @@ export interface UserFeedRequest {
 }
 
 export async function getUserFeed(request: UserFeedRequest): Promise<FeedResponse> {
-  const config = await getSystemConfig();
+  const { apiKey, baseUrl } = await getSoraConfig();
 
-  if (!config.soraApiKey) {
+  if (!apiKey) {
     throw new Error('Sora API Key 未配置');
   }
 
-  if (!config.soraBaseUrl) {
+  if (!baseUrl) {
     throw new Error('Sora Base URL 未配置');
   }
 
-  const baseUrl = config.soraBaseUrl.replace(/\/$/, '');
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
   const params = new URLSearchParams();
   if (request.limit) params.append('limit', String(request.limit));
   if (request.cursor) params.append('cursor', request.cursor);
 
-  const apiUrl = `${baseUrl}/v1/users/${encodeURIComponent(request.user_id)}/feed?${params.toString()}`;
+  const apiUrl = `${normalizedBaseUrl}/v1/users/${encodeURIComponent(request.user_id)}/feed?${params.toString()}`;
 
   const response = await undiciFetch(apiUrl, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${config.soraApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     dispatcher: soraAgent,
   });
@@ -460,28 +481,28 @@ export interface CharacterSearchResponse {
 }
 
 export async function searchCharacters(request: CharacterSearchRequest): Promise<CharacterSearchResponse> {
-  const config = await getSystemConfig();
+  const { apiKey, baseUrl } = await getSoraConfig();
 
-  if (!config.soraApiKey) {
+  if (!apiKey) {
     throw new Error('Sora API Key 未配置');
   }
 
-  if (!config.soraBaseUrl) {
+  if (!baseUrl) {
     throw new Error('Sora Base URL 未配置');
   }
 
-  const baseUrl = config.soraBaseUrl.replace(/\/$/, '');
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
   const params = new URLSearchParams();
   params.append('username', request.username);
   if (request.intent) params.append('intent', request.intent);
   if (request.limit) params.append('limit', String(request.limit));
 
-  const apiUrl = `${baseUrl}/v1/characters/search?${params.toString()}`;
+  const apiUrl = `${normalizedBaseUrl}/v1/characters/search?${params.toString()}`;
 
   const response = await undiciFetch(apiUrl, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${config.soraApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     dispatcher: soraAgent,
   });
@@ -508,23 +529,23 @@ export interface InviteCodeResponse {
 }
 
 export async function getInviteCode(): Promise<InviteCodeResponse> {
-  const config = await getSystemConfig();
+  const { apiKey, baseUrl } = await getSoraConfig();
 
-  if (!config.soraApiKey) {
+  if (!apiKey) {
     throw new Error('Sora API Key 未配置');
   }
 
-  if (!config.soraBaseUrl) {
+  if (!baseUrl) {
     throw new Error('Sora Base URL 未配置');
   }
 
-  const baseUrl = config.soraBaseUrl.replace(/\/$/, '');
-  const apiUrl = `${baseUrl}/v1/invite-codes`;
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+  const apiUrl = `${normalizedBaseUrl}/v1/invite-codes`;
 
   const response = await undiciFetch(apiUrl, {
     method: 'GET',
     headers: {
-      Authorization: `Bearer ${config.soraApiKey}`,
+      Authorization: `Bearer ${apiKey}`,
     },
     dispatcher: soraAgent,
   });

@@ -81,7 +81,7 @@ export default function AdminPage() {
   const quickLinks = [
     { href: '/admin/users', label: '用户管理', desc: '管理用户账号和权限', icon: Users, color: 'from-blue-500/20 to-cyan-500/20' },
     { href: '/admin/pricing', label: '积分定价', desc: '配置各服务消耗积分', icon: Coins, color: 'from-green-500/20 to-emerald-500/20' },
-    { href: '/admin/api', label: 'API 配置', desc: '管理 API 密钥和接口', icon: Settings, color: 'from-violet-500/20 to-purple-500/20' },
+    { href: '/admin/image-channels', label: '图像渠道', desc: '管理图像生成渠道和模型', icon: Settings, color: 'from-violet-500/20 to-purple-500/20' },
   ];
 
   return (

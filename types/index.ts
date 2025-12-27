@@ -381,30 +381,6 @@ export interface SoraGenerateRequest {
   remix_target_id?: string; // Remix 视频 ID
 }
 
-// Gemini 生成请求
-export interface GeminiGenerateRequest {
-  prompt: string;
-  model: string; // gemini-2.5-flash-image, gemini-3-pro-image-preview
-  aspectRatio: string;
-  imageSize?: string;
-  images?: { mimeType: string; data: string }[];
-  referenceImageUrl?: string;
-}
-
-// Z-Image 生成请求
-export interface ZImageGenerateRequest {
-  prompt: string;
-  model?: string; // 默认 Tongyi-MAI/Z-Image-Turbo
-  size?: string; // 分辨率，如 1024x1024
-  loras?: string | Record<string, number>; // 单个 LoRA 或多个 LoRA 配置
-  images?: { mimeType: string; data: string }[]; // 参考图（base64 数据）
-  channel?: 'modelscope' | 'gitee'; // 渠道选择
-  numInferenceSteps?: number; // Gitee 推理步数
-  outscale?: number; // 超分倍率
-  outputFormat?: string; // 输出格式
-  referenceImageUrl?: string;
-}
-
 // 生成结果
 export interface GenerateResult {
   type: GenerationType;
