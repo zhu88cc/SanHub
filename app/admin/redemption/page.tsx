@@ -20,6 +20,7 @@ export default function RedemptionPage() {
 
   useEffect(() => {
     loadCodes();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showUsed]);
 
   const loadCodes = async () => {

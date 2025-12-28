@@ -175,7 +175,7 @@ export async function getInviteCodeByCode(code: string): Promise<InviteCode | nu
   };
 }
 
-export async function useInviteCode(code: string, userId: string): Promise<{ success: boolean; error?: string; bonusPoints?: number }> {
+export async function applyInviteCode(code: string, userId: string): Promise<{ success: boolean; error?: string; bonusPoints?: number }> {
   await initializeCodesTables();
   const db = getAdapter();
 
@@ -568,7 +568,7 @@ export async function getAllGenerations(options: {
   const limit = Math.max(Number(options.limit) || 50, 1);
   const offset = Math.max(Number(options.offset) || 0, 0);
 
-  let whereClauses: string[] = [];
+  const whereClauses: string[] = [];
   const params: unknown[] = [];
 
   if (options.userId) {
