@@ -1,17 +1,46 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
-import { User, Key, LogOut, Loader2, Check, Mail, Shield, Coins } from 'lucide-react';
+import { User, Key, LogOut, Loader2, Check, Mail, Shield, Coins, Gift, UserPlus, Copy, Ticket } from 'lucide-react';
 import { toast } from '@/components/ui/toaster';
 import { formatBalance } from '@/lib/utils';
 
 export default function SettingsPage() {
-  const { data: session } = useSession();
+  const { data: session, update: updateSession } = useSession();
   const [currentPassword, setCurrentPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  
+  // Redemption code
+  const [redeemCode, setRedeemCode] = useState('');
+  const [redeemLoading, setRedeemLoading] = useState(false);
+  
+  // Invite code
+  const [inviteCode, setInviteCode] = useState('');
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [myInviteCode, setMyInviteCode] = useState<string | null>(null);
+  const [inviteCodeLoading, setInviteCodeLoading] = useState(false);
+
+  useEffect(() => {
+    loadMyInviteCode();
+  }, []);
+
+  const loadMyInviteCode = async () => {
+    try {
+      setInviteCodeLoading(true);
+      const res = await fetch('/api/user/invite-code');
+      if (res.ok) {
+        const data = await res.json();
+        setMyInviteCode(data.code || null);
+      }
+    } catch {
+      // ignore
+    } finally {
+      setInviteCodeLoading(false);
+    }
+  };
 
   const handleChangePassword = async () => {
     if (!newPassword || !confirmPassword) {
@@ -50,6 +79,75 @@ export default function SettingsPage() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleRedeemCode = async () => {
+    if (!redeemCode.trim()) {
+      toast({ title: '请输入兑换码', variant: 'destructive' });
+      return;
+    }
+
+    setRedeemLoading(true);
+    try {
+      const res = await fetch('/api/redeem', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: redeemCode.trim() }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      toast({ title: '兑换成功', description: `获得 ${formatBalance(data.points)} 积分` });
+      setRedeemCode('');
+      updateSession();
+    } catch (err) {
+      toast({ 
+        title: '兑换失败', 
+        description: err instanceof Error ? err.message : '未知错误',
+        variant: 'destructive' 
+      });
+    } finally {
+      setRedeemLoading(false);
+    }
+  };
+
+  const handleUseInviteCode = async () => {
+    if (!inviteCode.trim()) {
+      toast({ title: '请输入邀请码', variant: 'destructive' });
+      return;
+    }
+
+    setInviteLoading(true);
+    try {
+      const res = await fetch('/api/invite/use', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ code: inviteCode.trim() }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      toast({ title: '使用成功', description: `获得 ${formatBalance(data.bonusPoints)} 积分` });
+      setInviteCode('');
+      updateSession();
+    } catch (err) {
+      toast({ 
+        title: '使用失败', 
+        description: err instanceof Error ? err.message : '未知错误',
+        variant: 'destructive' 
+      });
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const copyInviteCode = () => {
+    if (myInviteCode) {
+      navigator.clipboard.writeText(myInviteCode);
+      toast({ title: '已复制邀请码' });
     }
   };
 
@@ -114,6 +212,103 @@ export default function SettingsPage() {
                 <span>当前余额</span>
               </div>
               <p className="text-white text-2xl font-light">{formatBalance(session.user.balance)} <span className="text-sm text-white/40">积分</span></p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Redeem Code Card */}
+      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+        <div className="p-6 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
+              <Gift className="w-5 h-5 text-green-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-medium text-white">积分兑换</h2>
+              <p className="text-sm text-white/40">使用兑换码获取积分</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="flex gap-3">
+            <input
+              type="text"
+              value={redeemCode}
+              onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
+              placeholder="输入兑换码"
+              className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors uppercase tracking-wider"
+            />
+            <button
+              onClick={handleRedeemCode}
+              disabled={redeemLoading}
+              className="flex items-center gap-2 px-6 py-3 bg-green-500/20 border border-green-500/30 text-green-400 rounded-xl font-medium hover:bg-green-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {redeemLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ticket className="w-4 h-4" />}
+              兑换
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Invite Code Card */}
+      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+        <div className="p-6 border-b border-white/10">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center">
+              <UserPlus className="w-5 h-5 text-violet-400" />
+            </div>
+            <div>
+              <h2 className="text-lg font-medium text-white">邀请码</h2>
+              <p className="text-sm text-white/40">邀请好友或使用他人邀请码获取积分</p>
+            </div>
+          </div>
+        </div>
+        <div className="p-6 space-y-6">
+          {/* My invite code */}
+          <div className="space-y-2">
+            <label className="text-sm text-white/50 uppercase tracking-wider">我的邀请码</label>
+            <div className="flex gap-3">
+              <div className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white font-mono tracking-wider flex items-center">
+                {inviteCodeLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin text-white/30" />
+                ) : myInviteCode ? (
+                  myInviteCode
+                ) : (
+                  <span className="text-white/30">暂无邀请码</span>
+                )}
+              </div>
+              {myInviteCode && (
+                <button
+                  onClick={copyInviteCode}
+                  className="flex items-center gap-2 px-4 py-3 bg-white/5 border border-white/10 text-white/60 rounded-xl hover:bg-white/10 hover:text-white transition-colors"
+                >
+                  <Copy className="w-4 h-4" />
+                </button>
+              )}
+            </div>
+            <p className="text-xs text-white/30">分享给好友，好友使用后双方都可获得积分奖励</p>
+          </div>
+          
+          {/* Use invite code */}
+          <div className="space-y-2">
+            <label className="text-sm text-white/50 uppercase tracking-wider">使用邀请码</label>
+            <div className="flex gap-3">
+              <input
+                type="text"
+                value={inviteCode}
+                onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                placeholder="输入他人的邀请码"
+                className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors uppercase tracking-wider"
+              />
+              <button
+                onClick={handleUseInviteCode}
+                disabled={inviteLoading}
+                className="flex items-center gap-2 px-6 py-3 bg-violet-500/20 border border-violet-500/30 text-violet-400 rounded-xl font-medium hover:bg-violet-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {inviteLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                使用
+              </button>
             </div>
           </div>
         </div>

@@ -5,6 +5,20 @@ import { BarChart3, Users, Zap, TrendingUp, Loader2 } from 'lucide-react';
 import type { StatsOverview } from '@/types';
 import { formatBalance } from '@/lib/utils';
 
+// Calculate nice Y-axis ticks
+function calcYAxisTicks(max: number): number[] {
+  if (max <= 0) return [0];
+  const magnitude = Math.pow(10, Math.floor(Math.log10(max)));
+  let step = magnitude;
+  if (max / step < 3) step = magnitude / 2;
+  if (max / step > 6) step = magnitude * 2;
+  step = Math.max(1, Math.round(step));
+  const ticks: number[] = [];
+  for (let v = 0; v <= max; v += step) ticks.push(v);
+  if (ticks[ticks.length - 1] < max) ticks.push(ticks[ticks.length - 1] + step);
+  return ticks;
+}
+
 export default function StatsPage() {
   const [stats, setStats] = useState<StatsOverview | null>(null);
   const [loading, setLoading] = useState(true);
@@ -40,6 +54,10 @@ export default function StatsPage() {
 
   const maxGen = Math.max(...stats.dailyStats.map(d => d.generations), 1);
   const maxUsers = Math.max(...stats.dailyStats.map(d => d.users), 1);
+  const genTicks = calcYAxisTicks(maxGen);
+  const userTicks = calcYAxisTicks(maxUsers);
+  const genCeil = genTicks[genTicks.length - 1] || 1;
+  const userCeil = userTicks[userTicks.length - 1] || 1;
 
   return (
     <div className="space-y-6">
@@ -73,21 +91,36 @@ export default function StatsPage() {
         {stats.dailyStats.length === 0 ? (
           <div className="h-48 flex items-center justify-center text-white/40">暂无数据</div>
         ) : (
-          <div className="h-48 flex items-end gap-1">
-            {stats.dailyStats.map((day, i) => (
-              <div key={day.date || i} className="flex-1 flex flex-col items-center gap-1">
-                <div 
-                  className="w-full bg-gradient-to-t from-violet-500 to-fuchsia-500 rounded-t opacity-80 hover:opacity-100 transition-opacity"
-                  style={{ height: `${(day.generations / maxGen) * 100}%`, minHeight: day.generations > 0 ? '4px' : '0' }}
-                  title={`${day.date}: ${day.generations} 次生成`}
-                />
-                {i % Math.ceil(stats.dailyStats.length / 7) === 0 && day.date && (
-                  <span className="text-[10px] text-white/40 whitespace-nowrap mt-2">
-                    {day.date.slice(5)}
-                  </span>
-                )}
+          <div className="flex">
+            {/* Y-axis */}
+            <div className="flex flex-col justify-between h-48 pr-2 text-right">
+              {[...genTicks].reverse().map((v) => (
+                <span key={v} className="text-[10px] text-white/40">{v}</span>
+              ))}
+            </div>
+            {/* Chart */}
+            <div className="flex-1 flex flex-col">
+              <div className="h-48 flex items-end gap-1 border-l border-b border-white/10 pl-1">
+                {stats.dailyStats.map((day, i) => (
+                  <div key={day.date || i} className="flex-1 flex flex-col items-center justify-end group relative">
+                    {/* Value label */}
+                    <span className="text-[9px] text-white/60 mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {day.generations}
+                    </span>
+                    <div 
+                      className="w-full bg-gradient-to-t from-violet-500 to-fuchsia-500 rounded-t opacity-80 group-hover:opacity-100 transition-opacity"
+                      style={{ height: `${(day.generations / genCeil) * 100}%`, minHeight: day.generations > 0 ? '4px' : '0' }}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+              {/* X-axis */}
+              <div className="flex justify-between mt-2 pl-1">
+                {stats.dailyStats.filter((_, i) => i % Math.ceil(stats.dailyStats.length / 7) === 0).map((day) => (
+                  <span key={day.date} className="text-[10px] text-white/40">{day.date?.slice(5)}</span>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>
@@ -98,21 +131,36 @@ export default function StatsPage() {
         {stats.dailyStats.length === 0 ? (
           <div className="h-48 flex items-center justify-center text-white/40">暂无数据</div>
         ) : (
-          <div className="h-48 flex items-end gap-1">
-            {stats.dailyStats.map((day, i) => (
-              <div key={day.date || i} className="flex-1 flex flex-col items-center gap-1">
-                <div 
-                  className="w-full bg-gradient-to-t from-blue-500 to-cyan-500 rounded-t opacity-80 hover:opacity-100 transition-opacity"
-                  style={{ height: `${(day.users / maxUsers) * 100}%`, minHeight: day.users > 0 ? '4px' : '0' }}
-                  title={`${day.date}: ${day.users} 新用户`}
-                />
-                {i % Math.ceil(stats.dailyStats.length / 7) === 0 && day.date && (
-                  <span className="text-[10px] text-white/40 whitespace-nowrap mt-2">
-                    {day.date.slice(5)}
-                  </span>
-                )}
+          <div className="flex">
+            {/* Y-axis */}
+            <div className="flex flex-col justify-between h-48 pr-2 text-right">
+              {[...userTicks].reverse().map((v) => (
+                <span key={v} className="text-[10px] text-white/40">{v}</span>
+              ))}
+            </div>
+            {/* Chart */}
+            <div className="flex-1 flex flex-col">
+              <div className="h-48 flex items-end gap-1 border-l border-b border-white/10 pl-1">
+                {stats.dailyStats.map((day, i) => (
+                  <div key={day.date || i} className="flex-1 flex flex-col items-center justify-end group relative">
+                    {/* Value label */}
+                    <span className="text-[9px] text-white/60 mb-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      {day.users}
+                    </span>
+                    <div 
+                      className="w-full bg-gradient-to-t from-blue-500 to-cyan-500 rounded-t opacity-80 group-hover:opacity-100 transition-opacity"
+                      style={{ height: `${(day.users / userCeil) * 100}%`, minHeight: day.users > 0 ? '4px' : '0' }}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
+              {/* X-axis */}
+              <div className="flex justify-between mt-2 pl-1">
+                {stats.dailyStats.filter((_, i) => i % Math.ceil(stats.dailyStats.length / 7) === 0).map((day) => (
+                  <span key={day.date} className="text-[10px] text-white/40">{day.date?.slice(5)}</span>
+                ))}
+              </div>
+            </div>
           </div>
         )}
       </div>

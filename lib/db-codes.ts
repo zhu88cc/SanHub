@@ -113,6 +113,53 @@ function generateInviteCode(): string {
   return code;
 }
 
+// Get user's own invite code (for sharing)
+export async function getUserInviteCode(userId: string): Promise<string | null> {
+  await initializeCodesTables();
+  const db = getAdapter();
+
+  // Find an unused invite code created by this user
+  const [rows] = await db.execute(
+    'SELECT code FROM invite_codes WHERE creator_id = ? AND used_by IS NULL ORDER BY created_at DESC LIMIT 1',
+    [userId]
+  );
+  const arr = rows as any[];
+  return arr.length > 0 ? arr[0].code : null;
+}
+
+// Create a personal invite code for user (with default bonuses from site settings)
+export async function createUserInviteCode(userId: string): Promise<string> {
+  await initializeCodesTables();
+  const db = getAdapter();
+
+  // Get default bonus from site settings or use defaults
+  const bonusPoints = 100; // Default bonus for invitee
+  const creatorBonus = 50; // Default bonus for inviter
+
+  // Retry up to 5 times in case of code collision
+  for (let attempt = 0; attempt < 5; attempt++) {
+    const code = generateInviteCode();
+    const id = generateId();
+    const now = Date.now();
+
+    try {
+      await db.execute(
+        `INSERT INTO invite_codes (id, code, creator_id, bonus_points, creator_bonus, created_at)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [id, code, userId, bonusPoints, creatorBonus, now]
+      );
+      return code;
+    } catch (err: any) {
+      if (err?.code === 'ER_DUP_ENTRY' || err?.code === 'SQLITE_CONSTRAINT') {
+        continue;
+      }
+      throw err;
+    }
+  }
+
+  throw new Error('Failed to generate unique invite code');
+}
+
 export async function createInviteCode(
   creatorId: string,
   bonusPoints = 0,
