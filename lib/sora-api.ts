@@ -40,19 +40,44 @@ const soraAgent = new Agent({
 });
 
 // ========================================
-// Video Generation API
+// Video Generation API (New Format)
 // ========================================
 
 export interface VideoGenerationRequest {
   prompt: string;
   model?: string;
-  seconds?: '10' | '15';
+  seconds?: '10' | '15' | '25';
   orientation?: 'landscape' | 'portrait';
+  size?: string; // e.g., '1920x1080', '1080x1920'
   style_id?: string;
   input_image?: string; // Base64 encoded image
   remix_target_id?: string;
+  async_mode?: boolean;
 }
 
+// New API response format
+export interface VideoTaskResponse {
+  id: string;
+  object: string;
+  model: string;
+  created_at: number;
+  status: 'processing' | 'succeeded' | 'failed';
+  progress: number;
+  expires_at?: number;
+  size?: string;
+  seconds?: string;
+  quality?: string;
+  url?: string;
+  permalink?: string;
+  revised_prompt?: string;
+  remixed_from_video_id?: string | null;
+  error?: {
+    message: string;
+    type: string;
+  } | null;
+}
+
+// Legacy response format (for compatibility)
 export interface VideoGenerationResponse {
   id: string;
   object: string;
@@ -66,7 +91,102 @@ export interface VideoGenerationResponse {
   }>;
 }
 
-export async function generateVideo(request: VideoGenerationRequest): Promise<VideoGenerationResponse> {
+// 自适应轮询间隔计算
+function getPollingInterval(progress: number, stallCount: number): number {
+  // 基础间隔根据进度调整
+  let baseInterval: number;
+  if (progress < 30) {
+    baseInterval = 5000; // 0-30%: 5秒
+  } else if (progress < 70) {
+    baseInterval = 3000; // 30-70%: 3秒
+  } else {
+    baseInterval = 2000; // 70-100%: 2秒
+  }
+  
+  // 停滞时增加间隔
+  if (stallCount > 0) {
+    baseInterval = Math.min(baseInterval + stallCount * 2000, 10000);
+  }
+  
+  return baseInterval;
+}
+
+// 查询视频任务状态
+export async function getVideoStatus(videoId: string): Promise<VideoTaskResponse> {
+  const { apiKey, baseUrl } = await getSoraConfig();
+  
+  if (!apiKey) {
+    throw new Error('Sora API Key 未配置');
+  }
+  
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+  const apiUrl = `${normalizedBaseUrl}/v1/videos/${videoId}`;
+  
+  const response = await undiciFetch(apiUrl, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+    },
+    dispatcher: soraAgent,
+  });
+  
+  const data = await response.json() as any;
+  
+  if (!response.ok) {
+    const errorMessage = data?.error?.message || data?.message || '查询视频状态失败';
+    throw new Error(errorMessage);
+  }
+  
+  return data as VideoTaskResponse;
+}
+
+// 轮询等待视频完成
+async function pollVideoCompletion(
+  videoId: string,
+  onProgress?: (progress: number, status: string) => void
+): Promise<VideoTaskResponse> {
+  let lastProgress = -1;
+  let stallCount = 0;
+  const maxStallCount = 60; // 最大停滞次数（约10分钟）
+  
+  while (true) {
+    const status = await getVideoStatus(videoId);
+    
+    if (onProgress) {
+      onProgress(status.progress, status.status);
+    }
+    
+    console.log(`[Sora API] 视频状态: ${status.status}, 进度: ${status.progress}%`);
+    
+    if (status.status === 'succeeded') {
+      return status;
+    }
+    
+    if (status.status === 'failed') {
+      throw new Error(status.error?.message || '视频生成失败');
+    }
+    
+    // 检测停滞
+    if (status.progress === lastProgress) {
+      stallCount++;
+      if (stallCount >= maxStallCount) {
+        throw new Error('视频生成超时：进度长时间无变化');
+      }
+    } else {
+      stallCount = 0;
+      lastProgress = status.progress;
+    }
+    
+    // 自适应等待
+    const interval = getPollingInterval(status.progress, stallCount);
+    await new Promise(resolve => setTimeout(resolve, interval));
+  }
+}
+
+export async function generateVideo(
+  request: VideoGenerationRequest,
+  onProgress?: (progress: number, status: string) => void
+): Promise<VideoGenerationResponse> {
   const { apiKey, baseUrl } = await getSoraConfig();
 
   if (!apiKey) {
@@ -84,25 +204,20 @@ export async function generateVideo(request: VideoGenerationRequest): Promise<Vi
     apiUrl,
     model: request.model,
     prompt: request.prompt?.substring(0, 50),
+    seconds: request.seconds,
+    size: request.size,
+    hasInputImage: !!request.input_image,
   });
 
   // 使用 form-data 格式
   const formData = new FormData();
   
-  // 如果没有 prompt，使用默认值
   const prompt = request.prompt || 'Generate video';
-  
-  console.log('[Sora API] 构建 form-data:', {
-    prompt,
-    model: request.model,
-    seconds: request.seconds,
-    orientation: request.orientation,
-    hasInputImage: !!request.input_image,
-  });
   
   formData.append('prompt', prompt);
   if (request.model) formData.append('model', request.model);
   if (request.seconds) formData.append('seconds', request.seconds);
+  if (request.size) formData.append('size', request.size);
   if (request.orientation) formData.append('orientation', request.orientation);
   if (request.style_id) formData.append('style_id', request.style_id);
   if (request.remix_target_id) formData.append('remix_target_id', request.remix_target_id);
@@ -128,7 +243,8 @@ export async function generateVideo(request: VideoGenerationRequest): Promise<Vi
   console.log('[Sora API] 视频生成响应:', {
     status: response.status,
     ok: response.ok,
-    data: JSON.stringify(data, null, 2),
+    hasUrl: !!data?.url,
+    taskStatus: data?.status,
   });
 
   if (!response.ok) {
@@ -137,9 +253,106 @@ export async function generateVideo(request: VideoGenerationRequest): Promise<Vi
     throw new Error(errorMessage);
   }
 
-  console.log('[Sora API] 视频生成成功:', data.data?.[0]?.url);
+  // 检查是否是新格式响应（有 status 字段）
+  if ('status' in data) {
+    const taskResponse = data as VideoTaskResponse;
+    
+    // 如果已经成功，直接返回
+    if (taskResponse.status === 'succeeded' && taskResponse.url) {
+      console.log('[Sora API] 视频生成成功（同步模式）:', taskResponse.url);
+      return {
+        id: taskResponse.id,
+        object: taskResponse.object,
+        created: taskResponse.created_at,
+        model: taskResponse.model,
+        data: [{
+          url: taskResponse.url,
+          permalink: taskResponse.permalink,
+          revised_prompt: taskResponse.revised_prompt,
+        }],
+      };
+    }
+    
+    // 如果失败，抛出错误
+    if (taskResponse.status === 'failed') {
+      throw new Error(taskResponse.error?.message || '视频生成失败');
+    }
+    
+    // 如果还在处理中，轮询等待
+    if (taskResponse.status === 'processing') {
+      console.log('[Sora API] 视频正在处理中，开始轮询...');
+      const finalStatus = await pollVideoCompletion(taskResponse.id, onProgress);
+      
+      if (!finalStatus.url) {
+        throw new Error('视频生成完成但未返回 URL');
+      }
+      
+      return {
+        id: finalStatus.id,
+        object: finalStatus.object,
+        created: finalStatus.created_at,
+        model: finalStatus.model,
+        data: [{
+          url: finalStatus.url,
+          permalink: finalStatus.permalink,
+          revised_prompt: finalStatus.revised_prompt,
+        }],
+      };
+    }
+  }
+
+  // 旧格式响应（直接返回 data 数组）
+  console.log('[Sora API] 视频生成成功（旧格式）:', data.data?.[0]?.url);
   return data as VideoGenerationResponse;
 }
+
+// 异步创建视频任务（立即返回任务ID）
+export async function createVideoTask(request: VideoGenerationRequest): Promise<VideoTaskResponse> {
+  const { apiKey, baseUrl } = await getSoraConfig();
+
+  if (!apiKey) {
+    throw new Error('Sora API Key 未配置');
+  }
+
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+  const apiUrl = `${normalizedBaseUrl}/v1/videos`;
+
+  const formData = new FormData();
+  
+  formData.append('prompt', request.prompt || 'Generate video');
+  formData.append('async_mode', 'true');
+  
+  if (request.model) formData.append('model', request.model);
+  if (request.seconds) formData.append('seconds', request.seconds);
+  if (request.size) formData.append('size', request.size);
+  if (request.orientation) formData.append('orientation', request.orientation);
+  if (request.style_id) formData.append('style_id', request.style_id);
+  if (request.remix_target_id) formData.append('remix_target_id', request.remix_target_id);
+  
+  if (request.input_image) {
+    const imageBuffer = Buffer.from(request.input_image, 'base64');
+    const imageBlob = new Blob([imageBuffer], { type: 'image/jpeg' });
+    formData.append('input_reference', imageBlob, 'input.jpg');
+  }
+
+  const response = await undiciFetch(apiUrl, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: formData,
+    dispatcher: soraAgent,
+  });
+
+  const data = await response.json() as any;
+
+  if (!response.ok) {
+    throw new Error(data?.error?.message || '创建视频任务失败');
+  }
+
+  return data as VideoTaskResponse;
+}
+
 
 // ========================================
 // Image Generation API

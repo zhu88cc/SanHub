@@ -9,27 +9,40 @@ import { generateVideo, type VideoGenerationRequest } from './sora-api';
 // 获取生成类型和成本
 function getTypeAndCost(
   model: string,
-  pricing: { soraVideo10s: number; soraVideo15s: number }
+  pricing: { soraVideo10s: number; soraVideo15s: number; soraVideo25s: number }
 ): { type: 'sora-video'; cost: number } {
-  if (model.includes('15s')) {
+  if (model.includes('25s') || model.includes('25')) {
+    return { type: 'sora-video', cost: pricing.soraVideo25s };
+  }
+  if (model.includes('15s') || model.includes('15')) {
     return { type: 'sora-video', cost: pricing.soraVideo15s };
   }
   return { type: 'sora-video', cost: pricing.soraVideo10s };
 }
 
-// 从模型名称解析方向和时长
-function parseModelParams(model: string): { orientation: 'landscape' | 'portrait'; seconds: '10' | '15' } {
+// 从模型名称解析方向、时长和分辨率
+function parseModelParams(model: string): {
+  orientation: 'landscape' | 'portrait';
+  seconds: '10' | '15' | '25';
+  size?: string;
+} {
   let orientation: 'landscape' | 'portrait' = 'landscape';
-  let seconds: '10' | '15' = '10';
+  let seconds: '10' | '15' | '25' = '10';
 
   if (model.includes('portrait')) {
     orientation = 'portrait';
   }
-  if (model.includes('15s') || model.includes('15')) {
+  
+  if (model.includes('25s') || model.includes('25')) {
+    seconds = '25';
+  } else if (model.includes('15s') || model.includes('15')) {
     seconds = '15';
   }
 
-  return { orientation, seconds };
+  // 根据方向设置默认分辨率
+  const size = orientation === 'portrait' ? '1080x1920' : '1920x1080';
+
+  return { orientation, seconds, size };
 }
 
 // 生成内容 (Non-Streaming)
@@ -46,7 +59,7 @@ export async function generateWithSora(
   });
 
   // 解析模型参数
-  const { orientation, seconds } = parseModelParams(request.model);
+  const { orientation, seconds, size } = parseModelParams(request.model);
 
   // 构建非流式 API 请求
   const videoRequest: VideoGenerationRequest = {
@@ -54,6 +67,7 @@ export async function generateWithSora(
     model: request.model,
     orientation,
     seconds,
+    size,
   };
 
   // 如果有参考图片，添加到请求

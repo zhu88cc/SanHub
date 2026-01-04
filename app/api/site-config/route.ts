@@ -14,7 +14,11 @@ export async function GET() {
     const config = await getSystemConfig();
     return NextResponse.json({
       success: true,
-      data: config.siteConfig,
+      data: {
+        ...config.siteConfig,
+        registerEnabled: config.registerEnabled,
+        defaultBalance: config.defaultBalance,
+      },
     });
   } catch (error) {
     console.error('Failed to get site config:', error);

@@ -30,6 +30,9 @@ COPY . .
 # 确保 public 目录存在
 RUN mkdir -p public
 
+# 清理可能存在的旧构建缓存
+RUN rm -rf .next
+
 # 设置环境变量
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production

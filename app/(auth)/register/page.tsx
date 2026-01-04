@@ -19,6 +19,19 @@ export default function RegisterPage() {
   const [captchaCode, setCaptchaCode] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [defaultBalance, setDefaultBalance] = useState<number>(100);
+
+  // 获取站点配置
+  useEffect(() => {
+    fetch('/api/site-config')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.data?.defaultBalance !== undefined) {
+          setDefaultBalance(data.data.defaultBalance);
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   // 已登录用户自动跳转
   useEffect(() => {
@@ -131,7 +144,7 @@ export default function RegisterPage() {
           {/* Bonus hint */}
           <div className="flex items-center justify-center gap-2 py-2.5 px-5 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-500/20 rounded-full mx-auto w-fit backdrop-blur-sm">
             <Gift className="w-4 h-4 text-purple-400" />
-            <span className="text-sm text-white/70">新用户赠送 <span className="text-purple-400 font-medium">100</span> 积分</span>
+            <span className="text-sm text-white/70">新用户赠送 <span className="text-purple-400 font-medium">{defaultBalance}</span> 积分</span>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
