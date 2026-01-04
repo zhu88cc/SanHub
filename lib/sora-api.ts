@@ -5,6 +5,25 @@ import { fetch as undiciFetch, Agent, FormData } from 'undici';
 // Sora OpenAI-Style Non-Streaming API
 // ========================================
 
+// 解析视频 URL（处理字符串、JSON 字符串数组、数组等格式）
+function parseVideoUrl(url: string | string[] | unknown): string {
+  if (typeof url === 'string') {
+    if (url.startsWith('[')) {
+      try {
+        const urls = JSON.parse(url);
+        return Array.isArray(urls) && urls.length > 0 ? urls[0] : url;
+      } catch {
+        return url;
+      }
+    }
+    return url;
+  }
+  if (Array.isArray(url) && url.length > 0) {
+    return url[0];
+  }
+  return String(url);
+}
+
 // 获取 Sora 配置（优先从新渠道表读取，回退到旧 system_config）
 async function getSoraConfig(): Promise<{ apiKey: string; baseUrl: string }> {
   // 优先从 video_channels 表获取 sora 类型的渠道
@@ -259,14 +278,15 @@ export async function generateVideo(
     
     // 如果已经成功，直接返回
     if (taskResponse.status === 'succeeded' && taskResponse.url) {
-      console.log('[Sora API] 视频生成成功（同步模式）:', taskResponse.url);
+      const videoUrl = parseVideoUrl(taskResponse.url);
+      console.log('[Sora API] 视频生成成功（同步模式）:', videoUrl);
       return {
         id: taskResponse.id,
         object: taskResponse.object,
         created: taskResponse.created_at,
         model: taskResponse.model,
         data: [{
-          url: taskResponse.url,
+          url: videoUrl,
           permalink: taskResponse.permalink,
           revised_prompt: taskResponse.revised_prompt,
         }],
@@ -287,13 +307,14 @@ export async function generateVideo(
         throw new Error('视频生成完成但未返回 URL');
       }
       
+      const videoUrl = parseVideoUrl(finalStatus.url);
       return {
         id: finalStatus.id,
         object: finalStatus.object,
         created: finalStatus.created_at,
         model: finalStatus.model,
         data: [{
-          url: finalStatus.url,
+          url: videoUrl,
           permalink: finalStatus.permalink,
           revised_prompt: finalStatus.revised_prompt,
         }],
