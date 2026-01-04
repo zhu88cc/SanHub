@@ -259,38 +259,46 @@ export async function generateVideo(
 
   const data = await response.json() as any;
 
-  console.log('[Sora API] 视频生成响应:', {
+  // 版本标记 v2 - 用于确认部署
+  console.log('[Sora API v2] 视频生成响应:', {
     status: response.status,
     ok: response.ok,
     hasUrl: !!data?.url,
     taskStatus: data?.status,
+    taskId: data?.id,
+    dataKeys: Object.keys(data || {}),
   });
+
+  // 始终打印完整响应用于调试
+  console.log('[Sora API v2] 完整响应体:', JSON.stringify(data));
 
   if (!response.ok) {
     const errorMessage = data?.error?.message || data?.message || data?.error || '视频生成失败';
-    console.error('[Sora API] 视频生成错误:', errorMessage, '完整响应:', JSON.stringify(data));
+    console.error('[Sora API v2] 视频生成错误:', errorMessage);
     throw new Error(errorMessage);
   }
 
-  // 检查是否是新格式响应（有 status 字段）
-  if ('status' in data) {
+  // 检查是否是新格式响应（有 id 和 status 字段，或者有 id 和 url 字段）
+  if (data?.id && (data?.status || data?.url)) {
     const taskResponse = data as VideoTaskResponse;
     
-    // 如果已经成功，直接返回
-    if (taskResponse.status === 'succeeded' && taskResponse.url) {
-      const videoUrl = parseVideoUrl(taskResponse.url);
-      console.log('[Sora API] 视频生成成功（同步模式）:', videoUrl);
-      return {
-        id: taskResponse.id,
-        object: taskResponse.object,
-        created: taskResponse.created_at,
-        model: taskResponse.model,
-        data: [{
-          url: videoUrl,
-          permalink: taskResponse.permalink,
-          revised_prompt: taskResponse.revised_prompt,
-        }],
-      };
+    // 如果已经成功（有 url 或 status === 'succeeded'）
+    if (taskResponse.url || taskResponse.status === 'succeeded') {
+      if (taskResponse.url) {
+        const videoUrl = parseVideoUrl(taskResponse.url);
+        console.log('[Sora API] 视频生成成功（同步模式）:', videoUrl);
+        return {
+          id: taskResponse.id,
+          object: taskResponse.object || 'video',
+          created: taskResponse.created_at || Date.now(),
+          model: taskResponse.model || '',
+          data: [{
+            url: videoUrl,
+            permalink: taskResponse.permalink,
+            revised_prompt: taskResponse.revised_prompt,
+          }],
+        };
+      }
     }
     
     // 如果失败，抛出错误
@@ -299,8 +307,8 @@ export async function generateVideo(
     }
     
     // 如果还在处理中，轮询等待
-    if (taskResponse.status === 'processing') {
-      console.log('[Sora API] 视频正在处理中，开始轮询...');
+    if (taskResponse.status === 'processing' || (taskResponse.id && !taskResponse.url)) {
+      console.log('[Sora API] 视频正在处理中，开始轮询... taskId:', taskResponse.id);
       const finalStatus = await pollVideoCompletion(taskResponse.id, onProgress);
       
       if (!finalStatus.url) {
@@ -310,9 +318,9 @@ export async function generateVideo(
       const videoUrl = parseVideoUrl(finalStatus.url);
       return {
         id: finalStatus.id,
-        object: finalStatus.object,
-        created: finalStatus.created_at,
-        model: finalStatus.model,
+        object: finalStatus.object || 'video',
+        created: finalStatus.created_at || Date.now(),
+        model: finalStatus.model || '',
         data: [{
           url: videoUrl,
           permalink: finalStatus.permalink,
@@ -323,8 +331,14 @@ export async function generateVideo(
   }
 
   // 旧格式响应（直接返回 data 数组）
-  console.log('[Sora API] 视频生成成功（旧格式）:', data.data?.[0]?.url);
-  return data as VideoGenerationResponse;
+  if (data?.data && Array.isArray(data.data) && data.data.length > 0 && data.data[0]?.url) {
+    console.log('[Sora API] 视频生成成功（旧格式）:', data.data[0].url);
+    return data as VideoGenerationResponse;
+  }
+
+  // 未知格式，抛出错误
+  console.error('[Sora API] 未知响应格式:', JSON.stringify(data));
+  throw new Error('视频生成失败：API 返回了未知格式的响应');
 }
 
 // 异步创建视频任务（立即返回任务ID）
