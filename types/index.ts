@@ -98,6 +98,7 @@ export interface GenerationParams {
   imageCount?: number; // 参考图数量
   permalink?: string;
   revised_prompt?: string;
+  progress?: number; // 生成进度 0-100
 }
 
 // SORA 后台配置
