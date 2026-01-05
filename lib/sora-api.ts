@@ -272,8 +272,8 @@ export async function getVideoContentUrl(videoId: string): Promise<string> {
   
   console.log('[Sora API v5] /content 响应状态:', response.status);
   
-  // 如果是重定向，返回 Location header 中的实际视频 URL
-  if (response.status === 302 || response.status === 301) {
+  // 如果是重定向（301, 302, 307, 308），返回 Location header 中的实际视频 URL
+  if ([301, 302, 307, 308].includes(response.status)) {
     const location = response.headers.get('location');
     console.log('[Sora API v5] /content 重定向 Location:', location?.substring(0, 100));
     if (location) {
