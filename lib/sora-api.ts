@@ -310,6 +310,21 @@ async function pollVideoCompletion(
       return status;
     }
     
+    // 进度 100% 但状态仍是 in_progress，尝试获取 /content
+    if (status.progress >= 100 && !status.url) {
+      try {
+        console.log('[Sora API v5] 进度100%但状态未完成，尝试 /content 端点');
+        const contentUrl = await getVideoContentUrl(videoId);
+        if (contentUrl) {
+          status.url = contentUrl;
+          status.status = 'completed';
+          return status;
+        }
+      } catch (e) {
+        console.log('[Sora API v5] /content 端点获取失败，继续轮询:', e);
+      }
+    }
+    
     if (status.status === 'failed') {
       throw new Error(status.error?.message || '视频生成失败');
     }
