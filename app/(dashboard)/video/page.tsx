@@ -637,8 +637,8 @@ export default function VideoGenerationPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-1">
+      <div className="grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[400px_minmax(0,1fr)] gap-6">
+        <div>
           <div className={cn(
             "bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm",
             (availableModels.length === 0 || isVideoLimitReached) && "opacity-50 pointer-events-none"
@@ -1017,7 +1017,7 @@ export default function VideoGenerationPage() {
           </div>
         </div>
 
-        <div className="lg:col-span-2">
+        <div className="min-w-0">
           <ResultGallery
             generations={generations}
             tasks={tasks}
