@@ -1,6 +1,6 @@
 /* eslint-disable no-console */
 import { getSystemConfig, getVideoChannels, getVideoChannel } from './db';
-import { fetch as undiciFetch, Agent, FormData } from 'undici';
+import { fetch as undiciFetch, Agent, FormData, type RequestInit as UndiciRequestInit } from 'undici';
 import type { VideoChannel } from '@/types';
 import { fetchWithRetry } from './http-retry';
 
@@ -300,14 +300,15 @@ export async function getVideoContentUrl(videoId: string, channelId?: string): P
   console.log('[Sora API v5] 获取视频内容:', apiUrl);
   
   // 使用 redirect: 'manual' 来捕获 302 重定向的 Location
-  const response = await fetchWithRetry(undiciFetch, apiUrl, () => ({
+  const requestInit: UndiciRequestInit = {
     method: 'GET',
     headers: {
       Authorization: `Bearer ${apiKey}`,
     },
     redirect: 'manual',
     dispatcher: soraAgent,
-  }));
+  };
+  const response = await fetchWithRetry(undiciFetch, apiUrl, () => requestInit);
   
   console.log('[Sora API v5] /content 响应状态:', response.status);
   
