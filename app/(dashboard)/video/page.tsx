@@ -1,7 +1,7 @@
 'use client';
 /* eslint-disable @next/next/no-img-element */
 
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo, type ReactNode } from 'react';
 import { useSession } from 'next-auth/react';
 import {
   Video,
@@ -36,6 +36,24 @@ const CREATION_MODES = [
   { id: 'remix', label: '视频Remix', icon: Wand2, description: '基于已有视频继续创作' },
   { id: 'storyboard', label: '视频分镜', icon: Film, description: '多镜头分段生成' },
 ] as const;
+
+type OptionGroupProps = {
+  label: string;
+  children: ReactNode;
+  className?: string;
+  contentClassName: string;
+};
+
+function OptionGroup({ label, children, className, contentClassName }: OptionGroupProps) {
+  return (
+    <div className={cn('space-y-2', className)}>
+      <label className="text-xs text-white/50 uppercase tracking-wider">{label}</label>
+      <div className={cn(contentClassName)}>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function VideoGenerationPage() {
   const { update } = useSession();
@@ -658,95 +676,86 @@ export default function VideoGenerationPage() {
 
             <div className="px-5 py-4 space-y-4">
               {/* Creation Mode Selection */}
-              <div className="space-y-2">
-                <label className="text-xs text-white/50 uppercase tracking-wider">创作模式</label>
-                <div className="grid grid-cols-3 gap-2">
-                  {CREATION_MODES.map((mode) => (
-                    <button
-                      key={mode.id}
-                      onClick={() => setCreationMode(mode.id as CreationMode)}
-                      className={cn(
-                        'flex flex-col items-center gap-1.5 px-2 py-2.5 rounded-lg border transition-all',
-                        creationMode === mode.id
-                          ? 'bg-white text-black border-white'
-                          : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
-                      )}
-                    >
-                      <mode.icon className="w-4 h-4" />
-                      <span className="text-xs font-medium">{mode.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <OptionGroup label="创作模式" contentClassName="grid grid-cols-3 gap-2">
+                {CREATION_MODES.map((mode) => (
+                  <button
+                    key={mode.id}
+                    onClick={() => setCreationMode(mode.id as CreationMode)}
+                    className={cn(
+                      'flex w-full flex-col items-center gap-1.5 px-2 py-2.5 rounded-lg border transition-all',
+                      creationMode === mode.id
+                        ? 'bg-white text-black border-white'
+                        : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
+                    )}
+                  >
+                    <mode.icon className="w-4 h-4" />
+                    <span className="text-xs font-medium">{mode.label}</span>
+                  </button>
+                ))}
+              </OptionGroup>
 
               {/* Model Selection */}
-              <div className="space-y-2">
-                <label className="text-xs text-white/50 uppercase tracking-wider">模型</label>
-                <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-                  {availableModels.map((model) => (
-                    <button
-                      key={model.id}
-                      type="button"
-                      title={model.description || model.name}
-                      onClick={() => setSelectedModelId(model.id)}
-                      className={cn(
-                        'px-3 py-2 rounded-lg border text-xs font-medium transition-all shrink-0',
-                        selectedModelId === model.id
-                          ? 'bg-white text-black border-white'
-                          : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
-                      )}
-                    >
-                      <span className="max-w-[140px] truncate">{model.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <OptionGroup
+                label="模型"
+                contentClassName="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1"
+              >
+                {availableModels.map((model) => (
+                  <button
+                    key={model.id}
+                    type="button"
+                    title={model.description || model.name}
+                    onClick={() => setSelectedModelId(model.id)}
+                    className={cn(
+                      'px-3 py-2 rounded-lg border text-xs font-medium transition-all shrink-0',
+                      selectedModelId === model.id
+                        ? 'bg-white text-black border-white'
+                        : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
+                    )}
+                  >
+                    <span className="max-w-[140px] truncate">{model.name}</span>
+                  </button>
+                ))}
+              </OptionGroup>
 
               {/* Aspect Ratio */}
               {currentModel && (
-              <div className="space-y-2">
-                <label className="text-xs text-white/50 uppercase tracking-wider">画面比例</label>
-                <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-                  {currentModel.aspectRatios.map((r) => (
-                    <button
-                      key={r.value}
-                      onClick={() => setAspectRatio(r.value)}
-                      className={cn(
-                        'flex items-center gap-1.5 px-3 py-2 rounded-lg border transition-all text-xs font-medium shrink-0',
-                        aspectRatio === r.value
-                          ? 'bg-white text-black border-white'
-                          : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
-                      )}
-                    >
-                      <span className="text-sm">{r.value === 'landscape' ? '▬' : '▮'}</span>
-                      <span className="text-xs font-medium">{r.label}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <OptionGroup label="画面比例" contentClassName="grid grid-cols-2 gap-2">
+                {currentModel.aspectRatios.map((r) => (
+                  <button
+                    key={r.value}
+                    onClick={() => setAspectRatio(r.value)}
+                    className={cn(
+                      'flex items-center gap-1.5 px-3 py-2 rounded-lg border transition-all text-xs font-medium',
+                      aspectRatio === r.value
+                        ? 'bg-white text-black border-white'
+                        : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
+                    )}
+                  >
+                    <span className="text-sm">{r.value === 'landscape' ? '▬' : '▮'}</span>
+                    <span className="text-xs font-medium">{r.label}</span>
+                  </button>
+                ))}
+              </OptionGroup>
               )}
 
               {/* Duration */}
               {currentModel && (
-              <div className="space-y-2">
-                <label className="text-xs text-white/50 uppercase tracking-wider">视频时长</label>
-                <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-                  {currentModel.durations.map((d) => (
-                    <button
-                      key={d.value}
-                      onClick={() => setDuration(d.value)}
-                      className={cn(
-                        'px-3 py-2 rounded-lg border transition-all text-xs font-medium shrink-0',
-                        duration === d.value
-                          ? 'bg-white text-black border-white'
-                          : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
-                      )}
-                    >
-                      {d.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <OptionGroup label="视频时长" contentClassName="grid grid-cols-3 gap-2">
+                {currentModel.durations.map((d) => (
+                  <button
+                    key={d.value}
+                    onClick={() => setDuration(d.value)}
+                    className={cn(
+                      'px-3 py-2 rounded-lg border transition-all text-xs font-medium',
+                      duration === d.value
+                        ? 'bg-white text-black border-white'
+                        : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
+                    )}
+                  >
+                    {d.label}
+                  </button>
+                ))}
+              </OptionGroup>
               )}
 
               {/* Mode-specific inputs */}
