@@ -29,13 +29,13 @@ export function WorkspaceContextMenu({
 }: WorkspaceContextMenuProps) {
   return (
     <div
-      className="absolute z-50 bg-black/90 border border-white/20 rounded-lg shadow-xl py-1 min-w-[160px]"
+      className="absolute z-50 bg-card/95 border border-border/70 rounded-lg shadow-xl py-1 min-w-[160px]"
       style={{
         left: position.x * zoom,
         top: position.y * zoom,
       }}
     >
-      <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-white/40 border-b border-white/10">
+      <div className="px-3 py-1.5 text-[10px] uppercase tracking-wider text-foreground/40 border-b border-border/70">
         添加节点
       </div>
       {NODE_TYPES.map(({ type, label, icon: Icon }) => (
@@ -45,7 +45,7 @@ export function WorkspaceContextMenu({
             onAddNode(type, position);
             onClose();
           }}
-          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-white/80 hover:bg-white/10 transition"
+          className="w-full flex items-center gap-2 px-3 py-2 text-sm text-foreground/80 hover:bg-card/70 transition"
         >
           <Icon className="w-4 h-4" />
           {label}
@@ -54,3 +54,4 @@ export function WorkspaceContextMenu({
     </div>
   );
 }
+

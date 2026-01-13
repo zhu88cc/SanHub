@@ -333,8 +333,8 @@ export default function CharacterCardPage() {
     <div className="max-w-7xl mx-auto space-y-6">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-extralight text-white">角色卡生成</h1>
-          <p className="text-white/50 mt-1 font-light">
+          <h1 className="text-3xl font-extralight text-foreground">角色卡生成</h1>
+          <p className="text-foreground/50 mt-1 font-light">
             上传视频生成专属角色卡，角色卡将绑定到您的账户
           </p>
         </div>
@@ -343,7 +343,7 @@ export default function CharacterCardPage() {
             "px-4 py-2 rounded-xl border text-sm",
             isCharacterCardLimitReached
               ? "bg-red-500/10 border-red-500/30 text-red-400"
-              : "bg-white/5 border-white/10 text-white/60"
+              : "bg-card/60 border-border/70 text-foreground/60"
           )}>
             今日: {dailyUsage.characterCardCount} / {dailyLimits.characterCardLimit}
           </div>
@@ -362,18 +362,18 @@ export default function CharacterCardPage() {
         {/* 左侧 - 生成面板 */}
         <div className="lg:col-span-1">
           <div className={cn(
-            "bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm",
+            "bg-card/60 border border-border/70 rounded-2xl overflow-hidden backdrop-blur-sm",
             isCharacterCardLimitReached && "opacity-50 pointer-events-none"
           )}>
             {/* Header */}
-            <div className="px-5 py-4 border-b border-white/10 bg-gradient-to-r from-pink-500/5 to-purple-500/5">
+            <div className="px-5 py-4 border-b border-border/70 bg-gradient-to-r from-emerald-500/5 to-sky-500/5">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-pink-500/30 to-purple-500/30 rounded-lg flex items-center justify-center">
-                  <User className="w-4 h-4 text-pink-400" />
+                <div className="w-9 h-9 bg-gradient-to-br from-emerald-500/30 to-sky-500/30 rounded-lg flex items-center justify-center">
+                  <User className="w-4 h-4 text-emerald-400" />
                 </div>
                 <div>
-                  <h2 className="text-base font-medium text-white">角色卡创建</h2>
-                  <p className="text-xs text-white/40">从视频提取角色</p>
+                  <h2 className="text-base font-medium text-foreground">角色卡创建</h2>
+                  <p className="text-xs text-foreground/40">从视频提取角色</p>
                 </div>
               </div>
             </div>
@@ -382,7 +382,7 @@ export default function CharacterCardPage() {
               {/* 视频上传 */}
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs text-white/50 uppercase tracking-wider">上传视频</label>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">上传视频</label>
                   {videoFile && (
                     <button
                       onClick={clearVideo}
@@ -402,18 +402,18 @@ export default function CharacterCardPage() {
                 {!videoFile ? (
                   <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="border border-dashed border-white/20 rounded-lg p-6 text-center cursor-pointer hover:bg-white/5 hover:border-pink-500/30 transition-all group"
+                    className="border border-dashed border-border/70 rounded-lg p-6 text-center cursor-pointer hover:bg-card/60 hover:border-emerald-500/30 transition-all group"
                   >
-                    <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-pink-500/10 to-purple-500/10 flex items-center justify-center group-hover:from-pink-500/20 group-hover:to-purple-500/20 transition-all">
-                      <Upload className="w-5 h-5 text-pink-400/60 group-hover:text-pink-400 transition-colors" />
+                    <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-emerald-500/10 to-sky-500/10 flex items-center justify-center group-hover:from-emerald-500/20 group-hover:to-sky-500/20 transition-all">
+                      <Upload className="w-5 h-5 text-emerald-400/60 group-hover:text-emerald-400 transition-colors" />
                     </div>
-                    <p className="text-sm text-white/60 group-hover:text-white/80 transition-colors">点击上传视频</p>
-                    <p className="text-xs text-white/30 mt-1">MP4 格式 · 最长 15 秒 · 最大 15MB</p>
+                    <p className="text-sm text-foreground/60 group-hover:text-foreground/80 transition-colors">点击上传视频</p>
+                    <p className="text-xs text-foreground/30 mt-1">MP4 格式 · 最长 15 秒 · 最大 15MB</p>
                   </div>
                 ) : (
                   <div className="space-y-3">
                     {/* 视频预览 */}
-                    <div className="relative aspect-video rounded-lg overflow-hidden border border-white/10">
+                    <div className="relative aspect-video rounded-lg overflow-hidden border border-border/70">
                       <video
                         src={videoFile.preview}
                         className="w-full h-full object-cover"
@@ -421,8 +421,8 @@ export default function CharacterCardPage() {
                       />
                     </div>
                     {/* 第一帧预览 */}
-                    <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-pink-500/10 to-purple-500/10 rounded-lg border border-pink-500/20">
-                      <div className="w-12 h-12 rounded-lg overflow-hidden border border-white/20 shrink-0">
+                    <div className="flex items-center gap-3 p-3 bg-gradient-to-r from-emerald-500/10 to-sky-500/10 rounded-lg border border-emerald-500/20">
+                      <div className="w-12 h-12 rounded-lg overflow-hidden border border-border/70 shrink-0">
                         <img
                           src={videoFile.firstFrame}
                           alt="Video first frame"
@@ -430,8 +430,8 @@ export default function CharacterCardPage() {
                         />
                       </div>
                       <div>
-                        <p className="text-xs text-white/80">角色卡封面</p>
-                        <p className="text-[10px] text-white/40">将使用视频第一帧作为角色卡图案</p>
+                        <p className="text-xs text-foreground/80">角色卡封面</p>
+                        <p className="text-[10px] text-foreground/40">将使用视频第一帧作为角色卡图案</p>
                       </div>
                     </div>
                   </div>
@@ -442,16 +442,16 @@ export default function CharacterCardPage() {
               {videoFile && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs text-white/50 uppercase tracking-wider">提取区间</label>
-                    <span className="text-xs text-white/40 font-mono">
+                    <label className="text-xs text-foreground/50 uppercase tracking-wider">提取区间</label>
+                    <span className="text-xs text-foreground/40 font-mono">
                       {timestampStart.toFixed(1)}s - {timestampEnd.toFixed(1)}s
                     </span>
                   </div>
-                  <div className="p-3 bg-white/5 rounded-lg space-y-3">
+                  <div className="p-3 bg-card/60 rounded-lg space-y-3">
                     {/* 可视化时间轴 */}
-                    <div className="relative h-3 bg-white/10 rounded-full overflow-hidden">
+                    <div className="relative h-3 bg-card/70 rounded-full overflow-hidden">
                       <div
-                        className="absolute h-full bg-gradient-to-r from-pink-500 to-purple-500 rounded-full transition-all"
+                        className="absolute h-full bg-gradient-to-r from-emerald-500 to-sky-500 rounded-full transition-all"
                         style={{
                           left: `${(timestampStart / videoDuration) * 100}%`,
                           width: `${((timestampEnd - timestampStart) / videoDuration) * 100}%`,
@@ -460,7 +460,7 @@ export default function CharacterCardPage() {
                       {/* 时间刻度 */}
                       <div className="absolute inset-0 flex justify-between px-1 items-center pointer-events-none">
                         {Array.from({ length: Math.min(Math.ceil(videoDuration) + 1, 16) }, (_, i) => (
-                          <div key={i} className="w-px h-1.5 bg-white/20" />
+                          <div key={i} className="w-px h-1.5 bg-card/80" />
                         ))}
                       </div>
                     </div>
@@ -468,8 +468,8 @@ export default function CharacterCardPage() {
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] text-white/40">起始</span>
-                          <span className="text-[10px] text-pink-400 font-mono">{timestampStart.toFixed(1)}s</span>
+                          <span className="text-[10px] text-foreground/40">起始</span>
+                          <span className="text-[10px] text-emerald-400 font-mono">{timestampStart.toFixed(1)}s</span>
                         </div>
                         <input
                           type="range"
@@ -482,13 +482,13 @@ export default function CharacterCardPage() {
                             setTimestampStart(val);
                             if (timestampEnd - val > 5) setTimestampEnd(val + 5);
                           }}
-                          className="w-full h-1.5 accent-pink-500 cursor-pointer"
+                          className="w-full h-1.5 accent-emerald-500 cursor-pointer"
                         />
                       </div>
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-[10px] text-white/40">结束</span>
-                          <span className="text-[10px] text-purple-400 font-mono">{timestampEnd.toFixed(1)}s</span>
+                          <span className="text-[10px] text-foreground/40">结束</span>
+                          <span className="text-[10px] text-sky-400 font-mono">{timestampEnd.toFixed(1)}s</span>
                         </div>
                         <input
                           type="range"
@@ -501,11 +501,11 @@ export default function CharacterCardPage() {
                             setTimestampEnd(val);
                             if (val - timestampStart > 5) setTimestampStart(val - 5);
                           }}
-                          className="w-full h-1.5 accent-purple-500 cursor-pointer"
+                          className="w-full h-1.5 accent-sky-500 cursor-pointer"
                         />
                       </div>
                     </div>
-                    <p className="text-[10px] text-white/30 text-center">
+                    <p className="text-[10px] text-foreground/30 text-center">
                       区间 {(timestampEnd - timestampStart).toFixed(1)}s / 最大 5s · 视频 {videoDuration.toFixed(1)}s
                     </p>
                   </div>
@@ -514,32 +514,32 @@ export default function CharacterCardPage() {
 
               {/* 角色信息（可选） */}
               <div className="space-y-3">
-                <label className="text-xs text-white/50 uppercase tracking-wider">角色信息（可选）</label>
+                <label className="text-xs text-foreground/50 uppercase tracking-wider">角色信息（可选）</label>
                 <div>
-                  <label className="text-[10px] text-white/40 mb-1.5 block">人物介绍</label>
+                  <label className="text-[10px] text-foreground/40 mb-1.5 block">人物介绍</label>
                   <textarea
                     value={instructionSet}
                     onChange={(e) => setInstructionSet(e.target.value)}
                     placeholder="描述角色的性格、特点等..."
-                    className="w-full h-16 px-3 py-2 bg-white/5 border border-white/10 text-white rounded-lg resize-none focus:outline-none focus:border-pink-500/30 placeholder:text-white/20 text-sm transition-colors"
+                    className="w-full h-16 px-3 py-2 bg-card/60 border border-border/70 text-foreground rounded-lg resize-none focus:outline-none focus:border-emerald-500/30 placeholder:text-foreground/30 text-sm transition-colors"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] text-white/40 mb-1.5 block">安全指令</label>
+                  <label className="text-[10px] text-foreground/40 mb-1.5 block">安全指令</label>
                   <textarea
                     value={safetyInstructionSet}
                     onChange={(e) => setSafetyInstructionSet(e.target.value)}
                     placeholder="安全相关的指令..."
-                    className="w-full h-16 px-3 py-2 bg-white/5 border border-white/10 text-white rounded-lg resize-none focus:outline-none focus:border-pink-500/30 placeholder:text-white/20 text-sm transition-colors"
+                    className="w-full h-16 px-3 py-2 bg-card/60 border border-border/70 text-foreground rounded-lg resize-none focus:outline-none focus:border-emerald-500/30 placeholder:text-foreground/30 text-sm transition-colors"
                   />
                 </div>
               </div>
 
               {/* 进度消息 */}
               {progressMessages.length > 0 && (
-                <div className="space-y-1 p-3 bg-white/5 rounded-lg max-h-40 overflow-y-auto">
+                <div className="space-y-1 p-3 bg-card/60 rounded-lg max-h-40 overflow-y-auto">
                   {progressMessages.map((msg, i) => (
-                    <p key={i} className="text-xs text-white/60 font-mono">{msg}</p>
+                    <p key={i} className="text-xs text-foreground/60 font-mono">{msg}</p>
                   ))}
                 </div>
               )}
@@ -559,8 +559,8 @@ export default function CharacterCardPage() {
                 className={cn(
                   'w-full flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-medium transition-all',
                   submitting || !videoFile
-                    ? 'bg-white/10 text-white/50 cursor-not-allowed'
-                    : 'bg-gradient-to-r from-pink-500 to-purple-500 text-white hover:opacity-90'
+                    ? 'bg-card/70 text-foreground/50 cursor-not-allowed'
+                    : 'bg-gradient-to-r from-emerald-500 to-sky-500 text-foreground hover:opacity-90'
                 )}
               >
                 {submitting ? (
@@ -581,15 +581,15 @@ export default function CharacterCardPage() {
 
         {/* 右侧 - 角色卡列表 */}
         <div className="lg:col-span-2">
-          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm">
-            <div className="px-5 py-4 border-b border-white/10 bg-gradient-to-r from-purple-500/5 to-pink-500/5">
+          <div className="bg-card/60 border border-border/70 rounded-2xl overflow-hidden backdrop-blur-sm">
+            <div className="px-5 py-4 border-b border-border/70 bg-gradient-to-r from-sky-500/5 to-emerald-500/5">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-purple-500/30 to-pink-500/30 rounded-lg flex items-center justify-center">
-                  <User className="w-4 h-4 text-purple-400" />
+                <div className="w-9 h-9 bg-gradient-to-br from-sky-500/30 to-emerald-500/30 rounded-lg flex items-center justify-center">
+                  <User className="w-4 h-4 text-sky-400" />
                 </div>
                 <div>
-                  <h2 className="text-base font-medium text-white">我的角色卡</h2>
-                  <p className="text-xs text-white/40">{characterCards.filter((c) => !pendingTasks.some((t) => t.id === c.id)).length + pendingTasks.length} 个角色卡</p>
+                  <h2 className="text-base font-medium text-foreground">我的角色卡</h2>
+                  <p className="text-xs text-foreground/40">{characterCards.filter((c) => !pendingTasks.some((t) => t.id === c.id)).length + pendingTasks.length} 个角色卡</p>
                 </div>
               </div>
             </div>
@@ -597,15 +597,15 @@ export default function CharacterCardPage() {
             <div className="p-5">
               {loadingCards ? (
                 <div className="flex items-center justify-center h-48">
-                  <Loader2 className="w-6 h-6 animate-spin text-white/30" />
+                  <Loader2 className="w-6 h-6 animate-spin text-foreground/30" />
                 </div>
               ) : characterCards.length === 0 && pendingTasks.length === 0 ? (
-                <div className="flex flex-col items-center justify-center h-48 border border-dashed border-white/20 rounded-xl bg-gradient-to-br from-pink-500/5 to-purple-500/5">
-                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-pink-500/10 to-purple-500/10 flex items-center justify-center mb-3">
-                    <User className="w-7 h-7 text-pink-400/40" />
+                <div className="flex flex-col items-center justify-center h-48 border border-dashed border-border/70 rounded-xl bg-gradient-to-br from-emerald-500/5 to-sky-500/5">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500/10 to-sky-500/10 flex items-center justify-center mb-3">
+                    <User className="w-7 h-7 text-emerald-400/40" />
                   </div>
-                  <p className="text-white/50 text-sm">暂无角色卡</p>
-                  <p className="text-white/30 text-xs mt-1">上传视频开始创建你的第一个角色卡</p>
+                  <p className="text-foreground/50 text-sm">暂无角色卡</p>
+                  <p className="text-foreground/30 text-xs mt-1">上传视频开始创建你的第一个角色卡</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -642,16 +642,16 @@ function PendingTaskItem({ task }: { task: PendingTask }) {
   const status = statusConfig[task.status];
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all">
-      <div className="aspect-square bg-gradient-to-br from-pink-500/10 to-purple-500/10 flex items-center justify-center relative">
+    <div className="bg-card/60 border border-border/70 rounded-xl overflow-hidden hover:border-border/70 transition-all">
+      <div className="aspect-square bg-gradient-to-br from-emerald-500/10 to-sky-500/10 flex items-center justify-center relative">
         {task.avatarUrl ? (
           <img src={task.avatarUrl} alt="" className="w-full h-full object-cover opacity-60" />
         ) : (
-          <User className="w-12 h-12 text-white/20" />
+          <User className="w-12 h-12 text-foreground/30" />
         )}
-        <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center gap-2">
+        <div className="absolute inset-0 bg-background/70 flex flex-col items-center justify-center gap-2">
           {task.status === 'processing' ? (
-            <Loader2 className="w-8 h-8 text-white animate-spin" />
+            <Loader2 className="w-8 h-8 text-foreground animate-spin" />
           ) : task.status === 'pending' ? (
             <div className="w-8 h-8 rounded-full border-2 border-amber-400/50 border-t-amber-400 animate-spin" />
           ) : null}
@@ -661,8 +661,8 @@ function PendingTaskItem({ task }: { task: PendingTask }) {
         </div>
       </div>
       <div className="p-3">
-        <p className="text-sm text-white/60 truncate">正在生成...</p>
-        <p className="text-[10px] text-white/30 mt-1">{formatDate(task.createdAt)}</p>
+        <p className="text-sm text-foreground/60 truncate">正在生成...</p>
+        <p className="text-[10px] text-foreground/30 mt-1">{formatDate(task.createdAt)}</p>
         {task.errorMessage && (
           <p className="text-[10px] text-red-400 mt-1 truncate">{task.errorMessage}</p>
         )}
@@ -683,10 +683,10 @@ function CharacterCardItem({ card, onDelete }: { card: CharacterCard; onDelete?:
   const isProcessing = card.status === 'processing' || card.status === 'pending';
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-pink-500/30 transition-all group">
+    <div className="bg-card/60 border border-border/70 rounded-xl overflow-hidden hover:border-emerald-500/30 transition-all group">
       <div className={cn(
         "aspect-square flex items-center justify-center relative",
-        card.status === 'failed' ? "bg-gradient-to-br from-red-500/10 to-red-900/10" : "bg-gradient-to-br from-pink-500/10 to-purple-500/10"
+        card.status === 'failed' ? "bg-gradient-to-br from-red-500/10 to-red-900/10" : "bg-gradient-to-br from-emerald-500/10 to-sky-500/10"
       )}>
         {card.avatarUrl ? (
           <img
@@ -695,17 +695,17 @@ function CharacterCardItem({ card, onDelete }: { card: CharacterCard; onDelete?:
             className={cn("w-full h-full object-cover", (card.status === 'failed' || isProcessing) && "opacity-60")}
           />
         ) : isProcessing ? (
-          <Loader2 className="w-10 h-10 text-white/30 animate-spin" />
+          <Loader2 className="w-10 h-10 text-foreground/30 animate-spin" />
         ) : card.status === 'failed' ? (
           <X className="w-10 h-10 text-red-400/50" />
         ) : (
-          <User className="w-12 h-12 text-white/20" />
+          <User className="w-12 h-12 text-foreground/30" />
         )}
         
         {/* 状态遮罩 */}
         {(isProcessing || card.status === 'failed') && (
-          <div className="absolute inset-0 bg-black/40 flex flex-col items-center justify-center gap-2">
-            {isProcessing && <Loader2 className="w-8 h-8 text-white animate-spin" />}
+          <div className="absolute inset-0 bg-background/70 flex flex-col items-center justify-center gap-2">
+            {isProcessing && <Loader2 className="w-8 h-8 text-foreground animate-spin" />}
             {card.status === 'failed' && <X className="w-8 h-8 text-red-400" />}
           </div>
         )}
@@ -714,10 +714,10 @@ function CharacterCardItem({ card, onDelete }: { card: CharacterCard; onDelete?:
         {onDelete && (
           <button
             onClick={() => onDelete(card.id)}
-            className="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
+            className="absolute top-2 right-2 p-1.5 bg-background/70 hover:bg-red-500 rounded-lg opacity-0 group-hover:opacity-100 transition-all"
             title="删除"
           >
-            <Trash2 className="w-3.5 h-3.5 text-white" />
+            <Trash2 className="w-3.5 h-3.5 text-foreground" />
           </button>
         )}
         
@@ -730,10 +730,10 @@ function CharacterCardItem({ card, onDelete }: { card: CharacterCard; onDelete?:
       </div>
 
       <div className="p-3">
-        <h3 className="text-sm font-medium text-white truncate">
+        <h3 className="text-sm font-medium text-foreground truncate">
           {card.characterName || (card.status === 'failed' ? '生成失败' : '生成中...')}
         </h3>
-        <p className="text-[10px] text-white/30 mt-1">{formatDate(card.createdAt)}</p>
+        <p className="text-[10px] text-foreground/30 mt-1">{formatDate(card.createdAt)}</p>
         {card.errorMessage && (
           <p className="text-[10px] text-red-400 mt-1 line-clamp-1" title={card.errorMessage}>
             {card.errorMessage}
@@ -743,3 +743,4 @@ function CharacterCardItem({ card, onDelete }: { card: CharacterCard; onDelete?:
     </div>
   );
 }
+

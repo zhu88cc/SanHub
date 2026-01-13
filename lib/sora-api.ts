@@ -1226,3 +1226,64 @@ export async function getInviteCode(): Promise<InviteCodeResponse> {
 
   return data as InviteCodeResponse;
 }
+
+
+// ========================================
+// Prompt Enhancement API
+// ========================================
+
+export interface EnhancePromptRequest {
+  prompt: string;
+  expansion_level?: 'short' | 'medium' | 'long';
+  duration_s?: 10 | 15;
+}
+
+export interface EnhancePromptResponse {
+  enhanced_prompt: string;
+}
+
+export async function enhancePrompt(request: EnhancePromptRequest): Promise<EnhancePromptResponse> {
+  const { apiKey, baseUrl } = await getSoraConfig();
+
+  if (!apiKey) {
+    throw new Error('Sora API Key 未配置');
+  }
+
+  if (!baseUrl) {
+    throw new Error('Sora Base URL 未配置');
+  }
+
+  const normalizedBaseUrl = baseUrl.replace(/\/$/, '');
+  const apiUrl = `${normalizedBaseUrl}/v1/enhance_prompt`;
+
+  console.log('[Sora API] 提示词增强请求:', {
+    prompt: request.prompt?.substring(0, 50),
+    expansion_level: request.expansion_level,
+    duration_s: request.duration_s,
+  });
+
+  const response = await fetchWithRetry(undiciFetch, apiUrl, () => ({
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      prompt: request.prompt,
+      expansion_level: request.expansion_level || 'medium',
+      duration_s: request.duration_s,
+    }),
+    dispatcher: soraAgent,
+  }));
+
+  const data = await response.json() as any;
+
+  if (!response.ok) {
+    const errorMessage = data?.error?.message || data?.message || '提示词增强失败';
+    console.error('[Sora API] 提示词增强错误:', errorMessage);
+    throw new Error(errorMessage);
+  }
+
+  console.log('[Sora API] 提示词增强成功');
+  return data as EnhancePromptResponse;
+}

@@ -101,7 +101,7 @@ export default function GenerationsPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-white/30" />
+        <Loader2 className="w-8 h-8 animate-spin text-foreground/30" />
       </div>
     );
   }
@@ -109,25 +109,25 @@ export default function GenerationsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-light text-white">生成记录</h1>
-        <p className="text-white/50 mt-1">管理所有用户的生成历史 · 共 {total} 条</p>
+        <h1 className="text-3xl font-light text-foreground">生成记录</h1>
+        <p className="text-foreground/50 mt-1">管理所有用户的生成历史 · 共 {total} 条</p>
       </div>
 
       {/* Filters */}
       <div className="flex flex-wrap gap-3">
         <div className="relative flex-1 min-w-[200px]">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
           <input
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="搜索用户或提示词..."
-            className="w-full pl-11 pr-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/20"
+            className="w-full pl-11 pr-4 py-3 bg-card/60 border border-border/70 rounded-xl text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-border/70"
           />
         </div>
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
-          className="px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl text-white focus:outline-none focus:border-white/20"
+          className="px-4 py-3 bg-card/60 border border-border/70 rounded-xl text-foreground focus:outline-none focus:border-border/70"
         >
           {TYPE_OPTIONS.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -136,7 +136,7 @@ export default function GenerationsPage() {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-3 bg-white/[0.03] border border-white/10 rounded-xl text-white focus:outline-none focus:border-white/20"
+          className="px-4 py-3 bg-card/60 border border-border/70 rounded-xl text-foreground focus:outline-none focus:border-border/70"
         >
           {STATUS_OPTIONS.map(opt => (
             <option key={opt.value} value={opt.value}>{opt.label}</option>
@@ -145,36 +145,36 @@ export default function GenerationsPage() {
       </div>
 
       {/* Records Table */}
-      <div className="bg-white/[0.03] border border-white/10 rounded-2xl overflow-hidden">
+      <div className="bg-card/60 border border-border/70 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left text-sm font-medium text-white/50 px-5 py-4">用户</th>
-                <th className="text-left text-sm font-medium text-white/50 px-5 py-4">类型</th>
-                <th className="text-left text-sm font-medium text-white/50 px-5 py-4 max-w-xs">提示词</th>
-                <th className="text-center text-sm font-medium text-white/50 px-5 py-4">状态</th>
-                <th className="text-right text-sm font-medium text-white/50 px-5 py-4">积分</th>
-                <th className="text-right text-sm font-medium text-white/50 px-5 py-4">时间</th>
-                <th className="text-right text-sm font-medium text-white/50 px-5 py-4">操作</th>
+              <tr className="border-b border-border/70">
+                <th className="text-left text-sm font-medium text-foreground/50 px-5 py-4">用户</th>
+                <th className="text-left text-sm font-medium text-foreground/50 px-5 py-4">类型</th>
+                <th className="text-left text-sm font-medium text-foreground/50 px-5 py-4 max-w-xs">提示词</th>
+                <th className="text-center text-sm font-medium text-foreground/50 px-5 py-4">状态</th>
+                <th className="text-right text-sm font-medium text-foreground/50 px-5 py-4">积分</th>
+                <th className="text-right text-sm font-medium text-foreground/50 px-5 py-4">时间</th>
+                <th className="text-right text-sm font-medium text-foreground/50 px-5 py-4">操作</th>
               </tr>
             </thead>
             <tbody>
               {filteredRecords.map((record) => (
-                <tr key={record.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                <tr key={record.id} className="border-b border-border/70 hover:bg-card/60">
                   <td className="px-5 py-4">
                     <div>
-                      <p className="text-white font-medium">{record.userName || '-'}</p>
-                      <p className="text-xs text-white/40">{record.userEmail}</p>
+                      <p className="text-foreground font-medium">{record.userName || '-'}</p>
+                      <p className="text-xs text-foreground/40">{record.userEmail}</p>
                     </div>
                   </td>
                   <td className="px-5 py-4">
-                    <span className="px-2 py-1 text-xs rounded-full bg-white/10 text-white/70">
+                    <span className="px-2 py-1 text-xs rounded-full bg-card/70 text-foreground/70">
                       {record.type}
                     </span>
                   </td>
                   <td className="px-5 py-4 max-w-xs">
-                    <p className="text-white/70 truncate" title={record.prompt}>
+                    <p className="text-foreground/70 truncate" title={record.prompt}>
                       {record.prompt || '-'}
                     </p>
                   </td>
@@ -182,7 +182,7 @@ export default function GenerationsPage() {
                     <StatusBadge status={record.status} />
                   </td>
                   <td className="px-5 py-4 text-right text-red-400">-{record.cost}</td>
-                  <td className="px-5 py-4 text-right text-white/50 text-sm">
+                  <td className="px-5 py-4 text-right text-foreground/50 text-sm">
                     {formatDate(record.createdAt)}
                   </td>
                   <td className="px-5 py-4 text-right">
@@ -192,7 +192,7 @@ export default function GenerationsPage() {
                           href={record.resultUrl}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-2 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                          className="p-2 text-foreground/40 hover:text-foreground hover:bg-card/70 rounded-lg transition-all"
                         >
                           <Eye className="w-4 h-4" />
                         </a>
@@ -212,7 +212,7 @@ export default function GenerationsPage() {
         </div>
 
         {filteredRecords.length === 0 && (
-          <div className="text-center py-12 text-white/40">
+          <div className="text-center py-12 text-foreground/40">
             <History className="w-10 h-10 mx-auto mb-3 opacity-30" />
             <p>暂无记录</p>
           </div>
@@ -222,7 +222,7 @@ export default function GenerationsPage() {
       {hasMore && (
         <button
           onClick={() => loadRecords(page + 1, true)}
-          className="w-full py-3 bg-white/[0.03] border border-white/10 text-white/60 rounded-xl hover:bg-white/[0.06] transition-all"
+          className="w-full py-3 bg-card/60 border border-border/70 text-foreground/60 rounded-xl hover:bg-card/70 transition-all"
         >
           加载更多
         </button>
@@ -251,3 +251,4 @@ function StatusBadge({ status }: { status: string }) {
     </span>
   );
 }
+

@@ -16,7 +16,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-black relative overflow-hidden">
+    <div className="min-h-screen relative overflow-hidden">
       <DashboardBackgroundWrapper />
       <DashboardShell user={session.user}>{children}</DashboardShell>
     </div>

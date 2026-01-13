@@ -166,7 +166,7 @@ export default function TokensPage() {
   if (configLoading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-white/30" />
+        <Loader2 className="w-8 h-8 animate-spin text-foreground/30" />
       </div>
     );
   }
@@ -175,21 +175,21 @@ export default function TokensPage() {
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-extralight text-white">SORA Token 管理</h1>
-        <p className="text-white/50 mt-1 font-light">管理 SORA 后台账号和批量导入 Token</p>
+        <h1 className="text-3xl font-extralight text-foreground">SORA Token 管理</h1>
+        <p className="text-foreground/50 mt-1 font-light">管理 SORA 后台账号和批量导入 Token</p>
       </div>
 
       {/* 统计数据 */}
-      <div className="bg-white/5 border border-white/10 rounded-xl p-6">
+      <div className="bg-card/60 border border-border/70 rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-lg font-medium text-white flex items-center gap-2">
+          <h2 className="text-lg font-medium text-foreground flex items-center gap-2">
             <BarChart3 className="w-5 h-5" />
             统计数据
           </h2>
           <button
             onClick={loadStats}
             disabled={statsLoading || !config.soraBackendUrl}
-            className="flex items-center gap-2 px-3 py-1.5 bg-white/10 hover:bg-white/20 rounded-lg text-sm text-white disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="flex items-center gap-2 px-3 py-1.5 bg-card/70 hover:bg-card/80 rounded-lg text-sm text-foreground disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
           >
             <RefreshCw className={`w-4 h-4 ${statsLoading ? 'animate-spin' : ''}`} />
             刷新
@@ -201,29 +201,29 @@ export default function TokensPage() {
         )}
 
         {!config.soraBackendUrl ? (
-          <div className="text-white/50 text-sm">请先配置 SORA 后台地址</div>
+          <div className="text-foreground/50 text-sm">请先配置 SORA 后台地址</div>
         ) : statsLoading && !stats ? (
-          <div className="flex items-center gap-2 text-white/50">
+          <div className="flex items-center gap-2 text-foreground/50">
             <Loader2 className="w-4 h-4 animate-spin" />
             加载中...
           </div>
         ) : stats ? (
           <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            <div className="bg-white/5 rounded-lg p-4">
-              <div className="flex items-center gap-2 text-white/50 text-sm mb-1">
+            <div className="bg-card/60 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-foreground/50 text-sm mb-1">
                 <Key className="w-4 h-4" />
                 Token 总数
               </div>
-              <div className="text-2xl font-light text-white">{stats.total_tokens}</div>
+              <div className="text-2xl font-light text-foreground">{stats.total_tokens}</div>
             </div>
-            <div className="bg-white/5 rounded-lg p-4">
+            <div className="bg-card/60 rounded-lg p-4">
               <div className="flex items-center gap-2 text-green-400/70 text-sm mb-1">
                 <CheckCircle className="w-4 h-4" />
                 活跃 Token
               </div>
               <div className="text-2xl font-bold text-green-400">{stats.active_tokens}</div>
             </div>
-            <div className="bg-white/5 rounded-lg p-4">
+            <div className="bg-card/60 rounded-lg p-4">
               <div className="flex items-center gap-2 text-blue-400/70 text-sm mb-1">
                 <ImageIcon className="w-4 h-4" />
                 今日图片/总图片
@@ -232,16 +232,16 @@ export default function TokensPage() {
                 {stats.today_images}/{stats.total_images}
               </div>
             </div>
-            <div className="bg-white/5 rounded-lg p-4">
-              <div className="flex items-center gap-2 text-purple-400/70 text-sm mb-1">
+            <div className="bg-card/60 rounded-lg p-4">
+              <div className="flex items-center gap-2 text-sky-400/70 text-sm mb-1">
                 <Video className="w-4 h-4" />
                 今日视频/总视频
               </div>
-              <div className="text-2xl font-bold text-purple-400">
+              <div className="text-2xl font-bold text-sky-400">
                 {stats.today_videos}/{stats.total_videos}
               </div>
             </div>
-            <div className="bg-white/5 rounded-lg p-4">
+            <div className="bg-card/60 rounded-lg p-4">
               <div className="flex items-center gap-2 text-red-400/70 text-sm mb-1">
                 <AlertTriangle className="w-4 h-4" />
                 今日错误/总错误
@@ -255,50 +255,50 @@ export default function TokensPage() {
       </div>
 
       {/* SORA 后台配置 */}
-      <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-        <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+      <div className="bg-card/60 border border-border/70 rounded-xl p-6">
+        <h2 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <Key className="w-5 h-5" />
           SORA 后台配置
         </h2>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-white/70 mb-2">后台地址</label>
+            <label className="block text-sm text-foreground/70 mb-2">后台地址</label>
             <input
               type="text"
               value={config.soraBackendUrl}
               onChange={(e) => setConfig({ ...config, soraBackendUrl: e.target.value })}
               placeholder="例如: http://sjc1.clusters.zeabur.com:25499"
-              className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+              className="w-full px-4 py-2.5 bg-card/60 border border-border/70 rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/30"
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-white/70 mb-2">用户名</label>
+              <label className="block text-sm text-foreground/70 mb-2">用户名</label>
               <input
                 type="text"
                 value={config.soraBackendUsername}
                 onChange={(e) => setConfig({ ...config, soraBackendUsername: e.target.value })}
                 placeholder="admin"
-                className="w-full px-4 py-2.5 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                className="w-full px-4 py-2.5 bg-card/60 border border-border/70 rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/30"
               />
             </div>
 
             <div>
-              <label className="block text-sm text-white/70 mb-2">密码</label>
+              <label className="block text-sm text-foreground/70 mb-2">密码</label>
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
                   value={config.soraBackendPassword}
                   onChange={(e) => setConfig({ ...config, soraBackendPassword: e.target.value })}
                   placeholder="••••••••"
-                  className="w-full px-4 py-2.5 pr-10 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-white/20"
+                  className="w-full px-4 py-2.5 pr-10 bg-card/60 border border-border/70 rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/30"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/50 hover:text-white"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground/50 hover:text-foreground"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -309,7 +309,7 @@ export default function TokensPage() {
           <button
             onClick={saveConfig}
             disabled={configSaving}
-            className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-white/90 disabled:opacity-50 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg hover:bg-foreground/90 disabled:opacity-50 transition-colors"
           >
             {configSaving ? (
               <Loader2 className="w-4 h-4 animate-spin" />
@@ -322,15 +322,15 @@ export default function TokensPage() {
       </div>
 
       {/* 批量导入 RT */}
-      <div className="bg-white/5 border border-white/10 rounded-xl p-6">
-        <h2 className="text-lg font-medium text-white mb-4 flex items-center gap-2">
+      <div className="bg-card/60 border border-border/70 rounded-xl p-6">
+        <h2 className="text-lg font-medium text-foreground mb-4 flex items-center gap-2">
           <Upload className="w-5 h-5" />
           批量导入 Token
         </h2>
 
         <div className="space-y-4">
           <div>
-            <label className="block text-sm text-white/70 mb-2">
+            <label className="block text-sm text-foreground/70 mb-2">
               Refresh Token (一行一个)
             </label>
             <textarea
@@ -338,7 +338,7 @@ export default function TokensPage() {
               onChange={(e) => setRtInput(e.target.value)}
               placeholder="rt_xxxxxxxxxx&#10;rt_yyyyyyyyyy&#10;rt_zzzzzzzzzz"
               rows={8}
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-white/20 font-mono text-sm resize-none"
+              className="w-full px-4 py-3 bg-card/60 border border-border/70 rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-ring/30 font-mono text-sm resize-none"
             />
           </div>
 
@@ -346,7 +346,7 @@ export default function TokensPage() {
             <button
               onClick={handleImport}
               disabled={importing || !config.soraBackendUrl || !rtInput.trim()}
-              className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-lg hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-lg hover:bg-foreground/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {importing ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -357,7 +357,7 @@ export default function TokensPage() {
             </button>
 
             {!config.soraBackendUrl && (
-              <span className="text-white/50 text-sm">请先配置 SORA 后台</span>
+              <span className="text-foreground/50 text-sm">请先配置 SORA 后台</span>
             )}
           </div>
         </div>
@@ -404,3 +404,4 @@ export default function TokensPage() {
     </div>
   );
 }
+

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { JetBrains_Mono, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import { Providers } from '@/components/providers';
 import { getSystemConfig } from '@/lib/db';
@@ -8,7 +8,14 @@ import type { ExtendedSiteConfig } from '@/components/providers/site-config-prov
 // Disable caching to always get fresh config
 export const dynamic = 'force-dynamic';
 
-const inter = Inter({ subsets: ['latin'] });
+const spaceGrotesk = Space_Grotesk({
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+});
 
 async function getSiteConfig(): Promise<ExtendedSiteConfig> {
   const config = await getSystemConfig();
@@ -45,7 +52,7 @@ export default async function RootLayout({
   
   return (
     <html lang="zh-CN" suppressHydrationWarning>
-      <body className={inter.className}>
+      <body className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} antialiased`}>
         <Providers initialSiteConfig={initialSiteConfig}>{children}</Providers>
       </body>
     </html>

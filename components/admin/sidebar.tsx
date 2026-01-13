@@ -64,18 +64,18 @@ export function AdminSidebar() {
   const NavContent = () => (
     <>
       {/* Logo */}
-      <div className="p-5 border-b border-white/10">
-        <Link href="/image" className="flex items-center gap-2 text-white/60 hover:text-white transition-colors text-sm">
+      <div className="p-5 border-b border-border/70">
+        <Link href="/image" className="flex items-center gap-2 text-foreground/60 hover:text-foreground transition-colors text-sm">
           <ArrowLeft className="w-4 h-4" />
           <span>返回首页</span>
         </Link>
         <div className="flex items-center gap-3 mt-4">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sky-500/25 to-emerald-500/25 border border-border/70 flex items-center justify-center">
+            <Sparkles className="w-5 h-5 text-foreground/80" />
           </div>
           <div>
-            <h1 className="text-lg font-semibold text-white">管理后台</h1>
-            <p className="text-xs text-white/40">{siteConfig.siteName} Admin</p>
+            <h1 className="text-lg font-semibold text-foreground">管理后台</h1>
+            <p className="text-xs text-foreground/40">{siteConfig.siteName} Admin</p>
           </div>
         </div>
       </div>
@@ -90,16 +90,16 @@ export function AdminSidebar() {
               href={item.href}
               onClick={() => setMobileOpen(false)}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200',
+                'flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200 border border-transparent',
                 active
-                  ? 'bg-gradient-to-r from-violet-500/20 to-fuchsia-500/20 text-white border border-white/10'
-                  : 'text-white/60 hover:bg-white/5 hover:text-white'
+                  ? 'bg-accent/80 text-foreground border-border/70'
+                  : 'text-foreground/60 hover:bg-card/70 hover:text-foreground'
               )}
             >
-              <item.icon className={cn('w-5 h-5', active && 'text-violet-400')} />
+              <item.icon className={cn('w-5 h-5', active && 'text-foreground')} />
               <span className="font-medium">{item.label}</span>
               {active && (
-                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-violet-400" />
+                <div className="ml-auto w-1.5 h-1.5 rounded-full bg-foreground/70" />
               )}
             </Link>
           );
@@ -107,9 +107,9 @@ export function AdminSidebar() {
       </nav>
 
       {/* Footer */}
-      <div className="p-4 border-t border-white/10">
-        <div className="px-4 py-3 rounded-xl bg-white/5 border border-white/10">
-          <p className="text-xs text-white/40 text-center">v1.0.0</p>
+      <div className="p-4 border-t border-border/70">
+        <div className="px-4 py-3 rounded-xl bg-card/60 border border-border/70">
+          <p className="text-xs text-foreground/50 text-center">v1.0.0</p>
         </div>
       </div>
     </>
@@ -120,7 +120,7 @@ export function AdminSidebar() {
       {/* Mobile Toggle */}
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
-        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-white/10 backdrop-blur-sm rounded-xl text-white border border-white/10"
+        className="lg:hidden fixed top-4 left-4 z-50 p-2.5 bg-card/70 backdrop-blur-sm rounded-xl text-foreground border border-border/70"
       >
         {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
       </button>
@@ -128,7 +128,7 @@ export function AdminSidebar() {
       {/* Mobile Overlay */}
       {mobileOpen && (
         <div
-          className="lg:hidden fixed inset-0 bg-black/60 backdrop-blur-sm z-40"
+          className="lg:hidden fixed inset-0 bg-background/80 backdrop-blur-sm z-40"
           onClick={() => setMobileOpen(false)}
         />
       )}
@@ -136,7 +136,7 @@ export function AdminSidebar() {
       {/* Sidebar - Mobile */}
       <aside
         className={cn(
-          'lg:hidden fixed inset-y-0 left-0 z-40 w-72 bg-black/90 backdrop-blur-xl border-r border-white/10 flex flex-col transform transition-transform duration-300 ease-out',
+          'lg:hidden fixed inset-y-0 left-0 z-40 w-72 bg-card/95 backdrop-blur-xl border-r border-border/70 flex flex-col transform transition-transform duration-300 ease-out',
           mobileOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -144,7 +144,7 @@ export function AdminSidebar() {
       </aside>
 
       {/* Sidebar - Desktop */}
-      <aside className="hidden lg:flex w-72 bg-black/40 backdrop-blur-xl border-r border-white/10 flex-col sticky top-0 h-screen">
+      <aside className="hidden lg:flex w-72 bg-card/70 backdrop-blur-xl border-r border-border/70 flex-col sticky top-0 h-screen">
         <NavContent />
       </aside>
     </>

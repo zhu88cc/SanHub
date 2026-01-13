@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Particle {
   x: number;
@@ -15,8 +15,21 @@ interface Particle {
 
 export function ParticlesBackground() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [prefersReducedMotion, setPrefersReducedMotion] = useState(false);
 
   useEffect(() => {
+    const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setPrefersReducedMotion(mediaQuery.matches);
+
+    const handler = (event: MediaQueryListEvent) => {
+      setPrefersReducedMotion(event.matches);
+    };
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, []);
+
+  useEffect(() => {
+    if (prefersReducedMotion) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -25,6 +38,7 @@ export function ParticlesBackground() {
 
     let animationId: number;
     let particles: Particle[] = [];
+    let isVisible = true;
 
     const resize = () => {
       canvas.width = window.innerWidth;
@@ -33,7 +47,7 @@ export function ParticlesBackground() {
 
     const createParticles = () => {
       // 减少粒子数量，提升性能
-      const count = Math.min(Math.floor((canvas.width * canvas.height) / 25000), 80);
+      const count = Math.min(Math.floor((canvas.width * canvas.height) / 28000), 70);
       particles = [];
       for (let i = 0; i < count; i++) {
         particles.push({
@@ -53,7 +67,7 @@ export function ParticlesBackground() {
       const pulseOpacity = p.opacity * (0.5 + 0.5 * Math.sin(p.pulse));
       ctx.beginPath();
       ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(255, 255, 255, ${pulseOpacity})`;
+      ctx.fillStyle = `rgba(255, 255, 255, ${pulseOpacity * 0.75})`;
       ctx.fill();
     };
 
@@ -69,7 +83,7 @@ export function ParticlesBackground() {
           const dy = particles[i].y - particles[j].y;
           const distSq = dx * dx + dy * dy;
           if (distSq < maxDistSq) {
-            const opacity = (1 - Math.sqrt(distSq) / maxDist) * 0.12;
+            const opacity = (1 - Math.sqrt(distSq) / maxDist) * 0.08;
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
             ctx.lineTo(particles[j].x, particles[j].y);
@@ -85,6 +99,7 @@ export function ParticlesBackground() {
     const frameInterval = 1000 / targetFPS;
 
     const animate = (currentTime: number) => {
+      if (!isVisible) return;
       animationId = requestAnimationFrame(animate);
       
       const deltaTime = currentTime - lastTime;
@@ -110,20 +125,31 @@ export function ParticlesBackground() {
       drawConnections();
     };
 
+    const handleVisibilityChange = () => {
+      isVisible = !document.hidden;
+      if (isVisible) {
+        lastTime = performance.now();
+        animationId = requestAnimationFrame(animate);
+      }
+    };
+
     resize();
     createParticles();
     requestAnimationFrame(animate);
 
-    window.addEventListener('resize', () => {
+    const handleResize = () => {
       resize();
       createParticles();
-    });
+    };
+    window.addEventListener('resize', handleResize);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
 
     return () => {
       cancelAnimationFrame(animationId);
-      window.removeEventListener('resize', resize);
+      window.removeEventListener('resize', handleResize);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
     };
-  }, []);
+  }, [prefersReducedMotion]);
 
   return (
     <canvas

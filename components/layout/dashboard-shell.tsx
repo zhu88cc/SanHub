@@ -23,10 +23,10 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
       {!isWorkspaceDetail && <Header user={user} />}
       <div className="flex relative z-10 min-h-screen">
         {isWorkspaceDetail ? (
-          <aside className="fixed left-0 top-0 bottom-0 w-12 border-r border-white/10 bg-black/80 backdrop-blur">
+          <aside className="fixed left-0 top-0 bottom-0 w-12 border-r border-border/70 bg-card/70 backdrop-blur">
             <Link
               href="/workspace"
-              className="mt-4 ml-2 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/20 text-white/70 transition hover:border-white/50 hover:text-white"
+              className="mt-4 ml-2 inline-flex h-8 w-8 items-center justify-center rounded-lg border border-border/70 text-foreground/70 transition hover:border-border hover:text-foreground"
               title="返回工作空间"
             >
               <ArrowLeft className="h-4 w-4" />
@@ -40,7 +40,7 @@ export function DashboardShell({ user, children }: DashboardShellProps) {
             'flex-1 min-w-0',
             isWorkspaceDetail
               ? 'ml-12 p-0 h-screen overflow-hidden'
-              : 'lg:ml-56 p-6 lg:p-8 mt-16'
+              : 'lg:ml-56 p-6 lg:p-8 mt-14'
           )}
         >
           {!isWorkspaceDetail && <AnnouncementBanner />}

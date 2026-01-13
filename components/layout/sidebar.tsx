@@ -41,10 +41,10 @@ export function Sidebar({ user }: SidebarProps) {
 
   return (
     <>
-    <aside className="fixed left-0 top-16 bottom-0 w-56 bg-black border-r border-white/10 hidden lg:flex flex-col">
+    <aside className="fixed left-0 top-14 bottom-0 w-56 bg-card/70 backdrop-blur-xl border-r border-border/70 hidden lg:flex flex-col">
       {/* Navigation */}
       <nav className="flex-1 px-3 py-2 space-y-1 overflow-y-auto">
-        <p className="text-[10px] font-medium text-white/30 uppercase tracking-[0.2em] px-3 py-2">
+        <p className="text-[10px] font-medium text-foreground/40 uppercase tracking-[0.2em] px-3 py-2">
           创作工具
         </p>
         {navItems.map((item) => {
@@ -54,28 +54,28 @@ export function Sidebar({ user }: SidebarProps) {
               key={item.href}
               href={item.href}
               className={cn(
-                'group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200',
+                'group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 border border-transparent',
                 isActive
-                  ? 'bg-white text-black'
-                  : 'hover:bg-white/5'
+                  ? 'bg-accent/80 text-foreground border-border/70'
+                  : 'hover:bg-card/70 text-foreground/70'
               )}
             >
               <div className={cn(
                 'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
-                isActive ? 'bg-black/10' : 'bg-white/5 group-hover:bg-white/10'
+                isActive ? 'bg-foreground/5' : 'bg-card/60 group-hover:bg-card/80'
               )}>
-                <item.icon className={cn('w-3.5 h-3.5', isActive ? 'text-black' : 'text-white/60')} />
+                <item.icon className={cn('w-3.5 h-3.5', isActive ? 'text-foreground' : 'text-foreground/60')} />
               </div>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
                   <p className={cn(
                     'text-sm font-medium',
-                    isActive ? 'text-black' : 'text-white/80'
+                    isActive ? 'text-foreground' : 'text-foreground/80'
                   )}>{item.label}</p>
                   {item.badge && (
                     <span className={cn(
-                      'text-[10px] px-1.5 py-0.5 rounded',
-                      isActive ? 'bg-black/10 text-black/60' : 'bg-white/10 text-white/40'
+                      'text-[10px] px-1.5 py-0.5 rounded border border-border/60',
+                      isActive ? 'bg-foreground/10 text-foreground/70' : 'bg-card/60 text-foreground/50'
                     )}>{item.badge}</span>
                   )}
                 </div>
@@ -87,8 +87,8 @@ export function Sidebar({ user }: SidebarProps) {
 
       {/* Admin Navigation */}
       {user.role === 'admin' && (
-        <div className="px-3 py-4 border-t border-white/10">
-          <p className="text-[10px] font-medium text-white/30 uppercase tracking-[0.2em] px-3 py-2">
+        <div className="px-3 py-4 border-t border-border/70">
+          <p className="text-[10px] font-medium text-foreground/40 uppercase tracking-[0.2em] px-3 py-2">
             管理
           </p>
           {adminItems.map((item) => {
@@ -98,22 +98,22 @@ export function Sidebar({ user }: SidebarProps) {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  'group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200',
+                  'group flex items-center gap-3 px-3 py-3 rounded-xl transition-all duration-200 border border-transparent',
                   isActive
-                    ? 'bg-white text-black'
-                    : 'hover:bg-white/5'
+                    ? 'bg-accent/80 text-foreground border-border/70'
+                    : 'hover:bg-card/70 text-foreground/70'
                 )}
               >
                 <div className={cn(
                   'w-8 h-8 rounded-lg flex items-center justify-center transition-colors',
-                  isActive ? 'bg-black/10' : 'bg-white/5 group-hover:bg-white/10'
+                  isActive ? 'bg-foreground/5' : 'bg-card/60 group-hover:bg-card/80'
                 )}>
-                  <item.icon className={cn('w-3.5 h-3.5', isActive ? 'text-black' : 'text-white/60')} />
+                  <item.icon className={cn('w-3.5 h-3.5', isActive ? 'text-foreground' : 'text-foreground/60')} />
                 </div>
                 <div>
                   <p className={cn(
                     'text-sm font-medium',
-                    isActive ? 'text-black' : 'text-white/80'
+                    isActive ? 'text-foreground' : 'text-foreground/80'
                   )}>{item.label}</p>
                 </div>
               </Link>
@@ -123,14 +123,14 @@ export function Sidebar({ user }: SidebarProps) {
       )}
 
       {/* Footer */}
-      <div className="p-4 border-t border-white/10">
+      <div className="p-4 border-t border-border/70">
         <div className="flex items-center justify-center gap-3">
-          <p className="text-[10px] text-white/20">{siteConfig.siteName} © {new Date().getFullYear()}</p>
+          <p className="text-[10px] text-foreground/40">{siteConfig.siteName} © {new Date().getFullYear()}</p>
           <a 
             href="https://github.com/genz27/sanhub" 
             target="_blank" 
             rel="noopener noreferrer"
-            className="text-white/20 hover:text-white/50 transition-colors"
+            className="text-foreground/40 hover:text-foreground/70 transition-colors"
             title="GitHub"
           >
             <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">

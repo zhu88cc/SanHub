@@ -128,8 +128,8 @@ export default function UsersPage() {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="flex flex-col items-center gap-3">
-          <Loader2 className="w-8 h-8 animate-spin text-white/30" />
-          <p className="text-sm text-white/40">加载用户数据...</p>
+          <Loader2 className="w-8 h-8 animate-spin text-foreground/30" />
+          <p className="text-sm text-foreground/40">加载用户数据...</p>
         </div>
       </div>
     );
@@ -139,20 +139,20 @@ export default function UsersPage() {
     <div className="space-y-6 h-full flex flex-col">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-light text-white">用户管理</h1>
-        <p className="text-white/50 mt-1">管理用户账号、余额和权限</p>
+        <h1 className="text-3xl font-light text-foreground">用户管理</h1>
+        <p className="text-foreground/50 mt-1">管理用户账号、余额和权限</p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 min-h-0">
         {/* 用户列表 */}
         <div className="lg:col-span-1 flex flex-col gap-4">
           <div className="relative flex-shrink-0">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-foreground/40" />
             <input
               value={search}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
               placeholder="搜索用户..."
-              className="w-full pl-11 pr-4 py-3 bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 focus:ring-1 focus:ring-white/10 transition-all"
+              className="w-full pl-11 pr-4 py-3 bg-card/60 backdrop-blur-sm border border-border/70 rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-border/70 focus:ring-2 focus:ring-ring/30 transition-all"
             />
           </div>
 
@@ -163,22 +163,22 @@ export default function UsersPage() {
                 className={cn(
                   'p-4 rounded-xl border cursor-pointer transition-all duration-200',
                   selectedUser?.id === user.id 
-                    ? 'bg-white/10 border-white/20 shadow-lg' 
-                    : 'bg-white/[0.03] border-white/10 hover:bg-white/[0.06] hover:border-white/15',
+                    ? 'bg-card/70 border-border/70 shadow-lg' 
+                    : 'bg-card/60 border-border/70 hover:bg-card/70 hover:border-border/70',
                   user.disabled && 'opacity-50'
                 )}
                 onClick={() => selectUser(user)}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-violet-500/20 to-fuchsia-500/20 flex items-center justify-center border border-white/10">
-                    <span className="text-white font-medium">{user.name.charAt(0).toUpperCase()}</span>
+                  <div className="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500/20 to-emerald-500/20 flex items-center justify-center border border-border/70">
+                    <span className="text-foreground font-medium">{user.name.charAt(0).toUpperCase()}</span>
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-white truncate">{user.name}</p>
-                    <p className="text-sm text-white/40 truncate">{user.email}</p>
+                    <p className="font-medium text-foreground truncate">{user.name}</p>
+                    <p className="text-sm text-foreground/40 truncate">{user.email}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-white">{formatBalance(user.balance)}</p>
+                    <p className="text-sm font-semibold text-foreground">{formatBalance(user.balance)}</p>
                     {user.disabled && (
                       <span className="text-xs text-red-400">已禁用</span>
                     )}
@@ -192,7 +192,7 @@ export default function UsersPage() {
             <button
               onClick={() => loadUsers(page + 1, true)}
               disabled={loadingMore}
-              className="w-full py-3 bg-white/[0.03] border border-white/10 text-white/60 rounded-xl text-sm font-medium hover:bg-white/[0.06] hover:text-white disabled:opacity-50 transition-all"
+              className="w-full py-3 bg-card/60 border border-border/70 text-foreground/60 rounded-xl text-sm font-medium hover:bg-card/70 hover:text-foreground disabled:opacity-50 transition-all"
             >
               {loadingMore ? (
                 <span className="flex items-center justify-center gap-2">
@@ -217,13 +217,13 @@ export default function UsersPage() {
               )}
 
               {/* 基本信息 */}
-              <div className="bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
-                <div className="p-5 border-b border-white/10 flex items-center justify-between">
+              <div className="bg-card/60 backdrop-blur-sm border border-border/70 rounded-2xl overflow-hidden">
+                <div className="p-5 border-b border-border/70 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center">
                       <User className="w-5 h-5 text-blue-400" />
                     </div>
-                    <span className="font-semibold text-white">用户信息</span>
+                    <span className="font-semibold text-foreground">用户信息</span>
                   </div>
                   {canEditUser(selectedUser) && (
                     <button
@@ -245,40 +245,40 @@ export default function UsersPage() {
                 </div>
                 <div className="p-5 grid grid-cols-2 gap-5">
                   <div className="space-y-1">
-                    <p className="text-xs text-white/40 uppercase tracking-wider">邮箱</p>
-                    <p className="text-white font-medium">{selectedUser.email}</p>
+                    <p className="text-xs text-foreground/40 uppercase tracking-wider">邮箱</p>
+                    <p className="text-foreground font-medium">{selectedUser.email}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs text-white/40 uppercase tracking-wider">昵称</p>
-                    <p className="text-white font-medium">{selectedUser.name}</p>
+                    <p className="text-xs text-foreground/40 uppercase tracking-wider">昵称</p>
+                    <p className="text-foreground font-medium">{selectedUser.name}</p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs text-white/40 uppercase tracking-wider">角色</p>
-                    <p className="text-white font-medium">
+                    <p className="text-xs text-foreground/40 uppercase tracking-wider">角色</p>
+                    <p className="text-foreground font-medium">
                       {selectedUser.role === 'admin' ? (
-                        <span className="px-2 py-0.5 text-xs rounded-full bg-violet-500/20 text-violet-400 border border-violet-500/30">超级管理员</span>
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-sky-500/20 text-sky-400 border border-sky-500/30">超级管理员</span>
                       ) : selectedUser.role === 'moderator' ? (
                         <span className="px-2 py-0.5 text-xs rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30">小管理员</span>
                       ) : (
-                        <span className="px-2 py-0.5 text-xs rounded-full bg-white/10 text-white/60 border border-white/10">普通用户</span>
+                        <span className="px-2 py-0.5 text-xs rounded-full bg-card/70 text-foreground/60 border border-border/70">普通用户</span>
                       )}
                     </p>
                   </div>
                   <div className="space-y-1">
-                    <p className="text-xs text-white/40 uppercase tracking-wider">注册时间</p>
-                    <p className="text-white font-medium">{formatDate(selectedUser.createdAt)}</p>
+                    <p className="text-xs text-foreground/40 uppercase tracking-wider">注册时间</p>
+                    <p className="text-foreground font-medium">{formatDate(selectedUser.createdAt)}</p>
                   </div>
                 </div>
               </div>
 
               {/* 修改密码 - 仅有权限时显示 */}
               {canEditUser(selectedUser) && (
-                <div className="bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
-                  <div className="p-5 border-b border-white/10 flex items-center gap-3">
+                <div className="bg-card/60 backdrop-blur-sm border border-border/70 rounded-2xl overflow-hidden">
+                  <div className="p-5 border-b border-border/70 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center">
                       <Key className="w-5 h-5 text-orange-400" />
                     </div>
-                    <span className="font-semibold text-white">修改密码</span>
+                    <span className="font-semibold text-foreground">修改密码</span>
                   </div>
                   <div className="p-5">
                     {editMode === 'password' ? (
@@ -288,13 +288,13 @@ export default function UsersPage() {
                           value={editValue}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditValue(e.target.value)}
                           placeholder="输入新密码（至少6位）"
-                          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 transition-all"
+                          className="flex-1 px-4 py-3 bg-card/60 border border-border/70 rounded-xl text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-border/70 transition-all"
                         />
-                        <button onClick={savePassword} className="px-5 py-3 bg-white text-black rounded-xl text-sm font-medium hover:bg-white/90 transition-colors">保存</button>
-                        <button onClick={() => { setEditMode(null); setEditValue(''); }} className="px-5 py-3 bg-white/10 text-white rounded-xl text-sm font-medium hover:bg-white/20 transition-colors">取消</button>
+                        <button onClick={savePassword} className="px-5 py-3 bg-foreground text-background rounded-xl text-sm font-medium hover:bg-foreground/90 transition-colors">保存</button>
+                        <button onClick={() => { setEditMode(null); setEditValue(''); }} className="px-5 py-3 bg-card/70 text-foreground rounded-xl text-sm font-medium hover:bg-card/80 transition-colors">取消</button>
                       </div>
                     ) : (
-                      <button onClick={() => { setEditMode('password'); setEditValue(''); }} className="flex items-center gap-2 px-5 py-3 bg-white/5 border border-white/10 text-white rounded-xl text-sm font-medium hover:bg-white/10 transition-all">
+                      <button onClick={() => { setEditMode('password'); setEditValue(''); }} className="flex items-center gap-2 px-5 py-3 bg-card/60 border border-border/70 text-foreground rounded-xl text-sm font-medium hover:bg-card/70 transition-all">
                         <Edit2 className="w-4 h-4" />
                         重置密码
                       </button>
@@ -305,13 +305,13 @@ export default function UsersPage() {
 
               {/* 修改余额 - 仅有权限时显示 */}
               {canEditUser(selectedUser) && (
-                <div className="bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
-                  <div className="p-5 border-b border-white/10 flex items-center gap-3">
+                <div className="bg-card/60 backdrop-blur-sm border border-border/70 rounded-2xl overflow-hidden">
+                  <div className="p-5 border-b border-border/70 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
                       <Coins className="w-5 h-5 text-green-400" />
                     </div>
                     <div>
-                      <span className="font-semibold text-white">积分余额</span>
+                      <span className="font-semibold text-foreground">积分余额</span>
                       <p className="text-2xl font-bold text-green-400">{formatBalance(selectedUser.balance)}</p>
                     </div>
                   </div>
@@ -323,13 +323,13 @@ export default function UsersPage() {
                           value={editValue}
                           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setEditValue(e.target.value)}
                           placeholder="输入新余额"
-                          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/20 transition-all"
+                          className="flex-1 px-4 py-3 bg-card/60 border border-border/70 rounded-xl text-foreground placeholder:text-foreground/30 focus:outline-none focus:border-border/70 transition-all"
                         />
-                        <button onClick={saveBalance} className="px-5 py-3 bg-white text-black rounded-xl text-sm font-medium hover:bg-white/90 transition-colors">保存</button>
-                        <button onClick={() => { setEditMode(null); setEditValue(''); }} className="px-5 py-3 bg-white/10 text-white rounded-xl text-sm font-medium hover:bg-white/20 transition-colors">取消</button>
+                        <button onClick={saveBalance} className="px-5 py-3 bg-foreground text-background rounded-xl text-sm font-medium hover:bg-foreground/90 transition-colors">保存</button>
+                        <button onClick={() => { setEditMode(null); setEditValue(''); }} className="px-5 py-3 bg-card/70 text-foreground rounded-xl text-sm font-medium hover:bg-card/80 transition-colors">取消</button>
                       </div>
                     ) : (
-                      <button onClick={() => { setEditMode('balance'); setEditValue(String(selectedUser.balance)); }} className="flex items-center gap-2 px-5 py-3 bg-white/5 border border-white/10 text-white rounded-xl text-sm font-medium hover:bg-white/10 transition-all">
+                      <button onClick={() => { setEditMode('balance'); setEditValue(String(selectedUser.balance)); }} className="flex items-center gap-2 px-5 py-3 bg-card/60 border border-border/70 text-foreground rounded-xl text-sm font-medium hover:bg-card/70 transition-all">
                         <Edit2 className="w-4 h-4" />
                         修改余额
                       </button>
@@ -340,13 +340,13 @@ export default function UsersPage() {
 
               {/* 无权限时只显示余额（只读） */}
               {!canEditUser(selectedUser) && (
-                <div className="bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
+                <div className="bg-card/60 backdrop-blur-sm border border-border/70 rounded-2xl overflow-hidden">
                   <div className="p-5 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center">
                       <Coins className="w-5 h-5 text-green-400" />
                     </div>
                     <div>
-                      <span className="font-semibold text-white">积分余额</span>
+                      <span className="font-semibold text-foreground">积分余额</span>
                       <p className="text-2xl font-bold text-green-400">{formatBalance(selectedUser.balance)}</p>
                     </div>
                   </div>
@@ -355,12 +355,12 @@ export default function UsersPage() {
 
               {/* 修改角色 - 仅超级管理员可见，且不能修改自己和其他超级管理员 */}
               {isAdmin && selectedUser.role !== 'admin' && (
-                <div className="bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
-                  <div className="p-5 border-b border-white/10 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-violet-500/20 flex items-center justify-center">
-                      <ShieldAlert className="w-5 h-5 text-violet-400" />
+                <div className="bg-card/60 backdrop-blur-sm border border-border/70 rounded-2xl overflow-hidden">
+                  <div className="p-5 border-b border-border/70 flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-sky-500/20 flex items-center justify-center">
+                      <ShieldAlert className="w-5 h-5 text-sky-400" />
                     </div>
-                    <span className="font-semibold text-white">用户角色</span>
+                    <span className="font-semibold text-foreground">用户角色</span>
                   </div>
                   <div className="p-5">
                     <div className="flex gap-3">
@@ -369,8 +369,8 @@ export default function UsersPage() {
                         className={cn(
                           'flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all border',
                           selectedUser.role === 'user'
-                            ? 'bg-white/10 text-white border-white/20'
-                            : 'bg-white/5 text-white/60 border-white/10 hover:bg-white/10 hover:text-white'
+                            ? 'bg-card/70 text-foreground border-border/70'
+                            : 'bg-card/60 text-foreground/60 border-border/70 hover:bg-card/70 hover:text-foreground'
                         )}
                       >
                         普通用户
@@ -381,13 +381,13 @@ export default function UsersPage() {
                           'flex-1 px-4 py-3 rounded-xl text-sm font-medium transition-all border',
                           selectedUser.role === 'moderator'
                             ? 'bg-blue-500/20 text-blue-400 border-blue-500/30'
-                            : 'bg-white/5 text-white/60 border-white/10 hover:bg-blue-500/10 hover:text-blue-400'
+                            : 'bg-card/60 text-foreground/60 border-border/70 hover:bg-blue-500/10 hover:text-blue-400'
                         )}
                       >
                         小管理员
                       </button>
                     </div>
-                    <p className="text-xs text-white/40 mt-3">
+                    <p className="text-xs text-foreground/40 mt-3">
                       小管理员可以管理普通用户的积分、密码和禁用状态
                     </p>
                   </div>
@@ -396,11 +396,11 @@ export default function UsersPage() {
 
             </div>
           ) : (
-            <div className="bg-white/[0.03] backdrop-blur-sm border border-white/10 rounded-2xl p-16 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-white/5 flex items-center justify-center">
-                <User className="w-8 h-8 text-white/20" />
+            <div className="bg-card/60 backdrop-blur-sm border border-border/70 rounded-2xl p-16 text-center">
+              <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-card/60 flex items-center justify-center">
+                <User className="w-8 h-8 text-foreground/30" />
               </div>
-              <p className="text-white/40">选择一个用户查看详情</p>
+              <p className="text-foreground/40">选择一个用户查看详情</p>
             </div>
           )}
         </div>
@@ -408,3 +408,4 @@ export default function UsersPage() {
     </div>
   );
 }
+

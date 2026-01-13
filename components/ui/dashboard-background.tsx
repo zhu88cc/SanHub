@@ -137,54 +137,42 @@ export function DashboardBackground() {
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-      {/* 基础渐变 */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black via-zinc-950 to-black" />
-
-      {/* 网格图案 - 静态，无性能影响 */}
-      <div 
-        className="absolute inset-0 opacity-[0.015]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '80px 80px',
-        }}
-      />
+      {/* Base gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-background via-background/80 to-background" />
 
       {/* 渐变球 - 使用 CSS 动画（GPU 加速），减少动画时暂停 */}
       {!prefersReducedMotion && (
         <>
-          {/* 动态渐变球 1 - 紫色 - 左上 */}
+          {/* Glow A */}
           <div 
             className="absolute w-[400px] h-[400px] rounded-full opacity-15 blur-[80px] animate-blob"
             style={{
               ...blobStyle,
-              background: 'radial-gradient(circle, rgba(147, 51, 234, 0.5) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, hsl(var(--glow-a) / 0.35) 0%, transparent 70%)',
               top: '-10%',
               left: '-5%',
               animationDelay: '0s',
             }}
           />
 
-          {/* 动态渐变球 2 - 蓝色 - 右侧 */}
+          {/* Glow B */}
           <div 
             className="absolute w-[350px] h-[350px] rounded-full opacity-12 blur-[70px] animate-blob"
             style={{
               ...blobStyle,
-              background: 'radial-gradient(circle, rgba(59, 130, 246, 0.5) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, hsl(var(--glow-b) / 0.35) 0%, transparent 70%)',
               top: '30%',
               right: '-5%',
               animationDelay: '2s',
             }}
           />
 
-          {/* 动态渐变球 3 - 粉色 - 底部 */}
+          {/* Neutral glow */}
           <div 
             className="absolute w-[300px] h-[300px] rounded-full opacity-10 blur-[60px] animate-blob"
             style={{
               ...blobStyle,
-              background: 'radial-gradient(circle, rgba(236, 72, 153, 0.4) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(255, 255, 255, 0.16) 0%, transparent 70%)',
               bottom: '5%',
               left: '30%',
               animationDelay: '4s',
@@ -199,7 +187,7 @@ export function DashboardBackground() {
           <div 
             className="absolute w-[400px] h-[400px] rounded-full opacity-15 blur-[80px]"
             style={{
-              background: 'radial-gradient(circle, rgba(147, 51, 234, 0.5) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, hsl(var(--glow-a) / 0.35) 0%, transparent 70%)',
               top: '-10%',
               left: '-5%',
             }}
@@ -207,7 +195,7 @@ export function DashboardBackground() {
           <div 
             className="absolute w-[350px] h-[350px] rounded-full opacity-12 blur-[70px]"
             style={{
-              background: 'radial-gradient(circle, rgba(59, 130, 246, 0.5) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, hsl(var(--glow-b) / 0.35) 0%, transparent 70%)',
               top: '30%',
               right: '-5%',
             }}
@@ -221,13 +209,8 @@ export function DashboardBackground() {
         className="absolute inset-0 opacity-50"
       />
 
-      {/* 噪点纹理 */}
-      <div 
-        className="absolute inset-0 opacity-[0.01]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
+      {/* Subtle fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-28 bg-gradient-to-t from-background to-transparent" />
     </div>
   );
 }

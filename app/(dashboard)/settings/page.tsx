@@ -159,74 +159,74 @@ export default function SettingsPage() {
     <div className="max-w-3xl mx-auto space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-extralight text-white">账号设置</h1>
-        <p className="text-white/50 mt-1 font-light">管理您的账号信息和安全设置</p>
+        <h1 className="text-3xl font-light text-foreground">账号设置</h1>
+        <p className="text-foreground/50 mt-1 font-light">管理您的账号信息和安全设置</p>
       </div>
 
       {/* User Info Card */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-        <div className="p-6 border-b border-white/10">
+      <div className="surface overflow-hidden">
+        <div className="p-6 border-b border-border/70">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-              <User className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 bg-card/60 border border-border/70 rounded-xl flex items-center justify-center">
+              <User className="w-5 h-5 text-foreground" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-white">个人信息</h2>
-              <p className="text-sm text-white/40">您的账号基本信息</p>
+              <h2 className="text-lg font-medium text-foreground">个人信息</h2>
+              <p className="text-sm text-foreground/40">您的账号基本信息</p>
             </div>
           </div>
         </div>
         <div className="p-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-white/40 text-sm">
+              <div className="flex items-center gap-2 text-foreground/40 text-sm">
                 <User className="w-4 h-4" />
                 <span>昵称</span>
               </div>
-              <p className="text-white text-lg">{session.user.name}</p>
+              <p className="text-foreground text-lg">{session.user.name}</p>
             </div>
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-white/40 text-sm">
+              <div className="flex items-center gap-2 text-foreground/40 text-sm">
                 <Mail className="w-4 h-4" />
                 <span>邮箱</span>
               </div>
-              <p className="text-white text-lg">{session.user.email}</p>
+              <p className="text-foreground text-lg">{session.user.email}</p>
             </div>
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-white/40 text-sm">
+              <div className="flex items-center gap-2 text-foreground/40 text-sm">
                 <Shield className="w-4 h-4" />
                 <span>角色</span>
               </div>
-              <p className="text-white text-lg">
+              <p className="text-foreground text-lg">
                 {session.user.role === 'admin' ? (
                   <span className="inline-flex items-center gap-2">
                     管理员
-                    <span className="px-2 py-0.5 bg-white/10 text-white/60 text-xs rounded">Admin</span>
+                    <span className="px-2 py-0.5 bg-card/70 text-foreground/60 text-xs rounded border border-border/60">Admin</span>
                   </span>
                 ) : '普通用户'}
               </p>
             </div>
             <div className="space-y-1">
-              <div className="flex items-center gap-2 text-white/40 text-sm">
+              <div className="flex items-center gap-2 text-foreground/40 text-sm">
                 <Coins className="w-4 h-4" />
                 <span>当前余额</span>
               </div>
-              <p className="text-white text-2xl font-light">{formatBalance(session.user.balance)} <span className="text-sm text-white/40">积分</span></p>
+              <p className="text-foreground text-2xl font-light">{formatBalance(session.user.balance)} <span className="text-sm text-foreground/40">积分</span></p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Redeem Code Card */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-        <div className="p-6 border-b border-white/10">
+      <div className="surface overflow-hidden">
+        <div className="p-6 border-b border-border/70">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-green-500/10 rounded-xl flex items-center justify-center">
-              <Gift className="w-5 h-5 text-green-400" />
+            <div className="w-10 h-10 bg-emerald-500/15 rounded-xl flex items-center justify-center border border-emerald-500/30">
+              <Gift className="w-5 h-5 text-emerald-300" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-white">积分兑换</h2>
-              <p className="text-sm text-white/40">使用兑换码获取积分</p>
+              <h2 className="text-lg font-medium text-foreground">积分兑换</h2>
+              <p className="text-sm text-foreground/40">使用兑换码获取积分</p>
             </div>
           </div>
         </div>
@@ -237,12 +237,12 @@ export default function SettingsPage() {
               value={redeemCode}
               onChange={(e) => setRedeemCode(e.target.value.toUpperCase())}
               placeholder="输入兑换码"
-              className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors uppercase tracking-wider"
+              className="flex-1 px-4 py-3 bg-input/70 border border-border/70 rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30 transition-colors uppercase tracking-wider"
             />
             <button
               onClick={handleRedeemCode}
               disabled={redeemLoading}
-              className="flex items-center gap-2 px-6 py-3 bg-green-500/20 border border-green-500/30 text-green-400 rounded-xl font-medium hover:bg-green-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex items-center gap-2 px-6 py-3 bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 rounded-xl font-medium hover:bg-emerald-500/25 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {redeemLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Ticket className="w-4 h-4" />}
               兑换
@@ -252,59 +252,59 @@ export default function SettingsPage() {
       </div>
 
       {/* Invite Code Card */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-        <div className="p-6 border-b border-white/10">
+      <div className="surface overflow-hidden">
+        <div className="p-6 border-b border-border/70">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-violet-500/10 rounded-xl flex items-center justify-center">
-              <UserPlus className="w-5 h-5 text-violet-400" />
+            <div className="w-10 h-10 bg-sky-500/15 rounded-xl flex items-center justify-center border border-sky-500/30">
+              <UserPlus className="w-5 h-5 text-sky-300" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-white">邀请码</h2>
-              <p className="text-sm text-white/40">邀请好友或使用他人邀请码获取积分</p>
+              <h2 className="text-lg font-medium text-foreground">邀请码</h2>
+              <p className="text-sm text-foreground/40">邀请好友或使用他人邀请码获取积分</p>
             </div>
           </div>
         </div>
         <div className="p-6 space-y-6">
           {/* My invite code */}
           <div className="space-y-2">
-            <label className="text-sm text-white/50 uppercase tracking-wider">我的邀请码</label>
+            <label className="text-sm text-foreground/50 uppercase tracking-wider">我的邀请码</label>
             <div className="flex gap-3">
-              <div className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white font-mono tracking-wider flex items-center">
+              <div className="flex-1 px-4 py-3 bg-card/60 border border-border/70 rounded-xl text-foreground font-mono tracking-wider flex items-center">
                 {inviteCodeLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin text-white/30" />
+                  <Loader2 className="w-4 h-4 animate-spin text-foreground/40" />
                 ) : myInviteCode ? (
                   myInviteCode
                 ) : (
-                  <span className="text-white/30">暂无邀请码</span>
+                  <span className="text-foreground/40">暂无邀请码</span>
                 )}
               </div>
               {myInviteCode && (
                 <button
                   onClick={copyInviteCode}
-                  className="flex items-center gap-2 px-4 py-3 bg-white/5 border border-white/10 text-white/60 rounded-xl hover:bg-white/10 hover:text-white transition-colors"
+                  className="flex items-center gap-2 px-4 py-3 bg-card/60 border border-border/70 text-foreground/60 rounded-xl hover:bg-card/80 hover:text-foreground transition-colors"
                 >
                   <Copy className="w-4 h-4" />
                 </button>
               )}
             </div>
-            <p className="text-xs text-white/30">分享给好友，好友使用后双方都可获得积分奖励</p>
+            <p className="text-xs text-foreground/40">分享给好友，好友使用后双方都可获得积分奖励</p>
           </div>
           
           {/* Use invite code */}
           <div className="space-y-2">
-            <label className="text-sm text-white/50 uppercase tracking-wider">使用邀请码</label>
+            <label className="text-sm text-foreground/50 uppercase tracking-wider">使用邀请码</label>
             <div className="flex gap-3">
               <input
                 type="text"
                 value={inviteCode}
                 onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
                 placeholder="输入他人的邀请码"
-                className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors uppercase tracking-wider"
+                className="flex-1 px-4 py-3 bg-input/70 border border-border/70 rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30 transition-colors uppercase tracking-wider"
               />
               <button
                 onClick={handleUseInviteCode}
                 disabled={inviteLoading}
-                className="flex items-center gap-2 px-6 py-3 bg-violet-500/20 border border-violet-500/30 text-violet-400 rounded-xl font-medium hover:bg-violet-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-6 py-3 bg-sky-500/15 border border-sky-500/30 text-sky-300 rounded-xl font-medium hover:bg-sky-500/25 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {inviteLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
                 使用
@@ -315,53 +315,53 @@ export default function SettingsPage() {
       </div>
 
       {/* Change Password Card */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-        <div className="p-6 border-b border-white/10">
+      <div className="surface overflow-hidden">
+        <div className="p-6 border-b border-border/70">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-              <Key className="w-5 h-5 text-white" />
+            <div className="w-10 h-10 bg-card/60 border border-border/70 rounded-xl flex items-center justify-center">
+              <Key className="w-5 h-5 text-foreground" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-white">修改密码</h2>
-              <p className="text-sm text-white/40">更新您的登录密码</p>
+              <h2 className="text-lg font-medium text-foreground">修改密码</h2>
+              <p className="text-sm text-foreground/40">更新您的登录密码</p>
             </div>
           </div>
         </div>
         <div className="p-6 space-y-5">
           <div className="space-y-2">
-            <label className="text-sm text-white/50 uppercase tracking-wider">当前密码</label>
+            <label className="text-sm text-foreground/50 uppercase tracking-wider">当前密码</label>
             <input
               type="password"
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
               placeholder="输入当前密码"
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors"
+              className="w-full px-4 py-3 bg-input/70 border border-border/70 rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30 transition-colors"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-white/50 uppercase tracking-wider">新密码</label>
+            <label className="text-sm text-foreground/50 uppercase tracking-wider">新密码</label>
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="至少 6 个字符"
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors"
+              className="w-full px-4 py-3 bg-input/70 border border-border/70 rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30 transition-colors"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-sm text-white/50 uppercase tracking-wider">确认新密码</label>
+            <label className="text-sm text-foreground/50 uppercase tracking-wider">确认新密码</label>
             <input
               type="password"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               placeholder="再次输入新密码"
-              className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors"
+              className="w-full px-4 py-3 bg-input/70 border border-border/70 rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30 transition-colors"
             />
           </div>
           <button
             onClick={handleChangePassword}
             disabled={loading}
-            className="flex items-center gap-2 px-6 py-3 bg-white text-black rounded-xl font-medium hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center gap-2 px-6 py-3 bg-foreground text-background rounded-xl font-medium hover:opacity-90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <><Loader2 className="w-4 h-4 animate-spin" /> 保存中...</>
@@ -373,22 +373,22 @@ export default function SettingsPage() {
       </div>
 
       {/* Logout Card */}
-      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-        <div className="p-6 border-b border-white/10">
+      <div className="surface overflow-hidden">
+        <div className="p-6 border-b border-border/70">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center">
-              <LogOut className="w-5 h-5 text-red-400" />
+            <div className="w-10 h-10 bg-red-500/10 rounded-xl flex items-center justify-center border border-red-500/30">
+              <LogOut className="w-5 h-5 text-red-300" />
             </div>
             <div>
-              <h2 className="text-lg font-medium text-white">退出登录</h2>
-              <p className="text-sm text-white/40">退出当前账号</p>
+              <h2 className="text-lg font-medium text-foreground">退出登录</h2>
+              <p className="text-sm text-foreground/40">退出当前账号</p>
             </div>
           </div>
         </div>
         <div className="p-6">
           <button 
             onClick={() => signOut({ callbackUrl: '/login' })}
-            className="flex items-center gap-2 px-6 py-3 bg-red-500/10 border border-red-500/20 text-red-400 rounded-xl font-medium hover:bg-red-500/20 transition-colors"
+            className="flex items-center gap-2 px-6 py-3 bg-red-500/10 border border-red-500/30 text-red-300 rounded-xl font-medium hover:bg-red-500/20 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             退出登录

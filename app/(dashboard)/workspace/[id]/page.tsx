@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 /* eslint-disable @next/next/no-img-element */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
@@ -1064,7 +1064,7 @@ export default function WorkspaceEditorPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-12 text-white/50">
+      <div className="flex items-center justify-center py-12 text-foreground/50">
         <Loader2 className="w-5 h-5 animate-spin mr-2" />
         加载中...
       </div>
@@ -1081,7 +1081,7 @@ export default function WorkspaceEditorPage() {
               setWorkspaceName(e.target.value);
               setDirty(true);
             }}
-            className="text-2xl font-light text-white bg-transparent border border-white/10 rounded-lg px-3 py-2 w-full max-w-md focus:outline-none focus:border-white/30"
+            className="text-2xl font-light text-foreground bg-transparent border border-border/70 rounded-lg px-3 py-2 w-full max-w-md focus:outline-none focus:border-border"
           />
         </div>
         <button
@@ -1090,8 +1090,8 @@ export default function WorkspaceEditorPage() {
           className={cn(
             'inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition shrink-0',
             dirty
-              ? 'bg-white text-black hover:bg-white/90'
-              : 'bg-white/10 text-white/40 cursor-not-allowed'
+              ? 'bg-foreground text-background hover:bg-foreground/90'
+              : 'bg-card/70 text-foreground/40 cursor-not-allowed'
           )}
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -1099,8 +1099,8 @@ export default function WorkspaceEditorPage() {
         </button>
       </div>
 
-      <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex-1 min-h-0">
-        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10 text-white/60 text-sm">
+      <div className="bg-card/60 border border-border/70 rounded-2xl overflow-hidden flex-1 min-h-0">
+        <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border/70 text-foreground/60 text-sm">
           <div className="flex items-center gap-3">
             <MousePointer2 className="w-4 h-4" />
             右键添加节点，拖拽布局，点击节点右侧圆点开始连线（Alt/Option + 滚轮缩放）
@@ -1108,29 +1108,29 @@ export default function WorkspaceEditorPage() {
           <div className="flex items-center gap-2">
             <button
               onClick={handleZoomOut}
-              className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-white/10 text-white/60 hover:text-white hover:border-white/40 transition"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-border/70 text-foreground/60 hover:text-foreground hover:border-border transition"
               title="缩小"
             >
               <ZoomOut className="w-4 h-4" />
             </button>
-            <div className="w-14 text-center text-xs text-white/50">{Math.round(zoom * 100)}%</div>
+            <div className="w-14 text-center text-xs text-foreground/50">{Math.round(zoom * 100)}%</div>
             <button
               onClick={handleZoomIn}
-              className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-white/10 text-white/60 hover:text-white hover:border-white/40 transition"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-border/70 text-foreground/60 hover:text-foreground hover:border-border transition"
               title="放大"
             >
               <ZoomIn className="w-4 h-4" />
             </button>
             <button
               onClick={handleZoomFit}
-              className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-white/10 text-white/60 hover:text-white hover:border-white/40 transition"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-border/70 text-foreground/60 hover:text-foreground hover:border-border transition"
               title="适配视图"
             >
               <Maximize2 className="w-4 h-4" />
             </button>
             <button
               onClick={handleZoomReset}
-              className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-white/10 text-white/60 hover:text-white hover:border-white/40 transition"
+              className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-border/70 text-foreground/60 hover:text-foreground hover:border-border transition"
               title="还原缩放"
             >
               <RotateCcw className="w-4 h-4" />
@@ -1219,20 +1219,20 @@ export default function WorkspaceEditorPage() {
                   <div
                     key={node.id}
                     data-workspace-node
-                    className="absolute w-72 bg-black/60 border border-white/15 rounded-xl shadow-lg"
+                    className="absolute w-72 bg-background/70 border border-border/70 rounded-xl shadow-lg"
                     style={{ left: node.position.x, top: node.position.y }}
                   >
                   <div
                     onPointerDown={(event) => startDrag(event, node)}
-                    className="flex items-center justify-between px-3 py-2 border-b border-white/10 bg-white/5 rounded-t-xl cursor-grab"
+                    className="flex items-center justify-between px-3 py-2 border-b border-border/70 bg-card/60 rounded-t-xl cursor-grab"
                   >
                     <div className="flex items-center gap-2 flex-1">
-                      {NodeIcon && <NodeIcon className="w-4 h-4 text-white/50" />}
+                      {NodeIcon && <NodeIcon className="w-4 h-4 text-foreground/50" />}
                       <input
                         value={node.name}
                         onChange={(e) => updateNode(node.id, { name: e.target.value })}
                         onPointerDown={(event) => event.stopPropagation()}
-                        className="text-sm text-white/90 bg-transparent focus:outline-none flex-1"
+                        className="text-sm text-foreground/90 bg-transparent focus:outline-none flex-1"
                       />
                     </div>
                     <div className="flex items-center gap-1">
@@ -1246,7 +1246,7 @@ export default function WorkspaceEditorPage() {
                           onPointerDown={(event) => event.stopPropagation()}
                           disabled={node.data.status === 'pending' || node.data.status === 'processing'}
                           className={cn(
-                            'text-white/40 hover:text-white transition',
+                            'text-foreground/40 hover:text-foreground transition',
                             (node.data.status === 'pending' || node.data.status === 'processing') &&
                               'opacity-40 cursor-not-allowed'
                           )}
@@ -1258,7 +1258,7 @@ export default function WorkspaceEditorPage() {
                       <button
                         onClick={() => removeNode(node.id)}
                         onPointerDown={(event) => event.stopPropagation()}
-                        className="text-white/40 hover:text-red-400 transition"
+                        className="text-foreground/40 hover:text-red-400 transition"
                         title="删除节点"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -1269,7 +1269,7 @@ export default function WorkspaceEditorPage() {
                   {showInputHandle && (
                     <button
                       onClick={() => handleFinishConnect(node.id)}
-                      className="absolute -left-2 top-[18px] w-4 h-4 rounded-full border border-white/30 bg-black hover:bg-white/10"
+                      className="absolute -left-2 top-[18px] w-4 h-4 rounded-full border border-border bg-card/80 hover:bg-card/70"
                       title="输入"
                     />
                   )}
@@ -1277,19 +1277,19 @@ export default function WorkspaceEditorPage() {
                     <button
                       onClick={() => handleStartConnect(node.id)}
                       className={cn(
-                        'absolute -right-2 top-[18px] w-4 h-4 rounded-full border border-white/30',
-                        connectingFrom === node.id ? 'bg-white' : 'bg-black hover:bg-white/10'
+                        'absolute -right-2 top-[18px] w-4 h-4 rounded-full border border-border',
+                        connectingFrom === node.id ? 'bg-foreground' : 'bg-card/80 hover:bg-card/70'
                       )}
                       title="输出"
                     />
                   )}
 
-                  <div className="p-3 space-y-3 text-xs text-white/70">
+                  <div className="p-3 space-y-3 text-xs text-foreground/70">
                     {/* Prompt Template Node */}
                     {node.type === 'prompt-template' && (
                       <>
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-wider text-white/40">模板</label>
+                          <label className="text-[10px] uppercase tracking-wider text-foreground/40">模板</label>
                           <div className="relative">
                             <select
                               value={node.data.templateId || ''}
@@ -1300,26 +1300,26 @@ export default function WorkspaceEditorPage() {
                                   templateOutput: template?.content || '',
                                 });
                               }}
-                              className="w-full px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/30"
+                              className="w-full px-2 py-2 bg-card/60 border border-border/70 rounded-lg text-foreground focus:outline-none focus:border-border"
                             >
-                              <option value="" className="bg-black">选择模板...</option>
+                              <option value="" className="bg-card/95">选择模板...</option>
                               {promptTemplates.map((template) => (
-                                <option key={template.id} value={template.id} className="bg-black">
+                                <option key={template.id} value={template.id} className="bg-card/95">
                                   {template.name}
                                 </option>
                               ))}
                             </select>
-                            <ChevronDown className="w-3 h-3 text-white/30 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            <ChevronDown className="w-3 h-3 text-foreground/30 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
                           </div>
                         </div>
                         {promptTemplates.length === 0 && (
-                          <div className="text-[10px] text-white/40">
+                          <div className="text-[10px] text-foreground/40">
                             暂无模板，请在 data/prompts 目录添加 .txt 文件
                           </div>
                         )}
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-wider text-white/40">输出内容</label>
-                          <div className="text-[10px] text-white/60 bg-white/5 rounded-lg px-2 py-1.5 max-h-32 overflow-auto whitespace-pre-wrap">
+                          <label className="text-[10px] uppercase tracking-wider text-foreground/40">输出内容</label>
+                          <div className="text-[10px] text-foreground/60 bg-card/60 rounded-lg px-2 py-1.5 max-h-32 overflow-auto whitespace-pre-wrap">
                             {node.data.templateOutput || '选择模板后显示内容'}
                           </div>
                         </div>
@@ -1330,30 +1330,30 @@ export default function WorkspaceEditorPage() {
                     {node.type === 'chat' && (
                       <>
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-wider text-white/40">聊天模型</label>
+                          <label className="text-[10px] uppercase tracking-wider text-foreground/40">聊天模型</label>
                           <div className="relative">
                             <select
                               value={node.data.chatModelId || ''}
                               onChange={(e) => updateNodeData(node.id, { chatModelId: e.target.value })}
-                              className="w-full px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/30"
+                              className="w-full px-2 py-2 bg-card/60 border border-border/70 rounded-lg text-foreground focus:outline-none focus:border-border"
                             >
                               {chatModels.length === 0 ? (
-                                <option value="" className="bg-black">无可用模型</option>
+                                <option value="" className="bg-card/95">无可用模型</option>
                               ) : (
                                 chatModels.map((m) => (
-                                  <option key={m.id} value={m.id} className="bg-black">
+                                  <option key={m.id} value={m.id} className="bg-card/95">
                                     {m.name} {m.supportsVision ? '(支持图片)' : ''}
                                   </option>
                                 ))
                               )}
                             </select>
-                            <ChevronDown className="w-3 h-3 text-white/30 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                            <ChevronDown className="w-3 h-3 text-foreground/30 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
                           </div>
                         </div>
 
                         {incoming.length > 0 && (
                           <div className="space-y-1">
-                            <label className="text-[10px] uppercase tracking-wider text-white/40">
+                            <label className="text-[10px] uppercase tracking-wider text-foreground/40">
                               <ImageIcon className="w-3 h-3 inline mr-1" />
                               输入图片 ({incoming.length})
                             </label>
@@ -1363,13 +1363,13 @@ export default function WorkspaceEditorPage() {
                                 return (
                                   <span
                                     key={edge.id}
-                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/10 text-white/60"
+                                    className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-card/70 text-foreground/60"
                                   >
                                     <Link2 className="w-3 h-3" />
                                     {fromNode?.name || '节点'}
                                     <button
                                       onClick={() => removeEdge(edge.id)}
-                                      className="text-white/40 hover:text-white"
+                                      className="text-foreground/40 hover:text-foreground"
                                     >
                                       ×
                                     </button>
@@ -1382,8 +1382,8 @@ export default function WorkspaceEditorPage() {
 
                         <div className="space-y-1">
                           <div className="flex items-center justify-between">
-                            <label className="text-[10px] uppercase tracking-wider text-white/40">提示词</label>
-                            <span className="text-[10px] text-white/30">{node.data.prompt.length}/{CHAT_MAX_LENGTH}</span>
+                            <label className="text-[10px] uppercase tracking-wider text-foreground/40">提示词</label>
+                            <span className="text-[10px] text-foreground/30">{node.data.prompt.length}/{CHAT_MAX_LENGTH}</span>
                           </div>
                           <textarea
                             value={node.data.prompt}
@@ -1393,7 +1393,7 @@ export default function WorkspaceEditorPage() {
                               }
                             }}
                             maxLength={CHAT_MAX_LENGTH}
-                            className="w-full h-20 px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs resize-none focus:outline-none focus:border-white/30"
+                            className="w-full h-20 px-2 py-2 bg-card/60 border border-border/70 rounded-lg text-foreground text-xs resize-none focus:outline-none focus:border-border"
                             placeholder="输入聊天内容..."
                           />
                         </div>
@@ -1408,8 +1408,8 @@ export default function WorkspaceEditorPage() {
                           className={cn(
                             'w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium transition',
                             node.data.status === 'pending' || node.data.status === 'processing'
-                              ? 'bg-white/10 text-white/50 cursor-not-allowed'
-                              : 'bg-white text-black hover:bg-white/90'
+                              ? 'bg-card/70 text-foreground/50 cursor-not-allowed'
+                              : 'bg-foreground text-background hover:bg-foreground/90'
                           )}
                         >
                           {node.data.status === 'pending' || node.data.status === 'processing' ? (
@@ -1427,8 +1427,8 @@ export default function WorkspaceEditorPage() {
 
                         {node.data.chatOutput && (
                           <div className="space-y-1">
-                            <label className="text-[10px] uppercase tracking-wider text-white/40">输出</label>
-                            <div className="text-[10px] text-white/60 bg-white/5 rounded-lg px-2 py-1.5 max-h-40 overflow-auto whitespace-pre-wrap">
+                            <label className="text-[10px] uppercase tracking-wider text-foreground/40">输出</label>
+                            <div className="text-[10px] text-foreground/60 bg-card/60 rounded-lg px-2 py-1.5 max-h-40 overflow-auto whitespace-pre-wrap">
                               {node.data.chatOutput}
                             </div>
                           </div>
@@ -1440,7 +1440,7 @@ export default function WorkspaceEditorPage() {
                     {(node.type === 'image' || node.type === 'video') && model && (
                     <>
                     <div className="space-y-1">
-                      <label className="text-[10px] uppercase tracking-wider text-white/40">模型</label>
+                      <label className="text-[10px] uppercase tracking-wider text-foreground/40">模型</label>
                       <div className="relative">
                         <select
                           value={node.data.modelId}
@@ -1469,34 +1469,34 @@ export default function WorkspaceEditorPage() {
                               });
                             }
                           }}
-                          className="w-full px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/30"
+                          className="w-full px-2 py-2 bg-card/60 border border-border/70 rounded-lg text-foreground focus:outline-none focus:border-border"
                         >
                           {(node.type === 'image' ? imageModels : videoModels).map((item) => (
-                            <option key={item.id} value={item.id} className="bg-black">
+                            <option key={item.id} value={item.id} className="bg-card/95">
                               {item.name}
                             </option>
                           ))}
                         </select>
-                        <ChevronDown className="w-3 h-3 text-white/30 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <ChevronDown className="w-3 h-3 text-foreground/30 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-2">
                       <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-white/40">比例</label>
+                        <label className="text-[10px] uppercase tracking-wider text-foreground/40">比例</label>
                         <select
                           value={node.data.aspectRatio || (model as SafeImageModel | SafeVideoModel)?.defaultAspectRatio || '1:1'}
                           onChange={(e) => updateNodeData(node.id, { aspectRatio: e.target.value })}
-                          className="w-full px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/30"
+                          className="w-full px-2 py-2 bg-card/60 border border-border/70 rounded-lg text-foreground focus:outline-none focus:border-border"
                         >
                           {node.type === 'image'
                             ? (model as SafeImageModel)?.aspectRatios?.map((ratio: string) => (
-                                <option key={ratio} value={ratio} className="bg-black">
+                                <option key={ratio} value={ratio} className="bg-card/95">
                                   {ratio}
                                 </option>
                               ))
                             : (model as SafeVideoModel)?.aspectRatios?.map((ratio: { value: string; label: string }) => (
-                                <option key={ratio.value} value={ratio.value} className="bg-black">
+                                <option key={ratio.value} value={ratio.value} className="bg-card/95">
                                   {ratio.label}
                                 </option>
                               ))}
@@ -1505,19 +1505,19 @@ export default function WorkspaceEditorPage() {
 
                       {node.type === 'image' ? (
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-wider text-white/40">分辨率</label>
+                          <label className="text-[10px] uppercase tracking-wider text-foreground/40">分辨率</label>
                           <select
                             value={node.data.imageSize || (model as SafeImageModel)?.defaultImageSize || '1K'}
                             onChange={(e) => updateNodeData(node.id, { imageSize: e.target.value })}
                             disabled={!(model as SafeImageModel)?.features?.imageSize}
-                            className="w-full px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/30 disabled:opacity-40"
+                            className="w-full px-2 py-2 bg-card/60 border border-border/70 rounded-lg text-foreground focus:outline-none focus:border-border disabled:opacity-40"
                           >
                             {(model as SafeImageModel)?.imageSizes?.map((size: string) => (
-                              <option key={size} value={size} className="bg-black">
+                              <option key={size} value={size} className="bg-card/95">
                                 {size}
                               </option>
                             )) || (
-                              <option value="1K" className="bg-black">
+                              <option value="1K" className="bg-card/95">
                                 1K
                               </option>
                             )}
@@ -1525,14 +1525,14 @@ export default function WorkspaceEditorPage() {
                         </div>
                       ) : (
                         <div className="space-y-1">
-                          <label className="text-[10px] uppercase tracking-wider text-white/40">时长</label>
+                          <label className="text-[10px] uppercase tracking-wider text-foreground/40">时长</label>
                           <select
                             value={node.data.duration || (model as SafeVideoModel)?.defaultDuration || '10s'}
                             onChange={(e) => updateNodeData(node.id, { duration: e.target.value })}
-                            className="w-full px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-white/30"
+                            className="w-full px-2 py-2 bg-card/60 border border-border/70 rounded-lg text-foreground focus:outline-none focus:border-border"
                           >
                             {(model as SafeVideoModel)?.durations?.map((duration: { value: string; label: string }) => (
-                              <option key={duration.value} value={duration.value} className="bg-black">
+                              <option key={duration.value} value={duration.value} className="bg-card/95">
                                 {duration.label}
                               </option>
                             ))}
@@ -1544,13 +1544,13 @@ export default function WorkspaceEditorPage() {
                     {node.type === 'video' && (
                       <div className="space-y-2">
                         <div className="flex items-center justify-between">
-                          <label className="text-[10px] uppercase tracking-wider text-white/40">角色卡</label>
-                          <span className="text-[10px] text-white/30">
+                          <label className="text-[10px] uppercase tracking-wider text-foreground/40">角色卡</label>
+                          <span className="text-[10px] text-foreground/30">
                             {characterCards.length} 个
                           </span>
                         </div>
                         {characterCards.length === 0 ? (
-                          <div className="text-[10px] text-white/30">暂无角色卡</div>
+                          <div className="text-[10px] text-foreground/30">暂无角色卡</div>
                         ) : (
                           <>
                             <div className="flex flex-wrap gap-1.5 max-h-20 overflow-auto pr-1">
@@ -1579,7 +1579,7 @@ export default function WorkspaceEditorPage() {
                                         prev?.card.id === card.id ? null : prev
                                       );
                                     }}
-                                    className="px-2 py-1 rounded-full border border-white/10 text-[10px] text-white/70 hover:text-white hover:border-white/30 transition"
+                                    className="px-2 py-1 rounded-full border border-border/70 text-[10px] text-foreground/70 hover:text-foreground hover:border-border transition"
                                     title="点击插入到提示词"
                                   >
                                     {mention}
@@ -1589,7 +1589,7 @@ export default function WorkspaceEditorPage() {
                             </div>
                             {hoveredCard && hoveredCard.nodeId === node.id && (
                               <div
-                                className="pointer-events-none absolute z-30 rounded-lg border border-white/20 bg-black/80 p-1 shadow-xl"
+                                className="pointer-events-none absolute z-30 rounded-lg border border-border/70 bg-background/80 p-1 shadow-xl"
                                 style={{
                                   left: hoveredCard.x,
                                   top: hoveredCard.y,
@@ -1603,16 +1603,16 @@ export default function WorkspaceEditorPage() {
                                     className="h-20 w-20 rounded-md object-cover"
                                   />
                                 ) : (
-                                  <div className="h-20 w-20 rounded-md bg-white/10" />
+                                  <div className="h-20 w-20 rounded-md bg-card/70" />
                                 )}
-                                <div className="mt-1 text-[10px] text-white/50 truncate w-20">
+                                <div className="mt-1 text-[10px] text-foreground/50 truncate w-20">
                                   @{hoveredCard.card.characterName}
                                 </div>
                               </div>
                             )}
                           </>
                         )}
-                        <div className="text-[10px] text-white/20">点击名称插入到提示词</div>
+                        <div className="text-[10px] text-foreground/30">点击名称插入到提示词</div>
                       </div>
                     )}
 
@@ -1620,21 +1620,21 @@ export default function WorkspaceEditorPage() {
                     {/* Upload reference image for video - only when no connected image node */}
                     {node.type === 'video' && !incoming.some(e => nodes.find(n => n.id === e.from)?.type === 'image') && (
                       <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-white/40">参考图 (1张)</label>
+                        <label className="text-[10px] uppercase tracking-wider text-foreground/40">参考图 (1张)</label>
                         <div className="flex flex-wrap gap-1">
                           {(node.data.uploadedImages || []).slice(0, 1).map((img, idx) => (
                             <div key={idx} className="relative group">
-                              <img src={img} alt="" className="w-12 h-12 rounded object-cover border border-white/10" />
+                              <img src={img} alt="" className="w-12 h-12 rounded object-cover border border-border/70" />
                               <button
                                 onClick={() => updateNodeData(node.id, { uploadedImages: [] })}
-                                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-foreground text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
                               >
                                 ×
                               </button>
                             </div>
                           ))}
                           {(!node.data.uploadedImages || node.data.uploadedImages.length === 0) && (
-                            <label className="w-12 h-12 rounded border border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:border-white/40 transition">
+                            <label className="w-12 h-12 rounded border border-dashed border-border/70 flex items-center justify-center cursor-pointer hover:border-border transition">
                               <input
                                 type="file"
                                 accept="image/*"
@@ -1651,7 +1651,7 @@ export default function WorkspaceEditorPage() {
                                   e.target.value = '';
                                 }}
                               />
-                              <ImageIcon className="w-4 h-4 text-white/30" />
+                              <ImageIcon className="w-4 h-4 text-foreground/30" />
                             </label>
                           )}
                         </div>
@@ -1659,25 +1659,25 @@ export default function WorkspaceEditorPage() {
                     )}
 
                     <div className="space-y-1">
-                      <label className="text-[10px] uppercase tracking-wider text-white/40">提示词</label>
+                      <label className="text-[10px] uppercase tracking-wider text-foreground/40">提示词</label>
                       <textarea
                         value={node.data.prompt}
                         onChange={(e) => updateNodeData(node.id, { prompt: e.target.value })}
-                        className="w-full h-20 px-2 py-2 bg-white/5 border border-white/10 rounded-lg text-white text-xs resize-none focus:outline-none focus:border-white/30"
+                        className="w-full h-20 px-2 py-2 bg-card/60 border border-border/70 rounded-lg text-foreground text-xs resize-none focus:outline-none focus:border-border"
                         placeholder="描述生成内容"
                       />
                     </div>
 
                     {incoming.length > 0 && (
                       <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-white/40">输入</label>
+                        <label className="text-[10px] uppercase tracking-wider text-foreground/40">输入</label>
                         <div className="flex flex-wrap gap-1">
                           {incoming.map((edge) => {
                             const fromNode = nodes.find((n) => n.id === edge.from);
                             return (
                               <span
                                 key={edge.id}
-                                className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-white/10 text-white/60"
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded-full bg-card/70 text-foreground/60"
                               >
                                 <Link2 className="w-3 h-3" />
                                 {fromNode?.name || '图片节点'}
@@ -1686,7 +1686,7 @@ export default function WorkspaceEditorPage() {
                                     e.stopPropagation();
                                     removeEdge(edge.id);
                                   }}
-                                  className="text-white/40 hover:text-white"
+                                  className="text-foreground/40 hover:text-foreground"
                                 >
                                   ×
                                 </button>
@@ -1700,26 +1700,26 @@ export default function WorkspaceEditorPage() {
                     {/* Upload reference images - only for image nodes without connected image node */}
                     {node.type === 'image' && model && (model as SafeImageModel).features.imageToImage && !incoming.some(e => nodes.find(n => n.id === e.from)?.type === 'image') && (
                       <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-white/40">
+                        <label className="text-[10px] uppercase tracking-wider text-foreground/40">
                           参考图 {(model as SafeImageModel).features.multipleImages ? '(可多张)' : '(1张)'}
                         </label>
                         <div className="flex flex-wrap gap-1">
                           {(node.data.uploadedImages || []).map((img, idx) => (
                             <div key={idx} className="relative group">
-                              <img src={img} alt="" className="w-12 h-12 rounded object-cover border border-white/10" />
+                              <img src={img} alt="" className="w-12 h-12 rounded object-cover border border-border/70" />
                               <button
                                 onClick={() => {
                                   const newImages = [...(node.data.uploadedImages || [])];
                                   newImages.splice(idx, 1);
                                   updateNodeData(node.id, { uploadedImages: newImages });
                                 }}
-                                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-white text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
+                                className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full text-foreground text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition"
                               >
                                 ×
                               </button>
                             </div>
                           ))}
-                          <label className="w-12 h-12 rounded border border-dashed border-white/20 flex items-center justify-center cursor-pointer hover:border-white/40 transition">
+                          <label className="w-12 h-12 rounded border border-dashed border-border/70 flex items-center justify-center cursor-pointer hover:border-border transition">
                             <input
                               type="file"
                               accept="image/*"
@@ -1744,7 +1744,7 @@ export default function WorkspaceEditorPage() {
                                 e.target.value = '';
                               }}
                             />
-                            <ImageIcon className="w-4 h-4 text-white/30" />
+                            <ImageIcon className="w-4 h-4 text-foreground/30" />
                           </label>
                         </div>
                       </div>
@@ -1760,8 +1760,8 @@ export default function WorkspaceEditorPage() {
                       className={cn(
                         'w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg font-medium transition',
                         node.data.status === 'pending' || node.data.status === 'processing'
-                          ? 'bg-white/10 text-white/50 cursor-not-allowed'
-                          : 'bg-white text-black hover:bg-white/90'
+                          ? 'bg-card/70 text-foreground/50 cursor-not-allowed'
+                          : 'bg-foreground text-background hover:bg-foreground/90'
                       )}
                     >
                       {node.data.status === 'pending' || node.data.status === 'processing' ? (
@@ -1784,14 +1784,14 @@ export default function WorkspaceEditorPage() {
                             key={`${node.data.generationId}-${node.data.outputUrl}`}
                             src={node.data.outputUrl}
                             controls
-                            className="w-full rounded-lg border border-white/10"
+                            className="w-full rounded-lg border border-border/70"
                           />
                         ) : (
                           <img
                             key={`${node.data.generationId}-${node.data.outputUrl}`}
                             src={`${node.data.outputUrl}${node.data.outputUrl.includes('?') ? '&' : '?'}_t=${node.data.generationId || Date.now()}`}
                             alt=""
-                            className="w-full rounded-lg border border-white/10"
+                            className="w-full rounded-lg border border-border/70"
                           />
                         )}
                         <a
@@ -1799,7 +1799,7 @@ export default function WorkspaceEditorPage() {
                           download={`${node.name || 'output'}-${node.data.generationId || Date.now()}.${node.data.outputType === 'video' ? 'mp4' : 'png'}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] text-white/60 hover:text-white bg-white/5 hover:bg-white/10 rounded-lg transition"
+                          className="inline-flex items-center gap-1.5 px-2 py-1 text-[10px] text-foreground/60 hover:text-foreground bg-card/60 hover:bg-card/70 rounded-lg transition"
                         >
                           <Download className="w-3 h-3" />
                           下载
@@ -1809,8 +1809,8 @@ export default function WorkspaceEditorPage() {
 
                     {node.data.revisedPrompt && (
                       <div className="space-y-1">
-                        <label className="text-[10px] uppercase tracking-wider text-white/40">改写提示词</label>
-                        <div className="text-[10px] text-white/60 bg-white/5 rounded-lg px-2 py-1.5 break-words max-h-24 overflow-auto">
+                        <label className="text-[10px] uppercase tracking-wider text-foreground/40">改写提示词</label>
+                        <div className="text-[10px] text-foreground/60 bg-card/60 rounded-lg px-2 py-1.5 break-words max-h-24 overflow-auto">
                           {node.data.revisedPrompt}
                         </div>
                       </div>
@@ -1824,7 +1824,7 @@ export default function WorkspaceEditorPage() {
 
               {contextMenu && (
                 <div
-                  className="absolute z-20 bg-black border border-white/10 rounded-lg shadow-xl p-2 text-sm text-white/80"
+                  className="absolute z-20 bg-card/95 border border-border/70 rounded-lg shadow-xl p-2 text-sm text-foreground/80"
                   style={{ left: contextMenu.x, top: contextMenu.y }}
                 >
                   <button
@@ -1832,7 +1832,7 @@ export default function WorkspaceEditorPage() {
                       addNodeAt('image', contextMenu);
                       setContextMenu(null);
                     }}
-                    className="block w-full text-left px-3 py-2 rounded hover:bg-white/10"
+                    className="block w-full text-left px-3 py-2 rounded hover:bg-card/70"
                   >
                     添加图片节点
                   </button>
@@ -1841,7 +1841,7 @@ export default function WorkspaceEditorPage() {
                       addNodeAt('video', contextMenu);
                       setContextMenu(null);
                     }}
-                    className="block w-full text-left px-3 py-2 rounded hover:bg-white/10"
+                    className="block w-full text-left px-3 py-2 rounded hover:bg-card/70"
                   >
                     添加视频节点
                   </button>
@@ -1850,7 +1850,7 @@ export default function WorkspaceEditorPage() {
                       addNodeAt('chat', contextMenu);
                       setContextMenu(null);
                     }}
-                    className="block w-full text-left px-3 py-2 rounded hover:bg-white/10"
+                    className="block w-full text-left px-3 py-2 rounded hover:bg-card/70"
                   >
                     添加聊天节点
                   </button>
@@ -1859,7 +1859,7 @@ export default function WorkspaceEditorPage() {
                       addNodeAt('prompt-template', contextMenu);
                       setContextMenu(null);
                     }}
-                    className="block w-full text-left px-3 py-2 rounded hover:bg-white/10"
+                    className="block w-full text-left px-3 py-2 rounded hover:bg-card/70"
                   >
                     添加提示词模板
                   </button>
@@ -1871,7 +1871,7 @@ export default function WorkspaceEditorPage() {
       </div>
 
       {connectingFrom && (
-        <div className="text-xs text-white/40 flex items-center gap-2">
+        <div className="text-xs text-foreground/40 flex items-center gap-2">
           <Check className="w-3 h-3" />
           点击目标节点左侧圆点完成连线
         </div>

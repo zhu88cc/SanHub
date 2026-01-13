@@ -122,16 +122,16 @@ export function SoraPanel({ onTaskAdded }: SoraPanelProps) {
   ];
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+    <div className="surface overflow-hidden">
       {/* Header */}
-      <div className="p-6 border-b border-white/10">
+      <div className="p-6 border-b border-border/70">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center">
-            <Video className="w-5 h-5 text-white" />
+          <div className="w-10 h-10 bg-card/60 border border-border/70 rounded-xl flex items-center justify-center">
+            <Video className="w-5 h-5 text-foreground" />
           </div>
           <div>
-            <h2 className="text-lg font-medium text-white">Sora 视频生成</h2>
-            <p className="text-sm text-white/40">AI 视频创作</p>
+            <h2 className="text-lg font-medium text-foreground">Sora 视频生成</h2>
+            <p className="text-sm text-foreground/40">AI 视频创作</p>
           </div>
         </div>
       </div>
@@ -139,7 +139,7 @@ export function SoraPanel({ onTaskAdded }: SoraPanelProps) {
       <div className="p-6 space-y-6">
         {/* Aspect Ratio */}
         <div className="space-y-3">
-          <label className="text-sm text-white/50 uppercase tracking-wider">画面比例</label>
+          <label className="text-sm text-foreground/50 uppercase tracking-wider">画面比例</label>
           <div className="grid grid-cols-3 gap-3">
             {ratioOptions.map((r) => (
               <button
@@ -148,8 +148,8 @@ export function SoraPanel({ onTaskAdded }: SoraPanelProps) {
                 className={cn(
                   'flex flex-col items-center gap-2 px-4 py-4 rounded-xl border transition-all',
                   ratio === r.value
-                    ? 'bg-white text-black border-white'
-                    : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
+                    ? 'bg-foreground text-background border-transparent'
+                    : 'bg-card/60 text-foreground/70 border-border/70 hover:bg-card/80 hover:text-foreground'
                 )}
               >
                 <span className="text-lg">{r.icon}</span>
@@ -161,7 +161,7 @@ export function SoraPanel({ onTaskAdded }: SoraPanelProps) {
 
         {/* Duration */}
         <div className="space-y-3">
-            <label className="text-sm text-white/50 uppercase tracking-wider">视频时长</label>
+            <label className="text-sm text-foreground/50 uppercase tracking-wider">视频时长</label>
             <div className="grid grid-cols-2 gap-3">
               {(['10s', '15s'] as Duration[]).map((d) => (
                 <button
@@ -170,8 +170,8 @@ export function SoraPanel({ onTaskAdded }: SoraPanelProps) {
                   className={cn(
                     'px-4 py-3 rounded-xl border transition-all text-sm font-medium',
                     duration === d
-                      ? 'bg-white text-black border-white'
-                      : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
+                      ? 'bg-foreground text-background border-transparent'
+                      : 'bg-card/60 text-foreground/70 border-border/70 hover:bg-card/80 hover:text-foreground'
                   )}
                 >
                   {d === '10s' ? '10 秒' : '15 秒'}
@@ -183,11 +183,11 @@ export function SoraPanel({ onTaskAdded }: SoraPanelProps) {
         {/* File Upload */}
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <label className="text-sm text-white/50 uppercase tracking-wider">参考素材</label>
+            <label className="text-sm text-foreground/50 uppercase tracking-wider">参考素材</label>
             {files.length > 0 && (
               <button 
                 onClick={clearFiles} 
-                className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
+                className="text-xs text-red-300 hover:text-red-200 flex items-center gap-1"
               >
                 <Trash2 className="w-3 h-3" /> 清除
               </button>
@@ -204,16 +204,16 @@ export function SoraPanel({ onTaskAdded }: SoraPanelProps) {
           {files.length === 0 ? (
             <div
               onClick={() => fileInputRef.current?.click()}
-              className="border border-dashed border-white/20 rounded-xl p-8 text-center cursor-pointer hover:bg-white/5 hover:border-white/30 transition-all"
+              className="border border-dashed border-border/70 rounded-xl p-8 text-center cursor-pointer hover:bg-card/70 hover:border-border transition-all"
             >
-              <Upload className="w-8 h-8 mx-auto text-white/30 mb-3" />
-              <p className="text-sm text-white/50">点击上传图片或视频</p>
-              <p className="text-xs text-white/30 mt-1">支持 JPG, PNG, MP4</p>
+              <Upload className="w-8 h-8 mx-auto text-foreground/40 mb-3" />
+              <p className="text-sm text-foreground/60">点击上传图片或视频</p>
+              <p className="text-xs text-foreground/40 mt-1">支持 JPG, PNG, MP4</p>
             </div>
           ) : (
             <div className="grid grid-cols-4 gap-2">
               {files.map((f, i) => (
-                <div key={i} className="aspect-square rounded-xl overflow-hidden border border-white/10">
+                <div key={i} className="aspect-square rounded-xl overflow-hidden border border-border/70">
                   {f.mimeType.startsWith('video') ? (
                     <video src={f.preview} className="w-full h-full object-cover" />
                   ) : (
@@ -227,29 +227,29 @@ export function SoraPanel({ onTaskAdded }: SoraPanelProps) {
 
         {/* Prompt */}
         <div className="space-y-3">
-          <label className="text-sm text-white/50 uppercase tracking-wider">创作描述</label>
+          <label className="text-sm text-foreground/50 uppercase tracking-wider">创作描述</label>
           <textarea
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
             placeholder="描述你想要生成的内容，越详细效果越好..."
-            className="w-full h-28 px-4 py-3 bg-white/5 border border-white/10 text-white rounded-xl resize-none focus:outline-none focus:border-white/30 placeholder:text-white/30 text-sm"
+            className="w-full h-28 px-4 py-3 bg-input/70 border border-border/70 text-foreground rounded-xl resize-none focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30 placeholder:text-muted-foreground/60 text-sm"
           />
           <label className="flex items-center gap-2 cursor-pointer select-none">
             <input
               type="checkbox"
               checked={keepPrompt}
               onChange={(e) => setKeepPrompt(e.target.checked)}
-              className="w-4 h-4 rounded border-white/20 bg-white/5 text-white accent-white cursor-pointer"
+              className="w-4 h-4 rounded border-border/70 bg-card/60 text-foreground accent-sky-400 cursor-pointer"
             />
-            <span className="text-sm text-white/50">保留提示词</span>
+            <span className="text-sm text-foreground/50">保留提示词</span>
           </label>
         </div>
 
         {/* Error */}
         {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-red-400 shrink-0 mt-0.5" />
-            <p className="text-sm text-red-400">{error}</p>
+          <div className="p-4 bg-red-500/10 border border-red-500/30 rounded-xl flex items-start gap-3">
+            <AlertCircle className="w-5 h-5 text-red-300 shrink-0 mt-0.5" />
+            <p className="text-sm text-red-300">{error}</p>
           </div>
         )}
 
@@ -260,8 +260,8 @@ export function SoraPanel({ onTaskAdded }: SoraPanelProps) {
           className={cn(
             'w-full flex items-center justify-center gap-2 px-6 py-4 rounded-xl font-medium transition-all',
             submitting
-              ? 'bg-white/10 text-white/50 cursor-not-allowed'
-              : 'bg-white text-black hover:bg-white/90'
+              ? 'bg-card/60 text-foreground/40 cursor-not-allowed'
+              : 'bg-foreground text-background hover:opacity-90'
           )}
         >
           {submitting ? (

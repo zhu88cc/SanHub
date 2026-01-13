@@ -21,7 +21,7 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="min-h-screen bg-black relative">
+    <div className="min-h-screen relative">
       <DashboardBackgroundWrapper />
       <div className="flex relative z-10">
         <AdminSidebar />
@@ -32,3 +32,4 @@ export default async function AdminLayout({
     </div>
   );
 }
+

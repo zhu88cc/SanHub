@@ -17,11 +17,15 @@ export function WorkspaceEdges({
   connectingFrom,
   cursorPos,
 }: WorkspaceEdgesProps) {
+  const nodeMap = useMemo(() => {
+    return new Map(nodes.map((node) => [node.id, node]));
+  }, [nodes]);
+
   const edgePaths = useMemo(() => {
     return edges
       .map((edge) => {
-        const fromNode = nodes.find((node) => node.id === edge.from);
-        const toNode = nodes.find((node) => node.id === edge.to);
+        const fromNode = nodeMap.get(edge.from);
+        const toNode = nodeMap.get(edge.to);
         if (!fromNode || !toNode) return null;
         const x1 = fromNode.position.x + NODE_WIDTH;
         const y1 = fromNode.position.y + HANDLE_OFFSET_Y;
@@ -34,11 +38,11 @@ export function WorkspaceEdges({
         };
       })
       .filter(Boolean) as Array<{ id: string; d: string }>;
-  }, [edges, nodes]);
+  }, [edges, nodeMap]);
 
   const previewPath = useMemo(() => {
     if (!connectingFrom || !cursorPos) return null;
-    const fromNode = nodes.find((node) => node.id === connectingFrom);
+    const fromNode = nodeMap.get(connectingFrom);
     if (!fromNode) return null;
     const x1 = fromNode.position.x + NODE_WIDTH;
     const y1 = fromNode.position.y + HANDLE_OFFSET_Y;
@@ -46,7 +50,7 @@ export function WorkspaceEdges({
     const y2 = cursorPos.y;
     const dx = Math.max(80, Math.abs(x2 - x1) * 0.5);
     return `M ${x1} ${y1} C ${x1 + dx} ${y1}, ${x2 - dx} ${y2}, ${x2} ${y2}`;
-  }, [connectingFrom, cursorPos, nodes]);
+  }, [connectingFrom, cursorPos, nodeMap]);
 
   return (
     <svg className="absolute inset-0 w-full h-full pointer-events-none">
@@ -71,3 +75,4 @@ export function WorkspaceEdges({
     </svg>
   );
 }
+

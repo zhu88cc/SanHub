@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
+import dynamic from 'next/dynamic';
 import { useSession } from 'next-auth/react';
 import {
   Upload,
@@ -17,7 +18,17 @@ import {
 import { cn, fileToBase64 } from '@/lib/utils';
 import type { Generation, SafeImageModel, DailyLimitConfig } from '@/types';
 import { toast } from '@/components/ui/toaster';
-import { ResultGallery, type Task } from '@/components/generator/result-gallery';
+import type { Task } from '@/components/generator/result-gallery';
+
+const ResultGallery = dynamic(
+  () => import('@/components/generator/result-gallery').then((mod) => mod.ResultGallery),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="surface p-6 text-sm text-foreground/50">Loading results...</div>
+    ),
+  }
+);
 
 // 每日使用量类型
 interface DailyUsage {
@@ -463,8 +474,8 @@ export default function ImageGenerationPage() {
     <div className="max-w-7xl mx-auto space-y-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-3xl font-extralight text-white">图像生成</h1>
-          <p className="text-white/50 mt-1 font-light">
+          <h1 className="text-3xl font-light text-foreground">图像生成</h1>
+          <p className="text-foreground/50 mt-1 font-light">
             选择模型，生成高质量图像
           </p>
         </div>
@@ -473,7 +484,7 @@ export default function ImageGenerationPage() {
             "px-4 py-2 rounded-xl border text-sm",
             isImageLimitReached
               ? "bg-red-500/10 border-red-500/30 text-red-400"
-              : "bg-white/5 border-white/10 text-white/60"
+              : "bg-card/60 border-border/70 text-foreground/60"
           )}>
             今日: {dailyUsage.imageCount} / {dailyLimits.imageLimit}
           </div>
@@ -499,29 +510,29 @@ export default function ImageGenerationPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-1">
           <div className={cn(
-            "bg-white/5 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-sm",
+            "surface overflow-hidden backdrop-blur-sm",
             (availableModels.length === 0 || isImageLimitReached) && "opacity-50 pointer-events-none"
           )}>
-            <div className="px-5 py-4 border-b border-white/10 bg-gradient-to-r from-blue-500/5 to-purple-500/5">
+            <div className="px-5 py-4 border-b border-border/70 bg-gradient-to-r from-sky-500/10 to-emerald-500/10">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 bg-gradient-to-br from-blue-500/20 to-purple-500/20 rounded-lg flex items-center justify-center">
-                  <Sparkles className="w-4 h-4 text-blue-400" />
+                <div className="w-9 h-9 bg-card/60 border border-border/70 rounded-lg flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-sky-300" />
                 </div>
                 <div>
-                  <h2 className="text-base font-medium text-white">创作面板</h2>
-                  <p className="text-xs text-white/40">配置参数开始生成</p>
+                  <h2 className="text-base font-medium text-foreground">创作面板</h2>
+                  <p className="text-xs text-foreground/40">配置参数开始生成</p>
                 </div>
               </div>
             </div>
             <div className="p-5 space-y-5">
               {/* Model Selection Dropdown */}
               <div className="space-y-2">
-                <label className="text-xs text-white/50 uppercase tracking-wider">模型</label>
+                <label className="text-xs text-foreground/50 uppercase tracking-wider">模型</label>
                 <div className="relative">
                   <button
                     type="button"
                     onClick={() => setShowModelDropdown(!showModelDropdown)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 bg-white/5 border border-white/10 text-white rounded-lg focus:outline-none focus:border-white/30"
+                    className="w-full flex items-center justify-between px-3 py-2.5 bg-card/60 border border-border/70 text-foreground rounded-lg focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30"
                   >
                     <div className="flex flex-col items-start">
                       <div className="flex items-center gap-2">
@@ -532,12 +543,12 @@ export default function ImageGenerationPage() {
                           </span>
                         )}
                       </div>
-                      <span className="text-xs text-white/50">{currentModel?.description || ''}</span>
+                  <span className="text-xs text-foreground/50">{currentModel?.description || ''}</span>
                     </div>
                     <ChevronDown className={`w-4 h-4 transition-transform ${showModelDropdown ? 'rotate-180' : ''}`} />
                   </button>
                   {showModelDropdown && (
-                    <div className="absolute z-50 w-full mt-1 bg-zinc-900 border border-white/10 rounded-lg shadow-xl max-h-72 overflow-y-auto">
+                    <div className="absolute z-50 w-full mt-1 bg-card/95 border border-border/70 rounded-lg shadow-xl max-h-72 overflow-y-auto">
                       {availableModels.map((model) => (
                         <button
                           key={model.id}
@@ -548,26 +559,26 @@ export default function ImageGenerationPage() {
                           }}
                           className={cn(
                             'w-full flex flex-col items-start px-3 py-2.5 transition-colors',
-                            selectedModelId === model.id ? 'bg-white/10' : 'hover:bg-white/10',
+                            selectedModelId === model.id ? 'bg-card/70' : 'hover:bg-card/80',
                             model.highlight && 'bg-amber-500/10 hover:bg-amber-500/20'
                           )}
                         >
                           <div className="flex items-center gap-2">
-                            <span className="text-sm font-medium text-white">{model.name}</span>
+                            <span className="text-sm font-medium text-foreground">{model.name}</span>
                             {model.highlight && (
                               <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-200 border border-amber-400/30">
                                 HD
                               </span>
                             )}
                           </div>
-                          <span className="text-xs text-white/50">
+                          <span className="text-xs text-foreground/50">
                             {model.description}
                             {!model.features.imageToImage && ' · 不支持参考图'}
                           </span>
                         </button>
                       ))}
                       {availableModels.length === 0 && (
-                        <div className="px-3 py-4 text-center text-white/40 text-sm">
+                        <div className="px-3 py-4 text-center text-foreground/40 text-sm">
                           暂无可用模型
                         </div>
                       )}
@@ -579,7 +590,7 @@ export default function ImageGenerationPage() {
               {/* Image Size (if supported) */}
               {currentModel?.features.imageSize && currentModel.imageSizes && (
                 <div className="space-y-2">
-                  <label className="text-xs text-white/50 uppercase tracking-wider">分辨率</label>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">分辨率</label>
                   <div className="grid grid-cols-3 gap-2">
                     {currentModel.imageSizes.map((size) => (
                       <button
@@ -588,8 +599,8 @@ export default function ImageGenerationPage() {
                         className={cn(
                           'px-3 py-2 rounded-lg border text-sm font-medium transition-all',
                           imageSize === size
-                            ? 'bg-white text-black border-white'
-                            : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
+                            ? 'bg-foreground text-background border-transparent'
+                            : 'bg-card/60 text-foreground/70 border-border/70 hover:bg-card/80 hover:text-foreground'
                         )}
                       >
                         {size}
@@ -603,8 +614,8 @@ export default function ImageGenerationPage() {
               {currentModel && (
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs text-white/50 uppercase tracking-wider">画面比例</label>
-                  <span className="text-xs text-white/40">{getCurrentResolutionDisplay()}</span>
+                  <label className="text-xs text-foreground/50 uppercase tracking-wider">画面比例</label>
+                  <span className="text-xs text-foreground/40">{getCurrentResolutionDisplay()}</span>
                 </div>
                 <div className="grid grid-cols-5 gap-1.5">
                   {currentModel.aspectRatios.map((r) => (
@@ -614,8 +625,8 @@ export default function ImageGenerationPage() {
                       className={cn(
                         'px-2 py-2 rounded-lg border text-xs font-medium transition-all',
                         aspectRatio === r
-                          ? 'bg-white text-black border-white'
-                          : 'bg-white/5 text-white/70 border-white/10 hover:bg-white/10 hover:text-white'
+                          ? 'bg-foreground text-background border-transparent'
+                          : 'bg-card/60 text-foreground/70 border-border/70 hover:bg-card/80 hover:text-foreground'
                       )}
                     >
                       {r}
@@ -629,11 +640,11 @@ export default function ImageGenerationPage() {
               {currentModel?.features.imageToImage && (
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-xs text-white/50 uppercase tracking-wider">参考图</label>
+                    <label className="text-xs text-foreground/50 uppercase tracking-wider">参考图</label>
                     {images.length > 0 && (
                       <button
                         onClick={clearImages}
-                        className="text-xs text-red-400 hover:text-red-300 flex items-center gap-1"
+                        className="text-xs text-red-300 hover:text-red-200 flex items-center gap-1"
                       >
                         <Trash2 className="w-3 h-3" /> 清除
                       </button>
@@ -650,17 +661,17 @@ export default function ImageGenerationPage() {
                   {images.length === 0 ? (
                     <div
                       onClick={() => fileInputRef.current?.click()}
-                      className="border border-dashed border-white/20 rounded-lg p-5 text-center cursor-pointer hover:bg-white/5 hover:border-white/30 transition-all"
+                      className="border border-dashed border-border/70 rounded-lg p-5 text-center cursor-pointer hover:bg-card/70 hover:border-border transition-all"
                     >
-                      <Upload className="w-6 h-6 mx-auto text-white/30 mb-2" />
-                      <p className="text-sm text-white/50">点击上传参考图</p>
+                      <Upload className="w-6 h-6 mx-auto text-foreground/40 mb-2" />
+                      <p className="text-sm text-foreground/60">点击上传参考图</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-4 gap-2">
                       {images.map((img, i) => (
                         <div
                           key={i}
-                          className="aspect-square rounded-lg overflow-hidden border border-white/10"
+                          className="aspect-square rounded-lg overflow-hidden border border-border/70"
                         >
                           <img
                             src={img.preview}
@@ -676,20 +687,20 @@ export default function ImageGenerationPage() {
 
               {/* Prompt */}
               <div className="space-y-2">
-                <label className="text-xs text-white/50 uppercase tracking-wider">提示词</label>
+                <label className="text-xs text-foreground/50 uppercase tracking-wider">提示词</label>
                 <textarea
                   value={prompt}
                   onChange={(e) => setPrompt(e.target.value)}
                   placeholder="描述你想要生成的图像..."
-                  className="w-full h-20 px-3 py-2.5 bg-white/5 border border-white/10 text-white rounded-lg resize-none focus:outline-none focus:border-white/30 placeholder:text-white/30 text-sm"
+                  className="w-full h-20 px-3 py-2.5 bg-input/70 border border-border/70 text-foreground rounded-lg resize-none focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30 placeholder:text-muted-foreground/60 text-sm"
                 />
               </div>
 
               {/* Error */}
               {error && (
-                <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-start gap-2">
-                  <AlertCircle className="w-4 h-4 text-red-400 shrink-0 mt-0.5" />
-                  <p className="text-sm text-red-400">{error}</p>
+                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg flex items-start gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-300 shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-300">{error}</p>
                 </div>
               )}
 
@@ -701,8 +712,8 @@ export default function ImageGenerationPage() {
                   className={cn(
                     'flex-1 flex items-center justify-center gap-2 px-5 py-3 rounded-lg font-medium transition-all',
                     submitting
-                      ? 'bg-white/10 text-white/50 cursor-not-allowed'
-                      : 'bg-white text-black hover:bg-white/90'
+                      ? 'bg-card/60 text-foreground/40 cursor-not-allowed'
+                      : 'bg-foreground text-background hover:opacity-90'
                   )}
                 >
                   {submitting ? (
@@ -724,7 +735,7 @@ export default function ImageGenerationPage() {
                     className={cn(
                       'h-[46px] w-[46px] flex items-center justify-center rounded-lg font-medium transition-all',
                       submitting
-                        ? 'bg-white/10 text-white/50 cursor-not-allowed'
+                        ? 'bg-card/60 text-foreground/40 cursor-not-allowed'
                         : 'bg-gradient-to-r from-amber-500 to-orange-500 text-white hover:opacity-90'
                     )}
                     title="抽卡模式"
@@ -732,15 +743,15 @@ export default function ImageGenerationPage() {
                     <Dices className="w-4 h-4" />
                   </button>
                   <div className="absolute bottom-full right-0 mb-2 hidden group-hover:block z-20">
-                    <div className="bg-zinc-800 border border-white/10 rounded-lg px-3 py-2 text-xs text-white/80 whitespace-nowrap shadow-lg">
+                    <div className="bg-card/90 border border-border/70 rounded-lg px-3 py-2 text-xs text-foreground/80 whitespace-nowrap shadow-lg">
                       <div className="flex items-center gap-1.5 mb-1">
-                        <Info className="w-3 h-3 text-amber-400" />
-                        <span className="font-medium text-white">抽卡模式</span>
+                        <Info className="w-3 h-3 text-amber-300" />
+                        <span className="font-medium text-foreground">抽卡模式</span>
                       </div>
                       <p>一次性提交 3 个相同参数的任务</p>
                       <p>提高出好图的概率</p>
                       <div className="absolute bottom-0 right-4 translate-y-full">
-                        <div className="border-8 border-transparent border-t-zinc-800"></div>
+                        <div className="border-8 border-transparent border-t-card/90"></div>
                       </div>
                     </div>
                   </div>

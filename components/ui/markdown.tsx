@@ -25,7 +25,7 @@ function CodeBlock({ className, children, ...props }: React.HTMLAttributes<HTMLE
   // 内联代码
   if (!className) {
     return (
-      <code className="px-1.5 py-0.5 bg-white/10 rounded text-sm font-mono text-pink-400" {...props}>
+      <code className="px-1.5 py-0.5 bg-card/70 border border-border/60 rounded text-sm font-mono text-foreground/80" {...props}>
         {children}
       </code>
     );
@@ -34,11 +34,11 @@ function CodeBlock({ className, children, ...props }: React.HTMLAttributes<HTMLE
   // 代码块
   return (
     <div className="relative group my-4">
-      <div className="flex items-center justify-between px-4 py-2 bg-white/5 border-b border-white/10 rounded-t-xl">
-        <span className="text-xs text-white/40 font-mono">{language || 'code'}</span>
+      <div className="flex items-center justify-between px-4 py-2 bg-card/70 border-b border-border/60 rounded-t-xl">
+        <span className="text-xs text-foreground/50 font-mono">{language || 'code'}</span>
         <button
           onClick={copyToClipboard}
-          className="flex items-center gap-1.5 px-2 py-1 text-xs text-white/40 hover:text-white/70 hover:bg-white/10 rounded transition-colors"
+          className="flex items-center gap-1.5 px-2 py-1 text-xs text-foreground/50 hover:text-foreground hover:bg-card/70 rounded transition-colors"
         >
           {copied ? (
             <>
@@ -53,7 +53,7 @@ function CodeBlock({ className, children, ...props }: React.HTMLAttributes<HTMLE
           )}
         </button>
       </div>
-      <pre className="p-4 bg-black/50 rounded-b-xl overflow-x-auto">
+      <pre className="p-4 bg-card/60 rounded-b-xl overflow-x-auto">
         <code className={`text-sm font-mono ${className}`} {...props}>
           {children}
         </code>
@@ -80,34 +80,34 @@ export const Markdown = memo(function Markdown({ content }: MarkdownProps) {
     li: ({ children }: { children?: React.ReactNode }) => <li className="leading-relaxed">{children}</li>,
     // 引用
     blockquote: ({ children }: { children?: React.ReactNode }) => (
-      <blockquote className="border-l-2 border-white/30 pl-4 my-3 text-white/60 italic">
+      <blockquote className="border-l-2 border-border/70 pl-4 my-3 text-foreground/60 italic">
         {children}
       </blockquote>
     ),
     // 链接
     a: ({ href, children }: { href?: string; children?: React.ReactNode }) => (
-      <a href={href} target="_blank" rel="noopener noreferrer" className="text-blue-400 hover:underline">
+      <a href={href} target="_blank" rel="noopener noreferrer" className="text-sky-300 hover:text-sky-200 underline-offset-4 hover:underline">
         {children}
       </a>
     ),
     // 表格
     table: ({ children }: { children?: React.ReactNode }) => (
       <div className="overflow-x-auto my-4">
-        <table className="min-w-full border border-white/10 rounded-lg overflow-hidden">
+        <table className="min-w-full border border-border/70 rounded-lg overflow-hidden">
           {children}
         </table>
       </div>
     ),
-    thead: ({ children }: { children?: React.ReactNode }) => <thead className="bg-white/5">{children}</thead>,
-    th: ({ children }: { children?: React.ReactNode }) => <th className="px-4 py-2 text-left text-sm font-medium border-b border-white/10">{children}</th>,
-    td: ({ children }: { children?: React.ReactNode }) => <td className="px-4 py-2 text-sm border-b border-white/10">{children}</td>,
+    thead: ({ children }: { children?: React.ReactNode }) => <thead className="bg-card/70">{children}</thead>,
+    th: ({ children }: { children?: React.ReactNode }) => <th className="px-4 py-2 text-left text-sm font-medium border-b border-border/60">{children}</th>,
+    td: ({ children }: { children?: React.ReactNode }) => <td className="px-4 py-2 text-sm border-b border-border/60">{children}</td>,
     // 分割线
-    hr: () => <hr className="my-6 border-white/10" />,
+    hr: () => <hr className="my-6 border-border/70" />,
     // 强调
-    strong: ({ children }: { children?: React.ReactNode }) => <strong className="font-semibold text-white">{children}</strong>,
+    strong: ({ children }: { children?: React.ReactNode }) => <strong className="font-semibold text-foreground">{children}</strong>,
     em: ({ children }: { children?: React.ReactNode }) => <em className="italic">{children}</em>,
     // 删除线
-    del: ({ children }: { children?: React.ReactNode }) => <del className="line-through text-white/50">{children}</del>,
+    del: ({ children }: { children?: React.ReactNode }) => <del className="line-through text-foreground/50">{children}</del>,
   }), []);
 
   return (

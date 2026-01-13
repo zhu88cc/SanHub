@@ -35,8 +35,8 @@ export default function LoginPage() {
   // 如果正在检查登录状态，显示加载中
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white/50">加载中...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-foreground/50">加载中...</div>
       </div>
     );
   }
@@ -44,8 +44,8 @@ export default function LoginPage() {
   // 已登录则不渲染登录表单（等待跳转）
   if (status === 'authenticated') {
     return (
-      <div className="min-h-screen bg-black flex items-center justify-center">
-        <div className="text-white/50">正在跳转...</div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-foreground/50">正在跳转...</div>
       </div>
     );
   }
@@ -98,7 +98,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-black flex flex-col relative overflow-hidden">
+    <div className="min-h-screen flex flex-col relative overflow-hidden text-foreground">
       {/* 动态背景 */}
       <AnimatedBackground variant="auth" />
       
@@ -106,54 +106,54 @@ export default function LoginPage() {
       <main className="flex-1 flex flex-col items-center justify-center px-6 relative z-10">
         <div className="w-full max-w-sm space-y-8">
           {/* Logo */}
-          <div className="text-center space-y-4">
+          <div className="text-center space-y-4 animate-rise">
             <Link href="/" className="inline-block group">
               <div className="flex items-center justify-center gap-2 mb-2">
-                <div className="w-10 h-10 bg-gradient-to-br from-purple-500/30 to-blue-500/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                  <Sparkles className="w-5 h-5 text-purple-400" />
+                <div className="w-10 h-10 bg-gradient-to-br from-sky-500/25 to-emerald-500/25 border border-border/70 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Sparkles className="w-5 h-5 text-foreground/80" />
                 </div>
               </div>
-              <h1 className="text-3xl font-extralight tracking-wider text-white">{siteConfig.siteName}</h1>
+              <h1 className="text-3xl font-light tracking-wider text-foreground">{siteConfig.siteName}</h1>
             </Link>
-            <p className="text-white/40 text-sm">欢迎回来</p>
+            <p className="text-foreground/40 text-sm">欢迎回来</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-1.5">
-              <label className="text-xs text-white/40 uppercase tracking-wider">邮箱</label>
+              <label className="text-xs text-foreground/50 uppercase tracking-wider">邮箱</label>
               <input
                 type="email"
                 placeholder="your@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors text-sm"
+                className="w-full px-4 py-3 bg-input/70 border border-border/70 rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30 transition-colors text-sm"
               />
             </div>
             <div className="space-y-1.5">
-              <label className="text-xs text-white/40 uppercase tracking-wider">密码</label>
+              <label className="text-xs text-foreground/50 uppercase tracking-wider">密码</label>
               <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder:text-white/20 focus:outline-none focus:border-white/30 transition-colors text-sm"
+                className="w-full px-4 py-3 bg-input/70 border border-border/70 rounded-lg text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30 transition-colors text-sm"
               />
             </div>
 
             <Captcha onCaptchaChange={handleCaptchaChange} />
 
             {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg">
-                <p className="text-sm text-red-400">{error}</p>
+              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                <p className="text-sm text-red-300">{error}</p>
               </div>
             )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-black rounded-full font-medium hover:bg-white/90 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
+              className="w-full flex items-center justify-center gap-2 px-6 py-3.5 bg-foreground text-background rounded-full font-medium hover:opacity-90 transition-all hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100"
             >
               {loading ? (
                 <>
@@ -170,8 +170,8 @@ export default function LoginPage() {
           </form>
 
           <div className="text-center text-sm">
-            <span className="text-white/30">还没有账号？</span>{' '}
-            <Link href="/register" className="text-white/70 hover:text-white transition-colors">
+            <span className="text-foreground/40">还没有账号？</span>{' '}
+            <Link href="/register" className="text-foreground/80 hover:text-foreground transition-colors">
               立即注册
             </Link>
           </div>
@@ -180,7 +180,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer className="relative z-10 py-6 text-center">
-        <p className="text-xs text-white/20">{siteConfig.copyright}</p>
+        <p className="text-xs text-foreground/30">{siteConfig.copyright}</p>
       </footer>
     </div>
   );

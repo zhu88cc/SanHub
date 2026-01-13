@@ -29,22 +29,22 @@ export function Header({ user }: HeaderProps) {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 h-16 bg-black/90 backdrop-blur-xl border-b border-white/10 z-50">
+      <header className="fixed top-0 left-0 right-0 h-14 bg-card/70 backdrop-blur-xl border-b border-border/70 shadow-[0_1px_0_rgba(255,255,255,0.04)] z-50">
         <div className="h-full px-4 lg:px-6 flex items-center justify-between">
           {/* Mobile Menu Button */}
           <button 
-            className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+            className="lg:hidden p-2 hover:bg-foreground/5 rounded-lg transition-colors"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
-            {mobileMenuOpen ? <X className="w-5 h-5 text-white" /> : <Menu className="w-5 h-5 text-white" />}
+            {mobileMenuOpen ? <X className="w-5 h-5 text-foreground/80" /> : <Menu className="w-5 h-5 text-foreground/80" />}
           </button>
 
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 border border-white/30 rounded-lg flex items-center justify-center">
-              <span className="text-sm font-light text-white">{siteConfig.siteName.charAt(0)}</span>
+            <div className="w-8 h-8 border border-border/70 bg-card/70 rounded-lg flex items-center justify-center">
+              <span className="text-sm font-light text-foreground/80">{siteConfig.siteName.charAt(0)}</span>
             </div>
-            <span className="font-light text-lg tracking-wider text-white hidden sm:block">{siteConfig.siteName}</span>
+            <span className="font-light text-lg tracking-wider text-foreground/90 hidden sm:block">{siteConfig.siteName}</span>
           </Link>
 
           {/* User Info */}
@@ -54,16 +54,16 @@ export function Header({ user }: HeaderProps) {
               {(user.role === 'admin' || user.role === 'moderator') && (
                 <Link 
                   href="/admin"
-                  className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-2 hover:bg-foreground/5 rounded-lg transition-colors"
                 >
-                  <Shield className="w-4 h-4 text-white/60" />
+                  <Shield className="w-4 h-4 text-foreground/60" />
                 </Link>
               )}
               <button
-                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+                className="p-2 hover:bg-foreground/5 rounded-lg transition-colors"
                 onClick={() => signOut({ callbackUrl: '/login' })}
               >
-                <LogOut className="w-4 h-4 text-white/60" />
+                <LogOut className="w-4 h-4 text-foreground/60" />
               </button>
             </div>
           </div>
@@ -73,18 +73,18 @@ export function Header({ user }: HeaderProps) {
       {/* Mobile Menu */}
       {mobileMenuOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="fixed inset-0 bg-black/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
-          <nav className="fixed top-16 left-0 bottom-0 w-72 bg-black border-r border-white/10 p-4 space-y-2">
+          <div className="fixed inset-0 bg-background/80 backdrop-blur-sm" onClick={() => setMobileMenuOpen(false)} />
+          <nav className="fixed top-14 left-0 bottom-0 w-72 bg-card/95 border-r border-border/70 p-4 space-y-2">
             {navItems.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl transition-all',
+                  'flex items-center gap-3 px-4 py-3 rounded-xl transition-all border border-transparent',
                   pathname === item.href 
-                    ? 'bg-white text-black' 
-                    : 'text-white/70 hover:bg-white/5 hover:text-white'
+                    ? 'bg-accent/80 text-foreground border-border/70' 
+                    : 'text-foreground/70 hover:bg-card/70 hover:text-foreground'
                 )}
               >
                 <item.icon className="w-5 h-5" />
@@ -96,10 +96,10 @@ export function Header({ user }: HeaderProps) {
                 href="/admin"
                 onClick={() => setMobileMenuOpen(false)}
                 className={cn(
-                  'flex items-center gap-3 px-4 py-3 rounded-xl transition-all',
+                  'flex items-center gap-3 px-4 py-3 rounded-xl transition-all border border-transparent',
                   pathname === '/admin' 
-                    ? 'bg-white text-black' 
-                    : 'text-white/70 hover:bg-white/5 hover:text-white'
+                    ? 'bg-accent/80 text-foreground border-border/70' 
+                    : 'text-foreground/70 hover:bg-card/70 hover:text-foreground'
                 )}
               >
                 <Shield className="w-5 h-5" />

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server';
 import { getSystemConfig } from '@/lib/db';
 import { cache, CacheKeys } from '@/lib/cache';
 
+export const dynamic = 'force-dynamic';
+
 // GET /api/channels - 获取启用的渠道列表
 export async function GET() {
   try {

@@ -62,7 +62,7 @@ export function Captcha({ onCaptchaChange }: CaptchaProps) {
 
   return (
     <div className="space-y-2">
-      <label className="text-sm text-white/50 uppercase tracking-wider">验证码</label>
+      <label className="text-sm text-foreground/60 uppercase tracking-wider">验证码</label>
       <div className="flex gap-3">
         <input
           type="text"
@@ -71,11 +71,11 @@ export function Captcha({ onCaptchaChange }: CaptchaProps) {
           onChange={(e) => handleCodeChange(e.target.value.toUpperCase())}
           maxLength={4}
           required
-          className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white placeholder:text-white/30 focus:outline-none focus:border-white/30 transition-colors backdrop-blur-sm uppercase tracking-widest"
+          className="flex-1 px-4 py-3 bg-input/70 border border-border/70 rounded-xl text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:border-border focus:ring-2 focus:ring-ring/30 transition-colors backdrop-blur-sm uppercase tracking-widest"
         />
         <div className="flex items-center gap-2">
           <div
-            className="h-[46px] w-[120px] rounded-xl overflow-hidden border border-white/10 cursor-pointer bg-[#1a1a1a]"
+            className="h-[46px] w-[120px] rounded-xl overflow-hidden border border-border/70 cursor-pointer bg-card/80"
             onClick={refreshCaptcha}
             dangerouslySetInnerHTML={{ __html: captchaSvg }}
           />
@@ -83,10 +83,10 @@ export function Captcha({ onCaptchaChange }: CaptchaProps) {
             type="button"
             onClick={refreshCaptcha}
             disabled={loading}
-            className="p-3 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 transition-colors disabled:opacity-50"
+            className="p-3 bg-card/60 border border-border/70 rounded-xl hover:bg-card/80 transition-colors disabled:opacity-50"
             title="刷新验证码"
           >
-            <RefreshCw className={`w-5 h-5 text-white/50 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-5 h-5 text-foreground/60 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>

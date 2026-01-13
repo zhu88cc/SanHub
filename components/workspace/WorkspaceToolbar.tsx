@@ -36,7 +36,7 @@ export function WorkspaceToolbar({
           <input
             value={workspaceName}
             onChange={(e) => onNameChange(e.target.value)}
-            className="text-2xl font-light text-white bg-transparent border border-white/10 rounded-lg px-3 py-2 w-full max-w-md focus:outline-none focus:border-white/30"
+            className="text-2xl font-light text-foreground bg-transparent border border-border/70 rounded-lg px-3 py-2 w-full max-w-md focus:outline-none focus:border-border"
           />
         </div>
         <button
@@ -45,8 +45,8 @@ export function WorkspaceToolbar({
           className={cn(
             'inline-flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition shrink-0',
             dirty
-              ? 'bg-white text-black hover:bg-white/90'
-              : 'bg-white/10 text-white/40 cursor-not-allowed'
+              ? 'bg-foreground text-background hover:bg-foreground/90'
+              : 'bg-card/70 text-foreground/40 cursor-not-allowed'
           )}
         >
           {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
@@ -55,7 +55,7 @@ export function WorkspaceToolbar({
       </div>
 
       {/* Canvas toolbar */}
-      <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-white/10 text-white/60 text-sm">
+      <div className="flex items-center justify-between gap-3 px-4 py-3 border-b border-border/70 text-foreground/60 text-sm">
         <div className="flex items-center gap-3">
           <MousePointer2 className="w-4 h-4" />
           右键添加节点，拖拽布局，点击节点右侧圆点开始连线（Alt/Option + 滚轮缩放）
@@ -63,29 +63,29 @@ export function WorkspaceToolbar({
         <div className="flex items-center gap-2">
           <button
             onClick={onZoomOut}
-            className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-white/10 text-white/60 hover:text-white hover:border-white/40 transition"
+            className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-border/70 text-foreground/60 hover:text-foreground hover:border-border transition"
             title="缩小"
           >
             <ZoomOut className="w-4 h-4" />
           </button>
-          <div className="w-14 text-center text-xs text-white/50">{Math.round(zoom * 100)}%</div>
+          <div className="w-14 text-center text-xs text-foreground/50">{Math.round(zoom * 100)}%</div>
           <button
             onClick={onZoomIn}
-            className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-white/10 text-white/60 hover:text-white hover:border-white/40 transition"
+            className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-border/70 text-foreground/60 hover:text-foreground hover:border-border transition"
             title="放大"
           >
             <ZoomIn className="w-4 h-4" />
           </button>
           <button
             onClick={onZoomFit}
-            className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-white/10 text-white/60 hover:text-white hover:border-white/40 transition"
+            className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-border/70 text-foreground/60 hover:text-foreground hover:border-border transition"
             title="适配视图"
           >
             <Maximize2 className="w-4 h-4" />
           </button>
           <button
             onClick={onZoomReset}
-            className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-white/10 text-white/60 hover:text-white hover:border-white/40 transition"
+            className="h-8 w-8 inline-flex items-center justify-center rounded-lg border border-border/70 text-foreground/60 hover:text-foreground hover:border-border transition"
             title="还原缩放"
           >
             <RotateCcw className="w-4 h-4" />
@@ -95,3 +95,4 @@ export function WorkspaceToolbar({
     </>
   );
 }
+

@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth';
 import { getPendingGenerations } from '@/lib/db';
 import type { Generation } from '@/types';
 
+export const dynamic = 'force-dynamic';
+
 // 获取用户正在进行的任务
 export async function GET(request: NextRequest) {
   try {

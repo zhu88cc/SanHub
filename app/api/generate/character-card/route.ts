@@ -40,21 +40,23 @@ async function processCharacterCardTask(
     // 调试日志：打印完整返回结果
     console.log(`[Task ${cardId}] API 返回结果:`, JSON.stringify(result, null, 2));
 
-    // 解析 message 字段中的 JSON（获取 username）
-    let returnedUsername: string | undefined;
-    
-    if (result.data?.message) {
+    const directUsername = result.data?.username;
+    const directDisplayName = result.data?.display_name;
+    let returnedUsername = directUsername;
+    let returnedDisplayName = directDisplayName;
+
+    if (!returnedUsername && result.data?.message) {
       try {
         const messageData = JSON.parse(result.data.message);
         returnedUsername = messageData.username;
+        returnedDisplayName = messageData.display_name;
         console.log(`[Task ${cardId}] 从 message 解析: username=${returnedUsername}`);
       } catch (e) {
         console.error(`[Task ${cardId}] 解析 message 失败:`, e);
       }
     }
 
-    // 只使用 username 作为角色名
-    const characterName = returnedUsername || '未命名角色';
+    const characterName = returnedUsername || returnedDisplayName || '未命名角色';
 
     console.log(`[Task ${cardId}] 角色卡创建成功: ${characterName}`);
 

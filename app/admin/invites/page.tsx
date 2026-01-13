@@ -82,7 +82,7 @@ export default function InvitesPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
-        <Loader2 className="w-8 h-8 animate-spin text-white/30" />
+        <Loader2 className="w-8 h-8 animate-spin text-foreground/30" />
       </div>
     );
   }
@@ -91,22 +91,22 @@ export default function InvitesPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-light text-white">邀请码管理</h1>
-          <p className="text-white/50 mt-1">创建和管理用户邀请码</p>
+          <h1 className="text-3xl font-light text-foreground">邀请码管理</h1>
+          <p className="text-foreground/50 mt-1">创建和管理用户邀请码</p>
         </div>
         <div className="flex items-center gap-3">
-          <label className="flex items-center gap-2 text-sm text-white/60">
+          <label className="flex items-center gap-2 text-sm text-foreground/60">
             <input
               type="checkbox"
               checked={showUsed}
               onChange={(e) => setShowUsed(e.target.checked)}
-              className="rounded border-white/20"
+              className="rounded border-border/70"
             />
             显示已使用
           </label>
           <button
             onClick={() => setShowCreate(true)}
-            className="flex items-center gap-2 px-4 py-2 bg-white text-black rounded-xl hover:bg-white/90 transition-all"
+            className="flex items-center gap-2 px-4 py-2 bg-foreground text-background rounded-xl hover:bg-foreground/90 transition-all"
           >
             <Plus className="w-4 h-4" />
             创建邀请码
@@ -115,29 +115,29 @@ export default function InvitesPage() {
       </div>
 
       {showCreate && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-zinc-900 border border-white/10 rounded-2xl p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold text-white mb-4">创建邀请码</h2>
+        <div className="fixed inset-0 bg-background/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-card/95 border border-border/70 rounded-2xl p-6 w-full max-w-md">
+            <h2 className="text-xl font-semibold text-foreground mb-4">创建邀请码</h2>
             
             <div className="space-y-4">
               <div>
-                <label className="block text-sm text-white/60 mb-2">被邀请人奖励积分</label>
+                <label className="block text-sm text-foreground/60 mb-2">被邀请人奖励积分</label>
                 <input
                   type="number"
                   value={bonusPoints}
                   onChange={(e) => setBonusPoints(Math.max(0, Number(e.target.value)))}
                   min={0}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-white/20"
+                  className="w-full px-4 py-3 bg-card/60 border border-border/70 rounded-xl text-foreground focus:outline-none focus:border-border/70"
                 />
               </div>
               <div>
-                <label className="block text-sm text-white/60 mb-2">邀请人奖励积分</label>
+                <label className="block text-sm text-foreground/60 mb-2">邀请人奖励积分</label>
                 <input
                   type="number"
                   value={creatorBonus}
                   onChange={(e) => setCreatorBonus(Math.max(0, Number(e.target.value)))}
                   min={0}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:outline-none focus:border-white/20"
+                  className="w-full px-4 py-3 bg-card/60 border border-border/70 rounded-xl text-foreground focus:outline-none focus:border-border/70"
                 />
               </div>
             </div>
@@ -145,14 +145,14 @@ export default function InvitesPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowCreate(false)}
-                className="flex-1 py-3 bg-white/5 border border-white/10 text-white rounded-xl hover:bg-white/10 transition-all"
+                className="flex-1 py-3 bg-card/60 border border-border/70 text-foreground rounded-xl hover:bg-card/70 transition-all"
               >
                 取消
               </button>
               <button
                 onClick={handleCreate}
                 disabled={creating}
-                className="flex-1 py-3 bg-white text-black rounded-xl hover:bg-white/90 disabled:opacity-50 transition-all"
+                className="flex-1 py-3 bg-foreground text-background rounded-xl hover:bg-foreground/90 disabled:opacity-50 transition-all"
               >
                 {creating ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : '创建'}
               </button>
@@ -161,24 +161,24 @@ export default function InvitesPage() {
         </div>
       )}
 
-      <div className="bg-white/[0.03] border border-white/10 rounded-2xl overflow-hidden">
+      <div className="bg-card/60 border border-border/70 rounded-2xl overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-white/10">
-                <th className="text-left text-sm font-medium text-white/50 px-5 py-4">邀请码</th>
-                <th className="text-right text-sm font-medium text-white/50 px-5 py-4">被邀请人奖励</th>
-                <th className="text-right text-sm font-medium text-white/50 px-5 py-4">邀请人奖励</th>
-                <th className="text-center text-sm font-medium text-white/50 px-5 py-4">状态</th>
-                <th className="text-right text-sm font-medium text-white/50 px-5 py-4">创建时间</th>
-                <th className="text-right text-sm font-medium text-white/50 px-5 py-4">操作</th>
+              <tr className="border-b border-border/70">
+                <th className="text-left text-sm font-medium text-foreground/50 px-5 py-4">邀请码</th>
+                <th className="text-right text-sm font-medium text-foreground/50 px-5 py-4">被邀请人奖励</th>
+                <th className="text-right text-sm font-medium text-foreground/50 px-5 py-4">邀请人奖励</th>
+                <th className="text-center text-sm font-medium text-foreground/50 px-5 py-4">状态</th>
+                <th className="text-right text-sm font-medium text-foreground/50 px-5 py-4">创建时间</th>
+                <th className="text-right text-sm font-medium text-foreground/50 px-5 py-4">操作</th>
               </tr>
             </thead>
             <tbody>
               {codes.map((code) => (
-                <tr key={code.id} className="border-b border-white/5 hover:bg-white/[0.02]">
+                <tr key={code.id} className="border-b border-border/70 hover:bg-card/60">
                   <td className="px-5 py-4">
-                    <code className="font-mono text-white bg-white/5 px-2 py-1 rounded">
+                    <code className="font-mono text-foreground bg-card/60 px-2 py-1 rounded">
                       {code.code}
                     </code>
                   </td>
@@ -186,7 +186,7 @@ export default function InvitesPage() {
                   <td className="px-5 py-4 text-right text-blue-400">+{code.creatorBonus}</td>
                   <td className="px-5 py-4 text-center">
                     {code.usedBy ? (
-                      <span className="px-2 py-1 text-xs rounded-full bg-white/10 text-white/50">
+                      <span className="px-2 py-1 text-xs rounded-full bg-card/70 text-foreground/50">
                         已使用
                       </span>
                     ) : (
@@ -195,14 +195,14 @@ export default function InvitesPage() {
                       </span>
                     )}
                   </td>
-                  <td className="px-5 py-4 text-right text-white/50 text-sm">
+                  <td className="px-5 py-4 text-right text-foreground/50 text-sm">
                     {formatDate(code.createdAt)}
                   </td>
                   <td className="px-5 py-4 text-right">
                     <div className="flex items-center justify-end gap-2">
                       <button
                         onClick={() => copyCode(code.code, code.id)}
-                        className="p-2 text-white/40 hover:text-white hover:bg-white/10 rounded-lg transition-all"
+                        className="p-2 text-foreground/40 hover:text-foreground hover:bg-card/70 rounded-lg transition-all"
                       >
                         {copiedId === code.id ? (
                           <Check className="w-4 h-4 text-green-400" />
@@ -227,7 +227,7 @@ export default function InvitesPage() {
         </div>
 
         {codes.length === 0 && (
-          <div className="text-center py-12 text-white/40">
+          <div className="text-center py-12 text-foreground/40">
             <UserPlus className="w-10 h-10 mx-auto mb-3 opacity-30" />
             <p>暂无邀请码</p>
           </div>
@@ -236,3 +236,4 @@ export default function InvitesPage() {
     </div>
   );
 }
+

@@ -102,7 +102,7 @@ export function AnimatedBackground({ variant = 'home' }: AnimatedBackgroundProps
         if (particle.y > window.innerHeight) particle.y = 0;
 
         ctx.globalAlpha = particle.opacity;
-        ctx.fillStyle = 'rgba(255, 255, 255, 1)';
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.75)';
         ctx.beginPath();
         ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
         ctx.fill();
@@ -139,54 +139,42 @@ export function AnimatedBackground({ variant = 'home' }: AnimatedBackgroundProps
 
   return (
     <div className="fixed inset-0 overflow-hidden pointer-events-none">
-      {/* 基础渐变 */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black via-zinc-950 to-black" />
-
-      {/* 网格图案 */}
-      <div 
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage: `
-            linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)
-          `,
-          backgroundSize: '100px 100px',
-        }}
-      />
+      {/* Base gradient */}
+      <div className="absolute inset-0 bg-gradient-to-b from-background/95 via-background/70 to-background/95" />
 
       {/* 渐变球 - 有动画或静态 */}
       {!prefersReducedMotion ? (
         <>
-          {/* 动态渐变球 1 - 紫色 */}
+          {/* Glow A */}
           <div 
             className="absolute w-[500px] h-[500px] rounded-full opacity-25 blur-[100px] animate-blob"
             style={{
               ...blobStyle,
-              background: 'radial-gradient(circle, rgba(147, 51, 234, 0.4) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, hsl(var(--glow-a) / 0.35) 0%, transparent 70%)',
               top: variant === 'home' ? '10%' : '20%',
               left: variant === 'home' ? '10%' : '-10%',
               animationDelay: '0s',
             }}
           />
 
-          {/* 动态渐变球 2 - 蓝色 */}
+          {/* Glow B */}
           <div 
             className="absolute w-[400px] h-[400px] rounded-full opacity-20 blur-[80px] animate-blob"
             style={{
               ...blobStyle,
-              background: 'radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, hsl(var(--glow-b) / 0.35) 0%, transparent 70%)',
               top: variant === 'home' ? '50%' : '60%',
               right: variant === 'home' ? '5%' : '-5%',
               animationDelay: '2s',
             }}
           />
 
-          {/* 动态渐变球 3 - 粉色 */}
+          {/* Soft neutral glow */}
           <div 
             className="absolute w-[350px] h-[350px] rounded-full opacity-15 blur-[70px] animate-blob"
             style={{
               ...blobStyle,
-              background: 'radial-gradient(circle, rgba(236, 72, 153, 0.3) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(255, 255, 255, 0.16) 0%, transparent 70%)',
               bottom: variant === 'home' ? '10%' : '5%',
               left: variant === 'home' ? '30%' : '60%',
               animationDelay: '4s',
@@ -195,11 +183,11 @@ export function AnimatedBackground({ variant = 'home' }: AnimatedBackgroundProps
         </>
       ) : (
         <>
-          {/* 静态渐变球 - 减少动画模式 */}
+          {/* Static glows */}
           <div 
             className="absolute w-[500px] h-[500px] rounded-full opacity-20 blur-[100px]"
             style={{
-              background: 'radial-gradient(circle, rgba(147, 51, 234, 0.4) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, hsl(var(--glow-a) / 0.35) 0%, transparent 70%)',
               top: variant === 'home' ? '10%' : '20%',
               left: variant === 'home' ? '10%' : '-10%',
             }}
@@ -207,7 +195,7 @@ export function AnimatedBackground({ variant = 'home' }: AnimatedBackgroundProps
           <div 
             className="absolute w-[400px] h-[400px] rounded-full opacity-15 blur-[80px]"
             style={{
-              background: 'radial-gradient(circle, rgba(59, 130, 246, 0.4) 0%, transparent 70%)',
+              background: 'radial-gradient(circle, hsl(var(--glow-b) / 0.35) 0%, transparent 70%)',
               top: variant === 'home' ? '50%' : '60%',
               right: variant === 'home' ? '5%' : '-5%',
             }}
@@ -223,24 +211,16 @@ export function AnimatedBackground({ variant = 'home' }: AnimatedBackgroundProps
         />
       )}
 
-      {/* 顶部光晕 */}
+      {/* Top halo */}
       <div 
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-20"
         style={{
-          background: 'radial-gradient(ellipse at center top, rgba(255,255,255,0.15) 0%, transparent 60%)',
+          background: 'radial-gradient(ellipse at center top, rgba(255,255,255,0.18) 0%, transparent 60%)',
         }}
       />
 
-      {/* 底部渐变遮罩 */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-black to-transparent" />
-
-      {/* 噪点纹理 */}
-      <div 
-        className="absolute inset-0 opacity-[0.015]"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E")`,
-        }}
-      />
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
     </div>
   );
 }

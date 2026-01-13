@@ -61,27 +61,27 @@ export default function SquarePage() {
     <div className="max-w-2xl mx-auto space-y-8 pt-10">
       {/* Header */}
       <div className="text-center space-y-2">
-        <h1 className="text-3xl font-extralight text-white">搜索用户</h1>
-        <p className="text-white/50 font-light">
+        <h1 className="text-3xl font-extralight text-foreground">搜索用户</h1>
+        <p className="text-foreground/50 font-light">
           搜索 Sora 创作者，查看他们的作品
         </p>
       </div>
 
       {/* Search */}
       <form onSubmit={handleSearch} className="relative">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/40" />
+        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-foreground/40" />
         <input
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="输入用户名..."
-          className="w-full pl-12 pr-24 py-4 bg-white/5 border border-white/10 text-white rounded-2xl focus:outline-none focus:border-white/30 placeholder:text-white/30 text-lg"
+          className="w-full pl-12 pr-24 py-4 bg-card/60 border border-border/70 text-foreground rounded-2xl focus:outline-none focus:border-border placeholder:text-foreground/30 text-lg"
           autoFocus
         />
         <button
           type="submit"
           disabled={!searchQuery.trim() || loading}
-          className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-white text-black rounded-xl font-medium text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-white/90 transition-colors"
+          className="absolute right-2 top-1/2 -translate-y-1/2 px-6 py-2 bg-foreground text-background rounded-xl font-medium text-sm disabled:opacity-30 disabled:cursor-not-allowed hover:bg-foreground/90 transition-colors"
         >
           {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : '搜索'}
         </button>
@@ -99,33 +99,33 @@ export default function SquarePage() {
         <div className="space-y-3">
           {results.length > 0 ? (
             <>
-              <p className="text-white/50 text-sm">找到 {results.length} 个用户</p>
+              <p className="text-foreground/50 text-sm">找到 {results.length} 个用户</p>
               <div className="space-y-2">
                 {results.map((user) => (
                   <button
                     key={user.user_id}
                     onClick={() => handleUserClick(user.username)}
-                    className="w-full flex items-center gap-4 p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-white/20 transition-all text-left"
+                    className="w-full flex items-center gap-4 p-4 bg-card/60 border border-border/70 rounded-xl hover:bg-card/70 hover:border-border/70 transition-all text-left"
                   >
                     {user.profile_picture_url ? (
                       <img
                         src={user.profile_picture_url}
                         alt=""
-                        className="w-12 h-12 rounded-full object-cover bg-white/10"
+                        className="w-12 h-12 rounded-full object-cover bg-card/70"
                       />
                     ) : (
-                      <div className="w-12 h-12 rounded-full bg-white/10 flex items-center justify-center">
-                        <User className="w-6 h-6 text-white/50" />
+                      <div className="w-12 h-12 rounded-full bg-card/70 flex items-center justify-center">
+                        <User className="w-6 h-6 text-foreground/50" />
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-white font-medium truncate">
+                      <p className="text-foreground font-medium truncate">
                         {user.display_name || user.username}
                       </p>
-                      <p className="text-white/50 text-sm">@{user.username}</p>
+                      <p className="text-foreground/50 text-sm">@{user.username}</p>
                     </div>
                     {user.can_cameo && (
-                      <span className="px-2 py-1 bg-purple-500/20 text-purple-300 text-xs rounded-lg">
+                      <span className="px-2 py-1 bg-sky-500/20 text-sky-300 text-xs rounded-lg">
                         角色
                       </span>
                     )}
@@ -135,10 +135,10 @@ export default function SquarePage() {
             </>
           ) : (
             <div className="flex flex-col items-center gap-4 py-8">
-              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
-                <User className="w-8 h-8 text-white/20" />
+              <div className="w-16 h-16 rounded-full bg-card/60 flex items-center justify-center">
+                <User className="w-8 h-8 text-foreground/30" />
               </div>
-              <p className="text-white/40 text-sm">未找到匹配的用户</p>
+              <p className="text-foreground/40 text-sm">未找到匹配的用户</p>
             </div>
           )}
         </div>
@@ -147,10 +147,10 @@ export default function SquarePage() {
       {/* Initial State */}
       {!searched && !loading && (
         <div className="flex flex-col items-center gap-4 pt-8">
-          <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center">
-            <User className="w-8 h-8 text-white/30" />
+          <div className="w-16 h-16 rounded-full bg-card/60 flex items-center justify-center">
+            <User className="w-8 h-8 text-foreground/30" />
           </div>
-          <p className="text-white/30 text-sm text-center">
+          <p className="text-foreground/30 text-sm text-center">
             输入用户名搜索 Sora 创作者
           </p>
         </div>
@@ -158,3 +158,4 @@ export default function SquarePage() {
     </div>
   );
 }
+

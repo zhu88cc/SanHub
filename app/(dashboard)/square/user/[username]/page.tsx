@@ -79,7 +79,7 @@ const FeedCard = memo(function FeedCard({ item, onVideoClick }: FeedCardProps) {
     : 9 / 16;
 
   return (
-    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-all group">
+    <div className="bg-card/60 border border-border/70 rounded-xl overflow-hidden hover:border-border/70 transition-all group">
       {/* Media */}
       <div className="relative" style={{ aspectRatio }}>
         <button
@@ -88,7 +88,7 @@ const FeedCard = memo(function FeedCard({ item, onVideoClick }: FeedCardProps) {
         >
           {/* Skeleton */}
           {!imageLoaded && !imageError && (
-            <div className="absolute inset-0 bg-white/5 animate-pulse" />
+            <div className="absolute inset-0 bg-card/60 animate-pulse" />
           )}
           
           {/* Image */}
@@ -105,21 +105,21 @@ const FeedCard = memo(function FeedCard({ item, onVideoClick }: FeedCardProps) {
               onError={() => setImageError(true)}
             />
           ) : (
-            <div className="w-full h-full bg-white/5 flex items-center justify-center">
-              <Play className="w-8 h-8 text-white/20" />
+            <div className="w-full h-full bg-card/60 flex items-center justify-center">
+              <Play className="w-8 h-8 text-foreground/30" />
             </div>
           )}
           
           {/* Hover overlay */}
-          <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-            <div className="w-14 h-14 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-              <Play className="w-7 h-7 text-white ml-1" fill="currentColor" />
+          <div className="absolute inset-0 flex items-center justify-center bg-background/70 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+            <div className="w-14 h-14 rounded-full bg-card/80 backdrop-blur-sm flex items-center justify-center">
+              <Play className="w-7 h-7 text-foreground ml-1" fill="currentColor" />
             </div>
           </div>
           
           {/* Duration badge */}
           {item.attachment?.duration_seconds && (
-            <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-black/70 backdrop-blur-sm rounded text-xs text-white font-medium">
+            <div className="absolute bottom-2 right-2 px-1.5 py-0.5 bg-background/70 backdrop-blur-sm rounded text-xs text-foreground font-medium">
               {Math.floor(item.attachment.duration_seconds)}s
             </div>
           )}
@@ -130,11 +130,11 @@ const FeedCard = memo(function FeedCard({ item, onVideoClick }: FeedCardProps) {
       <div className="p-3 space-y-2">
         {/* Text */}
         {item.text && (
-          <p className="text-sm text-white/80 line-clamp-2 leading-relaxed">{item.text}</p>
+          <p className="text-sm text-foreground/80 line-clamp-2 leading-relaxed">{item.text}</p>
         )}
 
         {/* Stats */}
-        <div className="flex items-center gap-3 text-xs text-white/40">
+        <div className="flex items-center gap-3 text-xs text-foreground/40">
           <span className="flex items-center gap-1">
             <Heart className="w-3 h-3" />
             {formatNumber(item.like_count)}
@@ -267,7 +267,7 @@ export default function UserProfilePage() {
       {/* Back Button */}
       <button
         onClick={() => router.push('/square')}
-        className="flex items-center gap-2 text-white/60 hover:text-white transition-colors"
+        className="flex items-center gap-2 text-foreground/60 hover:text-foreground transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         <span className="text-sm">返回广场</span>
@@ -276,7 +276,7 @@ export default function UserProfilePage() {
       {/* Loading */}
       {loading && (
         <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-8 h-8 animate-spin text-white/30" />
+          <Loader2 className="w-8 h-8 animate-spin text-foreground/30" />
         </div>
       )}
 
@@ -289,7 +289,7 @@ export default function UserProfilePage() {
 
       {/* Profile Header */}
       {!loading && profile && (
-        <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
+        <div className="bg-card/60 border border-border/70 rounded-2xl p-6">
           <div className="flex items-center gap-6">
             {/* Avatar */}
             {profile.profile_picture_url ? (
@@ -299,19 +299,19 @@ export default function UserProfilePage() {
                 className="w-20 h-20 rounded-2xl object-cover"
               />
             ) : (
-              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500/20 to-pink-500/20 flex items-center justify-center">
-                <User className="w-10 h-10 text-white/30" />
+              <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-sky-500/20 to-emerald-500/20 flex items-center justify-center">
+                <User className="w-10 h-10 text-foreground/30" />
               </div>
             )}
 
             {/* Info */}
             <div className="flex-1">
-              <h1 className="text-2xl font-light text-white">
+              <h1 className="text-2xl font-light text-foreground">
                 {profile.display_name || profile.username}
               </h1>
-              <p className="text-white/50 text-sm">@{profile.username}</p>
+              <p className="text-foreground/50 text-sm">@{profile.username}</p>
               <div className="flex items-center gap-4 mt-2">
-                <span className="flex items-center gap-1.5 text-sm text-white/60">
+                <span className="flex items-center gap-1.5 text-sm text-foreground/60">
                   <Users className="w-4 h-4" />
                   {formatNumber(profile.follower_count)} 粉丝
                 </span>
@@ -322,7 +322,7 @@ export default function UserProfilePage() {
             <button
               onClick={() => loadProfile()}
               disabled={loading}
-              className="p-2 text-white/50 hover:text-white/80 transition-colors"
+              className="p-2 text-foreground/50 hover:text-foreground/80 transition-colors"
             >
               <RefreshCw className={cn('w-5 h-5', loading && 'animate-spin')} />
             </button>
@@ -333,7 +333,7 @@ export default function UserProfilePage() {
       {/* Content Grid - 使用 CSS columns 实现瀑布流 */}
       {!loading && items.length > 0 && (
         <div>
-          <h2 className="text-lg font-light text-white mb-4">作品</h2>
+          <h2 className="text-lg font-light text-foreground mb-4">作品</h2>
           <div 
             className="columns-1 sm:columns-2 lg:columns-3 xl:columns-4 gap-4"
             style={{ columnFill: 'balance' }}
@@ -352,9 +352,9 @@ export default function UserProfilePage() {
 
       {/* Empty */}
       {!loading && items.length === 0 && profile && (
-        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-white/20 rounded-xl">
-          <Play className="w-12 h-12 text-white/20 mb-3" />
-          <p className="text-white/40">该用户暂无作品</p>
+        <div className="flex flex-col items-center justify-center py-20 border border-dashed border-border/70 rounded-xl">
+          <Play className="w-12 h-12 text-foreground/30 mb-3" />
+          <p className="text-foreground/40">该用户暂无作品</p>
         </div>
       )}
 
@@ -362,22 +362,22 @@ export default function UserProfilePage() {
       <div ref={loadMoreRef} className="py-4">
         {loadingMore && (
           <div className="flex items-center justify-center">
-            <Loader2 className="w-6 h-6 animate-spin text-white/30" />
+            <Loader2 className="w-6 h-6 animate-spin text-foreground/30" />
           </div>
         )}
         {!hasMore && items.length > 0 && (
-          <p className="text-center text-white/30 text-sm">没有更多了</p>
+          <p className="text-center text-foreground/30 text-sm">没有更多了</p>
         )}
       </div>
 
       {/* Video Player Modal */}
       {selectedVideo && (
         <div 
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/80 backdrop-blur-sm"
           onClick={() => setSelectedVideo(null)}
         >
           <div 
-            className="relative w-full max-w-4xl max-h-[90vh] bg-zinc-900 border border-white/10 rounded-2xl overflow-hidden"
+            className="relative w-full max-w-4xl max-h-[90vh] bg-card/95 border border-border/70 rounded-2xl overflow-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
@@ -392,13 +392,13 @@ export default function UserProfilePage() {
                         className="w-8 h-8 rounded-full object-cover"
                       />
                     ) : (
-                      <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                        <User className="w-4 h-4 text-white/50" />
+                      <div className="w-8 h-8 rounded-full bg-card/70 flex items-center justify-center">
+                        <User className="w-4 h-4 text-foreground/50" />
                       </div>
                     )}
                     <div className="text-left">
-                      <p className="text-sm font-medium text-white">{profile.display_name}</p>
-                      <p className="text-xs text-white/50">@{profile.username}</p>
+                      <p className="text-sm font-medium text-foreground">{profile.display_name}</p>
+                      <p className="text-xs text-foreground/50">@{profile.username}</p>
                     </div>
                   </div>
                 )}
@@ -407,22 +407,22 @@ export default function UserProfilePage() {
                 <button
                   type="button"
                   onClick={handleDownload}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                  className="p-2 rounded-lg bg-card/70 hover:bg-card/80 transition-colors"
                   title="下载视频"
                 >
-                  <Download className="w-5 h-5 text-white" />
+                  <Download className="w-5 h-5 text-foreground" />
                 </button>
                 <button
                   onClick={() => setSelectedVideo(null)}
-                  className="p-2 rounded-lg bg-white/10 hover:bg-white/20 transition-colors"
+                  className="p-2 rounded-lg bg-card/70 hover:bg-card/80 transition-colors"
                 >
-                  <X className="w-5 h-5 text-white" />
+                  <X className="w-5 h-5 text-foreground" />
                 </button>
               </div>
             </div>
 
             {/* Video */}
-            <div className="flex items-center justify-center bg-black">
+            <div className="flex items-center justify-center bg-card/80">
               <video
                 src={selectedVideo.attachment.downloadable_url}
                 controls
@@ -436,9 +436,9 @@ export default function UserProfilePage() {
             </div>
 
             {/* Footer */}
-            <div className="p-4 bg-zinc-900 border-t border-white/10">
-              <p className="text-sm text-white/80 mb-3">{selectedVideo.text}</p>
-              <div className="flex items-center gap-4 text-xs text-white/40">
+            <div className="p-4 bg-card/95 border-t border-border/70">
+              <p className="text-sm text-foreground/80 mb-3">{selectedVideo.text}</p>
+              <div className="flex items-center gap-4 text-xs text-foreground/40">
                 <span className="flex items-center gap-1">
                   <Heart className="w-3.5 h-3.5" />
                   {formatNumber(selectedVideo.like_count)}
@@ -455,7 +455,7 @@ export default function UserProfilePage() {
                   href={selectedVideo.permalink}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-auto text-white/50 hover:text-white/80 transition-colors"
+                  className="ml-auto text-foreground/50 hover:text-foreground/80 transition-colors"
                 >
                   在 Sora 中打开 →
                 </a>

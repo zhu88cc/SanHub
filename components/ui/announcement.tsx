@@ -46,21 +46,21 @@ export function AnnouncementBanner() {
   if (!announcement || dismissed) return null;
 
   return (
-    <div className="bg-gradient-to-r from-yellow-500/10 to-orange-500/10 border border-yellow-500/20 rounded-xl p-4 mb-6">
+    <div className="bg-gradient-to-r from-sky-500/10 to-emerald-500/10 border border-border/70 rounded-2xl p-4 mb-6">
       <div className="flex items-start gap-3">
-        <div className="w-8 h-8 bg-yellow-500/20 rounded-lg flex items-center justify-center shrink-0">
-          <Megaphone className="w-4 h-4 text-yellow-400" />
+        <div className="w-8 h-8 bg-sky-500/15 rounded-lg flex items-center justify-center shrink-0">
+          <Megaphone className="w-4 h-4 text-sky-300" />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-white mb-1">{announcement.title}</h3>
+          <h3 className="font-medium text-foreground mb-1">{announcement.title}</h3>
           <div
-            className="text-sm text-white/70 prose prose-invert prose-sm max-w-none"
+            className="text-sm text-foreground/70 prose prose-invert prose-sm max-w-none"
             dangerouslySetInnerHTML={{ __html: announcement.content }}
           />
         </div>
         <button
           onClick={handleDismiss}
-          className="p-1 text-white/40 hover:text-white/70 transition-colors shrink-0"
+          className="p-1 text-foreground/40 hover:text-foreground/70 transition-colors shrink-0"
         >
           <X className="w-4 h-4" />
         </button>
