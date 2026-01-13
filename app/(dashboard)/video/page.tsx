@@ -413,7 +413,7 @@ export default function VideoGenerationPage() {
 
       await poll();
     },
-    [update]
+    []
   );
 
   // 加载 pending 任务
