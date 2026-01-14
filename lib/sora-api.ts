@@ -424,6 +424,16 @@ async function pollVideoCompletion(
   let lastProgress = -1;
   let stallCount = 0;
   const maxStallCount = 60; // 最大停滞次数（约10分钟）
+  let failedCount = 0;
+  const maxFailedCount = 3;
+  const failedRetryDelayMs = 5000;
+  const retryableFailedPatterns = ['stale in_progress timeout', 'stale in progress timeout'];
+
+  const isRetryableFailedError = (message?: string | null): boolean => {
+    if (!message) return false;
+    const lower = message.toLowerCase();
+    return retryableFailedPatterns.some(pattern => lower.includes(pattern));
+  };
   
   while (true) {
     const status = await getVideoStatus(videoId, channelId);
@@ -455,7 +465,21 @@ async function pollVideoCompletion(
     }
 
     if (status.status === 'failed') {
-      throw new Error(status.error?.message || '视频生成失败');
+      failedCount += 1;
+      const errorMessage = status.error?.message || '视频生成失败';
+      if (!isRetryableFailedError(status.error?.message)) {
+        throw new Error(errorMessage);
+      }
+      if (failedCount >= maxFailedCount) {
+        throw new Error(errorMessage);
+      }
+      console.warn(
+        `[Sora API v5] Status failed (${failedCount}/${maxFailedCount}), retrying after ${failedRetryDelayMs}ms: ${errorMessage}`
+      );
+      await new Promise(resolve => setTimeout(resolve, failedRetryDelayMs));
+      continue;
+    } else {
+      failedCount = 0;
     }
     
     // 检测停滞
