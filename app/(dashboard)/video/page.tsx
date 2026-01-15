@@ -727,8 +727,8 @@ export default function VideoGenerationPage() {
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[400px_minmax(0,1fr)] gap-6">
-        <div>
+      <div className="grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] xl:grid-cols-[400px_minmax(0,1fr)] gap-6 items-start">
+        <div className="lg:sticky lg:top-20 self-start">
           <div className={cn(
             "surface overflow-hidden backdrop-blur-sm",
             (availableModels.length === 0 || isVideoLimitReached) && "opacity-50 pointer-events-none"
