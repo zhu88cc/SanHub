@@ -457,6 +457,7 @@ export default function VideoGenerationPage() {
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFiles = Array.from(e.target.files || []);
     const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB limit
+    const PREVIEW_THRESHOLD = 5 * 1024 * 1024; // 5MB: use thumbnail for preview
     
     for (const file of selectedFiles) {
       // Only allow images, no videos
@@ -479,13 +480,73 @@ export default function VideoGenerationPage() {
         continue;
       }
       
-      const data = await fileToBase64(file);
-      setFiles((prev) => [
-        ...prev,
-        { data, mimeType: file.type, preview: URL.createObjectURL(file) },
-      ]);
+      try {
+        // Keep original data for upload
+        const data = await fileToBase64(file);
+        
+        // For large files, generate a small thumbnail for preview only
+        let previewUrl: string;
+        if (file.size > PREVIEW_THRESHOLD) {
+          previewUrl = await generateThumbnail(file, 400);
+        } else {
+          previewUrl = URL.createObjectURL(file);
+        }
+        
+        setFiles((prev) => [
+          ...prev,
+          { data, mimeType: file.type, preview: previewUrl },
+        ]);
+      } catch (err) {
+        console.error('Failed to process image:', err);
+        toast({
+          title: '图片处理失败',
+          description: '请尝试使用较小的图片',
+          variant: 'destructive',
+        });
+      }
     }
     e.target.value = '';
+  };
+  
+  // Generate small thumbnail for preview only (original data unchanged)
+  const generateThumbnail = (file: File, maxSize: number): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+      
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+        
+        let { width, height } = img;
+        if (width > height) {
+          height = Math.round((height * maxSize) / width);
+          width = maxSize;
+        } else {
+          width = Math.round((width * maxSize) / height);
+          height = maxSize;
+        }
+        
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('Failed to get canvas context'));
+          return;
+        }
+        
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', 0.7));
+      };
+      
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Failed to load image'));
+      };
+      
+      img.src = url;
+    });
   };
 
   const clearFiles = () => {
