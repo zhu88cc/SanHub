@@ -425,7 +425,7 @@ export default function VideoGenerationPage() {
         if (res.ok) {
           const data = await res.json();
           const videoTasks: Task[] = (data.data || [])
-            .filter((t: any) => t.type?.includes('video') || t.type?.includes('sora'))
+            .filter((t: any) => t.type === 'sora-video' || t.type === 'video')
             .map((t: any) => ({
               id: t.id,
               prompt: t.prompt,

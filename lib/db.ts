@@ -3008,7 +3008,7 @@ export async function getSafeVideoModels(enabledOnly = false): Promise<SafeVideo
   const channels = await getVideoChannels();
   const channelMap = new Map(channels.map((c) => [c.id, c]));
 
-  return models
+  const allModels = models
     .filter((m) => {
       const channel = channelMap.get(m.channelId);
       return channel && (!enabledOnly || channel.enabled);
@@ -3030,6 +3030,14 @@ export async function getSafeVideoModels(enabledOnly = false): Promise<SafeVideo
         enabled: m.enabled,
       };
     });
+
+  // Deduplicate by model name - keep only the first occurrence
+  const seen = new Set<string>();
+  return allModels.filter((m) => {
+    if (seen.has(m.name)) return false;
+    seen.add(m.name);
+    return true;
+  });
 }
 
 // 获取视频模型的完整配置
