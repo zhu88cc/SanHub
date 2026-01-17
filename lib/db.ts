@@ -1526,15 +1526,22 @@ async function initializeAdmin(): Promise<void> {
   );
 
   if ((existing as unknown[]).length === 0) {
-    const hashedPassword = await bcrypt.hash(adminPassword, 10);
-    const now = Date.now();
+    try {
+      const hashedPassword = await bcrypt.hash(adminPassword, 10);
+      const now = Date.now();
 
-    await db.execute(
-      `INSERT INTO users (id, email, password, name, role, balance, created_at, updated_at)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [generateId(), adminEmail, hashedPassword, 'Admin', 'admin', 999999, now, now]
-    );
-    console.log('Admin account created:', adminEmail);
+      await db.execute(
+        `INSERT INTO users (id, email, password, name, role, balance, created_at, updated_at)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+        [generateId(), adminEmail, hashedPassword, 'Admin', 'admin', 999999, now, now]
+      );
+      console.log('Admin account created:', adminEmail);
+    } catch (error: any) {
+      // 忽略唯一约束错误（用户可能已被其他进程创建）
+      if (!error.message.includes('UNIQUE constraint failed')) {
+        throw error;
+      }
+    }
   }
 }
 
